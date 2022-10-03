@@ -10,7 +10,7 @@ locale                   : "en-US"
 title                    : "Jake Taylor"
 title_separator          : "-"
 name                     : &name "Jake Taylor"
-description              : &description "Postdoctoral Researcher at the University of Montreal"
+description              : &description "Postdoctoral Researcher at the University of Oxford"
 url                      : https://astrojt.github.io # the base hostname & protocol for your site e.g. "https://mmistakes.github.io"
 baseurl                  : "" # the subpath of your site, e.g. "/blog"
 repository               : "astrojt/astrojt.github.io"
@@ -82,12 +82,12 @@ analytics:
 author:
   name             : 
   avatar           : "me.jpg"
-  bio              : "Postdoctoral Researcher at the University of Montreal"
-  location         : "Montreal, Canada"
+  bio              : "Postdoctoral Researcher at the University of Oxford"
+  location         : "Oxford,UK"
   employer         :
   pubmed           : 
   googlescholar    : 
-  email            : "jake.taylor@umontreal.ca"
+  email            : "jake.taylor@physics.ox.ac.uk"
   researchgate     :  # example: "https://www.researchgate.net/profile/yourprofile"
   uri              :
   bitbucket        :
