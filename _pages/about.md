@@ -8,7 +8,7 @@ redirect_from:
   - /about.html
 ---
 
-I'm a postdoctoral research fellow at the University of Montreal, my role involves performing retrieval analysis of exoplanet atmospheres. For more information click <a href="http://www.exoplanetes.umontreal.ca/our-team/researchers/jake-taylor/?lang=en">here</a> for my university profile. 
+I'm a postdoctoral research fellow at the University of Montreal, my role involves performing retrieval analysis of exoplanet atmospheres. For more information <a href="https://www.physics.ox.ac.uk/our-people/jaketaylor">here</a> for my university profile or <a href="https://www.physics.ox.ac.uk/news/meetjake-taylor">here</a> for a story that Oxford Physics wrote about me. 
 
 ![Image of me at NASA JPL](/images/JPL.jpg)
 
