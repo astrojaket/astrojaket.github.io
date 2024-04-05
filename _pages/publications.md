@@ -5,6 +5,7 @@ permalink: /publications/
 author_profile: true
 ---
 
+Click <a href="https://ui.adsabs.harvard.edu/search/q=orcid%3A0000-0003-4844-9838&sort=date+desc">here</a> for my publications as listed on NASA ADS. 
 ## Lead author publications:
 
 **Taylor J.**, Parmentier V., Line. R. M., Lee E. K., Irwin P. G. & Aigrain S. (2020) <a href="https://ui.adsabs.harvard.edu/abs/2020arXiv200912411T/abstract">How Does Thermal Scattering Shape the Infrared Spectra of Cloudy Exoplanets? A Theoretical Framework and Consequences for Atmospheric Retrievals in the JWST era</a> - eprint arXiv:2009.12411
