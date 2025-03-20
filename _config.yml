@@ -26,7 +26,7 @@ defaults:
       layout: "default"
 
 # SEO Settings
-author: "Jake SEO"
+author: ""
 language: "en"
 social:
   name: "Jake Taylor"
