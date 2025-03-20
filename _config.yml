@@ -1,7 +1,39 @@
-title: "Your Name's Website"
-description: "Personal website showcasing research, publications, and posts."
-baseurl: ""
+title: "Dr Jake Taylor"
+description: "Personal website showcasing my research, publications, and posts."
 url: "https://astrojaket.github.io"
+
+# Theme and Plugins
+theme: minima
 plugins:
   - jekyll-seo-tag
   - jekyll-feed
+  - jekyll-sitemap
+
+# Collections
+collections:
+  pages:
+    output: true
+    permalink: /:path/
+
+# Markdown Support
+markdown: kramdown
+
+# Defaults for Layout
+defaults:
+  - scope:
+      path: "_pages"
+    values:
+      layout: "default"
+
+# SEO Settings
+author: "Dr Jake Taylor"
+language: "en"
+social:
+  name: "Dr Jake Taylor"
+  links:
+    - "https://bsky.app/profile/astrojake"
+    - "https://www.tiktok.com/@astrojaket"
+
+# Sitemap Settings
+sitemap:
+  exclude: ['404.html']
