@@ -1,0 +1,7 @@
+title: "Your Name's Website"
+description: "Personal website showcasing research, publications, and posts."
+baseurl: ""
+url: "https://astrojaket.github.io"
+plugins:
+  - jekyll-seo-tag
+  - jekyll-feed
