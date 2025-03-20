@@ -21,44 +21,31 @@ title: Home
     </nav>
   </header>
 
-  {% if page.title == 'Home' %}
-  <main>
-    <section class="about">
-      <h1>About Me</h1>
+  <main class="portfolio">
+    <section class="intro">
+      <h1>Welcome to My Portfolio</h1>
+      <p>Explore my research, publications, and thoughts through my posts. Feel free to reach out for collaborations or discussions!</p>
       <img src="/assets/images/profile.jpg" alt="Profile Picture" class="profile" />
-      <p>Hello! Welcome to my personal website. Here, you'll find information about my research, publications, and personal posts. Enjoy exploring!</p>
     </section>
-  </main>
-  {% elsif page.title == 'Research' %}
-  <main>
-    <section class="research">
-      <h1>My Research</h1>
-      <p>Details about your research projects will go here. You can update this section with information on ongoing studies, past research, and any other relevant details.</p>
-    </section>
-  </main>
-  {% elsif page.title == 'Publications' %}
-  <main>
-    <section class="publications">
-      <h1>Publications</h1>
-      <p>List your publications here with links to journals or articles. You can format this section as needed.</p>
-    </section>
-  </main>
-  {% elsif page.title == 'Posts' %}
-  <main>
-    <section class="posts">
-      <h1>My Posts</h1>
-      <h2>Bluesky Posts</h2>
-      <p>Embed your Bluesky feed here using third-party services or custom scripts.</p>
 
-      <h2>TikTok Videos</h2>
-      <p>Embed TikToks using the embed code provided by TikTok. Example:</p>
-      <blockquote class="tiktok-embed" cite="https://www.tiktok.com/@yourusername" data-video-id="123456789">
-        <a href="https://www.tiktok.com/@yourusername">View on TikTok</a>
-      </blockquote>
-      <script async src="https://www.tiktok.com/embed.js"></script>
+    <section class="overview">
+      <div class="card">
+        <h2>Research</h2>
+        <p>Discover my ongoing and past research projects.</p>
+        <a href="/research">Learn More</a>
+      </div>
+      <div class="card">
+        <h2>Publications</h2>
+        <p>Browse my academic publications and articles.</p>
+        <a href="/publications">View Publications</a>
+      </div>
+      <div class="card">
+        <h2>Posts</h2>
+        <p>Check out my latest posts from Bluesky and TikTok.</p>
+        <a href="/posts">Read Posts</a>
+      </div>
     </section>
   </main>
-  {% endif %}
 
   <footer>
     <p>&copy; 2025 Your Name</p>
