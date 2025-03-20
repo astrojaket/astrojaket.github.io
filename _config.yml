@@ -26,10 +26,10 @@ defaults:
       layout: "default"
 
 # SEO Settings
-author: ""
+author: "Jake SEO"
 language: "en"
 social:
-  name: "Dr Jake Taylor"
+  name: "Jake Taylor"
   links:
     - "https://bsky.app/profile/astrojake"
     - "https://www.tiktok.com/@astrojaket"
