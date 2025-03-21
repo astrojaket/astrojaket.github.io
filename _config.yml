@@ -1,4 +1,4 @@
-title: "Dr Jake Taylor"
+title: "Jake Taylor"
 description: ""
 url: "https://astrojaket.github.io"
 
@@ -37,3 +37,19 @@ social:
 # Sitemap Settings
 sitemap:
   exclude: ['404.html']
+
+# Custom Styling
+sass:
+  style: compressed
+
+# Global Styles
+global_styles: |
+  body {
+    font-family: Avenir, sans-serif;
+    background-color: #e6e1f5;
+    margin: 0;
+    padding: 0;
+  }
+  footer {
+    display: none;
+  }
