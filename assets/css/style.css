@@ -212,3 +212,24 @@ nav a {
 nav a:hover {
   color: #6b5b95;
 }
+
+#publications-list {
+    margin-top: 20px;
+}
+
+.publication {
+    margin-bottom: 20px;
+}
+
+.publication h2 {
+    font-size: 1.5rem;
+}
+
+.publication a {
+    color: #6A1B9A; /* Purple link color */
+    text-decoration: none;
+}
+
+.publication a:hover {
+    text-decoration: underline;
+}
