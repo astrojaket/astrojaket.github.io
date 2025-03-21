@@ -7,17 +7,65 @@
   <link rel="stylesheet" href="/assets/css/style.css" />
 </head>
 <body>
-  <header>
-    <nav>
-      <a href="/">Home</a>
-      <a href="/research">Research</a>
-      <a href="/publications">Publications</a>
-      <a href="/posts">Posts</a>
+  <!-- Improved Navigation Bar -->
+  <header class="header">
+    <div class="logo">🌌 Jake Taylor</div>
+    <nav class="navbar">
+      <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/research">Research</a></li>
+        <li><a href="/publications">Publications</a></li>
+        <li><a href="/posts">Posts</a></li>
+      </ul>
     </nav>
   </header>
 
   <main>
     {{ content }}
   </main>
+
 </body>
 </html>
+
+<!-- CSS for Improved Navigation -->
+<style>
+  body {
+    font-family: Avenir, sans-serif;
+    background-color: #e6e1f5;
+    margin: 0;
+    padding: 0;
+  }
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background-color: #4b3a69;
+  }
+
+  .logo {
+    font-size: 1.5rem;
+    color: white;
+    font-weight: bold;
+  }
+
+  .navbar ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: 20px;
+  }
+
+  .navbar a {
+    text-decoration: none;
+    color: white;
+    font-size: 1rem;
+    transition: color 0.3s;
+  }
+
+  .navbar a:hover {
+    color: #d3bce3;
+  }
+</style>
