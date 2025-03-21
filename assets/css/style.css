@@ -213,6 +213,28 @@ nav a:hover {
   color: #6b5b95;
 }
 
+#first-author-papers {
+    margin-bottom: 30px;
+}
+
+#first-author-papers ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+#first-author-papers li {
+    margin-bottom: 10px;
+}
+
+#first-author-papers a {
+    color: #6A1B9A; /* Purple link color */
+    text-decoration: none;
+}
+
+#first-author-papers a:hover {
+    text-decoration: underline;
+}
+
 #publications-list {
     margin-top: 20px;
 }
@@ -221,8 +243,8 @@ nav a:hover {
     margin-bottom: 20px;
 }
 
-.publication h2 {
-    font-size: 1.5rem;
+.publication h3 {
+    font-size: 1.2rem;
 }
 
 .publication a {
