@@ -192,3 +192,23 @@ form, fieldset{
 .nav ul li{
 	padding: 0 20px;
 }
+
+/* Global Styles */
+body {
+  font-family: Avenir, sans-serif;
+  background-color: #e6e1f5; /* Light Purple Background */
+  margin: 0;
+  padding: 0;
+  color: #4b3a69;
+}
+
+/* Navigation Styles */
+nav a {
+  color: #4b3a69;
+  text-decoration: none;
+  margin-right: 20px;
+}
+
+nav a:hover {
+  color: #6b5b95;
+}
