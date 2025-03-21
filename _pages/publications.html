@@ -4,36 +4,47 @@ title: Publications
 permalink: /publications/
 ---
 
-<h1>My Publications</h1>
+<!--<h1>My Publications</h1>-->
 
 <div id="publications-list"></div>
 
 <script>
     const ORCID = "0000-0003-4844-9838";  // Your ORCiD
-    const API_KEY = "g0Pn79NujLVjaSfeu0YIBeAI5o2Zpc8t7Qj69unj";  // Your ADS API Token
+    const API_URL = `https://pub.orcid.org/v3.0/${ORCID}/works`;
 
     async function fetchPublications() {
-        const response = await fetch(`https://api.adsabs.harvard.edu/v1/search/query?q=orcid:${ORCID}&start=0&rows=10&fl=title,bibcode`, {
+        const response = await fetch(API_URL, {
             headers: {
-                "Authorization": `Bearer ${API_KEY}`
+                "Accept": "application/json" // ORCiD API returns data in JSON format
             }
         });
+
+        if (!response.ok) {
+            console.error("Failed to fetch publications");
+            return [];
+        }
+
         const data = await response.json();
-        return data.response.docs;
+        return data.group || []; // ORCiD's API returns publications in the "group" array
     }
 
     function renderPublications(publications) {
         const container = document.getElementById("publications-list");
+        if (publications.length === 0) {
+            container.innerHTML = "<p>No publications found.</p>";
+            return;
+        }
+
         publications.forEach(pub => {
             const publicationElement = document.createElement("div");
             publicationElement.classList.add("publication");
 
             const title = document.createElement("h2");
-            title.textContent = pub.title[0];
+            title.textContent = pub.work-summary[0]["title"].title;
             publicationElement.appendChild(title);
 
             const link = document.createElement("a");
-            link.href = `https://ui.adsabs.harvard.edu/link_gateway/${pub.bibcode}/EPRINT`;
+            link.href = pub["url"]["value"] || "#"; // Link to the publication if available
             link.textContent = "Read more";
             publicationElement.appendChild(link);
 
