@@ -13,23 +13,35 @@ title: Home
   <style>
     body {
       font-family: Avenir, sans-serif;
+      font-size: 14px; /* Set the font size to 14px */
+      margin: 0;
+      padding: 0;
+    }
+
+    .banner-small {
+      background-color: #e6e1f5;
+      height: 200px;
+      border-radius: 12px;
+      margin-bottom: 30px;
     }
 
     .about-container {
-      margin: 50px;
       display: flex;
-      justify-content: space-between;
+      justify-content: center;
       align-items: center;
+      margin: 50px;
     }
 
     .about-text {
       flex: 1;
       max-width: 50%;
+      margin-left: 20px; /* Add spacing between the text and the photo */
+      text-align: left;
     }
 
     .about-photo {
-      order: -1; /* Moves photo to the left */
-      margin-right: 5px; /* Add spacing between photo and text */
+      order: -1; /* Moves the photo to the left */
+      margin-right: 20px;
     }
 
     .profile-photo {
@@ -42,7 +54,7 @@ title: Home
 <body class="light-purple-theme">
 
   <!-- Banner Section -->
-  <section class="banner-small" style="background-color: #e6e1f5; height: 200px; border-radius: 12px;">
+  <section class="banner-small">
   </section>
 
   <!-- About Section -->

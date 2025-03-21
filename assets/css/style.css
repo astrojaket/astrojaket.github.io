@@ -255,3 +255,37 @@ nav a:hover {
 .publication a:hover {
     text-decoration: underline;
 }
+
+.research-section {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 50px;
+}
+
+.research-text {
+    flex: 1;
+    max-width: 45%;
+    padding-right: 20px;
+}
+
+.research-image {
+    flex: 1;
+    max-width: 45%;
+    text-align: center;
+}
+
+.research-image img {
+    width: 100%;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.research-section h3 {
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+}
+
+.research-section p {
+    font-size: 1rem;
+    line-height: 1.5;
+}
