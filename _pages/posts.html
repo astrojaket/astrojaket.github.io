@@ -5,15 +5,53 @@ title: Posts
 
 <h1>My Posts</h1>
 
-<h2>Bluesky Posts</h2>
-  <script type="module" src="https://cdn.jsdelivr.net/npm/bsky-embed/dist/bsky-embed.es.js" async></script>
-  <bsky-embed
-    username="astrojake.bsky.social"
-    mode="white"
-    limit="5"
-  >
-  </bsky-embed>
-<h2>TikTok Videos</h2>
-<p>Below are some of my latest TikTok videos. Enjoy!</p>
+<div class="posts-container">
+  <!-- Bluesky Section -->
+  <div class="bluesky-section">
+    <h2>Bluesky Posts</h2>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/bsky-embed/dist/bsky-embed.es.js" async></script>
+    <bsky-embed
+      username="astrojake.bsky.social"
+      mode="white"
+      limit="5"
+    ></bsky-embed>
+  </div>
 
-<blockquote class="tiktok-embed" cite="https://www.tiktok.com/@astrojaket" data-unique-id="astrojaket" data-embed-type="creator" style="max-width: 780px; min-width: 288px;" > <section> <a target="_blank" href="https://www.tiktok.com/@astrojaket?refer=creator_embed">@astrojaket</a> </section> </blockquote> <script async src="https://www.tiktok.com/embed.js"></script>
+  <!-- TikTok Section -->
+  <div class="tiktok-section">
+    <h2>TikTok Videos</h2>
+    <p>Below are some of my latest TikTok videos. Enjoy!</p>
+    <blockquote class="tiktok-embed" cite="https://www.tiktok.com/@astrojaket" data-unique-id="astrojaket" data-embed-type="creator" style="max-width: 780px; min-width: 288px;">
+      <section>
+        <a target="_blank" href="https://www.tiktok.com/@astrojaket?refer=creator_embed">@astrojaket</a>
+      </section>
+    </blockquote>
+    <script async src="https://www.tiktok.com/embed.js"></script>
+  </div>
+</div>
+
+<!-- CSS for Layout -->
+<style>
+  .posts-container {
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-start;
+    margin-top: 20px;
+  }
+
+  .bluesky-section, .tiktok-section {
+    width: 45%;
+    background-color: #f9f9ff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+  }
+
+  h2 {
+    color: #6b5b95;
+  }
+
+  p {
+    color: #333;
+  }
+</style>
