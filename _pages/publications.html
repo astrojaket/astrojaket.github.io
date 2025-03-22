@@ -13,7 +13,7 @@ permalink: /publications/
                 Another look at the dayside spectra of WASP-43b and HD 209458b: Are there scattering clouds?
             </a><br>
             <strong>Authors:</strong> Jake Taylor, Vivien Parmentier<br>
-            <strong>Keywords:</strong> radiative transfer, planets and satellites: atmospheres, methods: analytical, techniques: spectroscopic, Astrophysics - Earth and Planetary Astrophysics<br>
+            <!--<strong>Keywords:</strong> radiative transfer, planets and satellites: atmospheres, methods: analytical, techniques: spectroscopic, Astrophysics - Earth and Planetary Astrophysics<br>-->
             <strong>DOI:</strong> <a href="https://doi.org/10.1093/mnras/stad2287" target="_blank">10.1093/mnras/stad2287</a>
         </li>
         <li class="publication-box">
@@ -21,7 +21,7 @@ permalink: /publications/
                 Awesome SOSS: atmospheric characterization of WASP-96 b using the JWST early release observations
             </a><br>
             <strong>Authors:</strong> Jake Taylor, Michael Radica, Luis Welbanks, Ryan J. MacDonald, Jasmina Blecic, Maria Zamyatina, Alexander Roth, Jacob L. Bean, Vivien Parmentier, Louis-Philippe Coulombe, Adina D. Feinstein, Néstor Espinoza, Björn Benneke, David Lafrenière, René Doyon, Eva-Maria Ahrer<br>
-            <strong>Keywords:</strong> planets and satellites: atmospheres, planets and satellites: gaseous planets, planets and satellites: individual: WASP-96 b, Astrophysics - Earth and Planetary Astrophysics<br>
+            <!--<strong>Keywords:</strong> planets and satellites: atmospheres, planets and satellites: gaseous planets, planets and satellites: individual: WASP-96 b, Astrophysics - Earth and Planetary Astrophysics<br>-->
             <strong>DOI:</strong> <a href="https://doi.org/10.1093/mnras/stad1547" target="_blank">10.1093/mnras/stad1547</a>
         </li>
         <li class="publication-box">
@@ -29,7 +29,7 @@ permalink: /publications/
                 Impact of variable photospheric radius on exoplanet atmospheric retrievals
             </a><br>
             <strong>Authors:</strong> Jake Taylor<br>
-            <strong>Keywords:</strong> methods: data analysis, techniques: spectroscopic, Astrophysics - Earth and Planetary Astrophysics, Astrophysics - Instrumentation and Methods for Astrophysics<br>
+            <!--<strong>Keywords:</strong> methods: data analysis, techniques: spectroscopic, Astrophysics - Earth and Planetary Astrophysics, Astrophysics - Instrumentation and Methods for Astrophysics<br>-->
             <strong>DOI:</strong> <a href="https://doi.org/10.1093/mnrasl/slac028" target="_blank">10.1093/mnrasl/slac028</a>
         </li>
         <li class="publication-box">
@@ -37,7 +37,7 @@ permalink: /publications/
                 How does thermal scattering shape the infrared spectra of cloudy exoplanets? A theoretical framework and consequences for atmospheric retrievals in the JWST era
             </a><br>
             <strong>Authors:</strong> Jake Taylor, Vivien Parmentier, Michael R. Line, Elspeth K.H. Lee, Patrick G.J. Irwin, Suzanne Aigrain<br>
-            <strong>Keywords:</strong> radiative transfer, methods: analytical, techniques: spectroscopic, planets and satellites: atmospheres, Astrophysics - Earth and Planetary Astrophysics<br>
+            <!--<strong>Keywords:</strong> radiative transfer, methods: analytical, techniques: spectroscopic, planets and satellites: atmospheres, Astrophysics - Earth and Planetary Astrophysics<br>-->
             <strong>DOI:</strong> <a href="https://doi.org/10.1093/mnras/stab1854" target="_blank">10.1093/mnras/stab1854</a>
         </li>
         <li class="publication-box">
@@ -45,7 +45,7 @@ permalink: /publications/
                 Understanding and mitigating biases when studying inhomogeneous emission spectra with JWST
             </a><br>
             <strong>Authors:</strong> Jake Taylor, Vivien Parmentier, Patrick G.J. Irwin, Suzanne Aigrain, Elspeth K.H. Lee, Joshua Krissansen-Totton<br>
-            <strong>Keywords:</strong> radiative transfer, methods: analytical, techniques: spectroscopic, planets and satellites: atmospheres, Astrophysics - Earth and Planetary Astrophysics<br>
+            <!--<strong>Keywords:</strong> radiative transfer, methods: analytical, techniques: spectroscopic, planets and satellites: atmospheres, Astrophysics - Earth and Planetary Astrophysics<br>-->
             <strong>DOI:</strong> <a href="https://doi.org/10.1093/mnras/staa552" target="_blank">10.1093/mnras/staa552</a>
         </li>
     </ul>
@@ -85,13 +85,17 @@ permalink: /publications/
     #first-author-papers {
         display: flex;
         justify-content: center;
-        flex-direction: column;
+        align-items: center;  /* Center the items vertically */
+        flex-wrap: wrap;  /* Allow wrapping on smaller screens */
         margin-top: 20px;
     }
 
     #first-author-papers ul {
         list-style-type: none;
         padding: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;  /* Center the list items horizontally */
     }
 
     .publication-box {
