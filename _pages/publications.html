@@ -4,39 +4,35 @@ title: Publications
 permalink: /publications/
 ---
 
-<h1>My Publications</h1>
-
-<p>Below is a list of publications where I am the first author. Click on the titles to read more details or access the full paper.</p>
-
 <!-- First Author Papers Section -->
 <h2>First Author Papers</h2>
 <div id="first-author-papers">
     <ul>
-        <li>
+        <li class="publication-box">
             <a href="https://ui.adsabs.harvard.edu/abs/2023MNRAS.526.2133T/abstract" target="_blank" class="publication-link">
                 2023 MNRAS 526, 2133: First Author Paper 1
             </a><br>
             <strong>Authors:</strong> Jake Taylor, et al.
         </li>
-        <li>
+        <li class="publication-box">
             <a href="https://ui.adsabs.harvard.edu/abs/2023MNRAS.524..817T/abstract" target="_blank" class="publication-link">
                 2023 MNRAS 524, 817: First Author Paper 2
             </a><br>
             <strong>Authors:</strong> Jake Taylor, et al.
         </li>
-        <li>
+        <li class="publication-box">
             <a href="https://ui.adsabs.harvard.edu/abs/2022MNRAS.513L..20T/abstract" target="_blank" class="publication-link">
                 2022 MNRAS 513, L20: First Author Paper 3
             </a><br>
             <strong>Authors:</strong> Jake Taylor, et al.
         </li>
-        <li>
+        <li class="publication-box">
             <a href="https://ui.adsabs.harvard.edu/abs/2021MNRAS.506.1309T/abstract" target="_blank" class="publication-link">
                 2021 MNRAS 506, 1309: First Author Paper 4
             </a><br>
             <strong>Authors:</strong> Jake Taylor, et al.
         </li>
-        <li>
+        <li class="publication-box">
             <a href="https://ui.adsabs.harvard.edu/abs/2020MNRAS.493.4342T/abstract" target="_blank" class="publication-link">
                 2020 MNRAS 493, 4342: First Author Paper 5
             </a><br>
@@ -88,16 +84,17 @@ permalink: /publications/
         padding: 0;
     }
 
-    #first-author-papers li {
+    .publication-box {
         background-color: #ffffff;
         border-radius: 8px;
-        padding: 15px;
-        margin-bottom: 15px;
+        padding: 20px;
+        margin-bottom: 20px;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         transition: transform 0.3s ease-in-out;
+        text-align: center;
     }
 
-    #first-author-papers li:hover {
+    .publication-box:hover {
         transform: scale(1.05);
     }
 
@@ -107,7 +104,7 @@ permalink: /publications/
         text-decoration: none;
         font-weight: bold;
         display: inline-block;
-        margin-bottom: 5px;
+        margin-bottom: 10px;
     }
 
     .publication-link:hover {
