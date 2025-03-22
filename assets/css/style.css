@@ -239,23 +239,6 @@ nav a:hover {
     margin-top: 20px;
 }
 
-.publication {
-    margin-bottom: 20px;
-}
-
-.publication h3 {
-    font-size: 1.2rem;
-}
-
-.publication a {
-    color: #6A1B9A; /* Purple link color */
-    text-decoration: none;
-}
-
-.publication a:hover {
-    text-decoration: underline;
-}
-
 .research-section {
     display: flex;
     justify-content: space-between;
