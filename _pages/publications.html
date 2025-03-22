@@ -4,11 +4,11 @@ title: Publications
 permalink: /publications/
 ---
 
-<!--<h1>My Publications</h1>-->
+<h1>My Publications</h1>
 
 <!-- First Author Papers Section -->
 <h2>First Author Papers</h2>
-<div id="first-author-papers">
+<div id="first-author-papers" style="margin-bottom: 30px;">
     <ul>
         <li>
             <a href="https://ui.adsabs.harvard.edu/abs/2023MNRAS.526.2133T/abstract" target="_blank">
@@ -45,7 +45,7 @@ permalink: /publications/
 
 <!-- ORCiD Publications Section -->
 <h2>Other Publications (via ORCiD)</h2>
-<div id="publications-list"></div>
+<div id="publications-list" style="display: flex; flex-wrap: wrap;"></div>
 
 <script>
     const ORCID = "0000-0003-4844-9838";  // Your ORCiD
@@ -70,25 +70,27 @@ permalink: /publications/
     function renderPublications(publications) {
         const container = document.getElementById("publications-list");
         if (publications.length === 0) {
-            container.innerHTML = "<p>No publications found.</p>";
+            container.innerHTML = "<p>No publications found from ORCiD.</p>";
             return;
         }
 
         publications.forEach(pub => {
             const publicationElement = document.createElement("div");
             publicationElement.classList.add("publication");
+            publicationElement.style = "flex: 1 1 45%; margin: 10px; padding: 20px; background-color: #f9f9f9; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);";
 
             const title = document.createElement("h3");
-            title.textContent = pub.work-summary[0]["title"].title;
+            title.textContent = pub["work-summary"][0]["title"].title;
             publicationElement.appendChild(title);
 
             const authors = document.createElement("p");
-            authors.innerHTML = "<strong>Authors:</strong> " + pub.work-summary[0]["author"]?.map(author => author["credit-name"] || "Unknown").join(", ");
+            authors.innerHTML = "<strong>Authors:</strong> " + pub["work-summary"][0]["author"]?.map(author => author["credit-name"] || "Unknown").join(", ");
             publicationElement.appendChild(authors);
 
             const link = document.createElement("a");
-            link.href = pub["url"]["value"] || "#"; // Link to the publication if available
+            link.href = pub["url"]?.value || "#"; // Link to the publication if available
             link.textContent = "Read more";
+            link.target = "_blank";
             publicationElement.appendChild(link);
 
             container.appendChild(publicationElement);
