@@ -29,19 +29,8 @@
     {{ content }}
   </main>
 
-  <!-- Buy Me a Coffee Modal Popup -->
-  <!-- The footer with the Buy Me a Coffee link is now removed, only the popup remains -->
-
-  <!-- Modal for Buy Me a Coffee -->
-  <div id="bmc-modal" class="modal">
-    <div class="modal-content">
-      <span class="close">&times;</span>
-      <script src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-name="BMC-Widget" data-cfasync="false" data-id="astrojake" data-description="Support me on Buy me a coffee!" data-message="Thank you for your support!" data-color="#6b5b95" data-position="Right" data-x_margin="18" data-y_margin="18"></script>
-    </div>
-  </div>
-
-  <!-- Button to trigger the Buy Me a Coffee Popup -->
-  <button id="bmc-popup-btn" class="donate-button">Buy Me a Coffee</button>
+  <!-- Buy Me a Coffee Popup Widget -->
+  <script src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-name="BMC-Widget" data-cfasync="false" data-id="astrojake" data-description="Support me on Buy me a coffee!" data-message="Thank you for your support!" data-color="#6b5b95" data-position="Right" data-x_margin="18" data-y_margin="18"></script>
 </body>
 </html>
 
@@ -122,84 +111,13 @@
       padding: 20px;
     }
   }
-
-  /* Styling for the Donate Button */
-  .donate-button {
-    background-color: #6b5b95;
-    color: #fff;
-    border: none;
-    padding: 12px 24px;
-    font-size: 16px;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-    margin: 20px auto;
-    display: block;
-  }
-
-  .donate-button:hover {
-    background-color: #574a78;
-  }
-
-  /* Modal Styling */
-  .modal {
-    display: none; 
-    position: fixed; 
-    z-index: 1;
-    left: 0;
-    top: 0;
-    width: 100%; 
-    height: 100%; 
-    background-color: rgba(0, 0, 0, 0.5); 
-    overflow: auto;
-  }
-
-  .modal-content {
-    background-color: #fff;
-    margin: 15% auto;
-    padding: 20px;
-    border-radius: 12px;
-    width: 50%;
-    max-width: 600px;
-    text-align: center;
-  }
-
-  .close {
-    color: #aaa;
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
-    cursor: pointer;
-  }
-
-  .close:hover,
-  .close:focus {
-    color: black;
-    text-decoration: none;
-    cursor: pointer;
-  }
 </style>
 
 <script>
-  // Modal Script
-  const modal = document.getElementById("bmc-modal");
-  const btn = document.getElementById("bmc-popup-btn");
-  const span = document.getElementsByClassName("close")[0];
+  const hamburger = document.querySelector('.hamburger');
+  const navbar = document.querySelector('.navbar');
 
-  // Open the modal when the "Buy Me a Coffee" button is clicked
-  btn.onclick = function() {
-    modal.style.display = "block";
-  }
-
-  // Close the modal when the "X" is clicked
-  span.onclick = function() {
-    modal.style.display = "none";
-  }
-
-  // Close the modal if the user clicks anywhere outside of the modal
-  window.onclick = function(event) {
-    if (event.target == modal) {
-      modal.style.display = "none";
-    }
-  }
+  hamburger.addEventListener('click', () => {
+    navbar.classList.toggle('active');
+  });
 </script>
