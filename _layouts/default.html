@@ -30,20 +30,18 @@
   </main>
 
   <!-- Buy Me a Coffee Modal Popup -->
-  <footer>
-    <div class="support-widget-container">
-      <h3>Support Me</h3>
-      <button id="bmc-popup-btn" class="donate-button">Buy Me a Coffee</button>
-    </div>
+  <!-- The footer with the Buy Me a Coffee link is now removed, only the popup remains -->
 
-    <!-- Modal for Buy Me a Coffee -->
-    <div id="bmc-modal" class="modal">
-      <div class="modal-content">
-        <span class="close">&times;</span>
-        <script src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-name="BMC-Widget" data-cfasync="false" data-id="astrojake" data-description="Support me on Buy me a coffee!" data-message="Thank you for your support!" data-color="#6b5b95" data-position="Right" data-x_margin="18" data-y_margin="18"></script>
-      </div>
+  <!-- Modal for Buy Me a Coffee -->
+  <div id="bmc-modal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <script src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-name="BMC-Widget" data-cfasync="false" data-id="astrojake" data-description="Support me on Buy me a coffee!" data-message="Thank you for your support!" data-color="#6b5b95" data-position="Right" data-x_margin="18" data-y_margin="18"></script>
     </div>
-  </footer>
+  </div>
+
+  <!-- Button to trigger the Buy Me a Coffee Popup -->
+  <button id="bmc-popup-btn" class="donate-button">Buy Me a Coffee</button>
 </body>
 </html>
 
@@ -125,28 +123,7 @@
     }
   }
 
-  /* Styling for the footer and Buy Me a Coffee widget */
-  footer {
-    background-color: #4b3a69;
-    padding: 20px 0;
-    text-align: center;
-    margin-top: 40px;
-  }
-
-  .support-widget-container {
-    background-color: #6b5b95;
-    border-radius: 12px;
-    padding: 15px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  }
-
-  .support-widget-container h3 {
-    color: white;
-    margin-bottom: 15px;
-    font-size: 1.2rem;
-  }
-
-  /* Styling for the donate button */
+  /* Styling for the Donate Button */
   .donate-button {
     background-color: #6b5b95;
     color: #fff;
@@ -156,6 +133,8 @@
     border-radius: 8px;
     cursor: pointer;
     transition: background-color 0.3s;
+    margin: 20px auto;
+    display: block;
   }
 
   .donate-button:hover {
