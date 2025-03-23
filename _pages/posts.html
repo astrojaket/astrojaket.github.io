@@ -2,9 +2,7 @@
 layout: default
 title: Posts
 ---
-<!--
-<h1>My Posts</h1>
--->
+
 <div class="posts-container">
   <!-- Bluesky Section -->
   <div class="bluesky-section">
@@ -20,7 +18,6 @@ title: Posts
   <!-- TikTok Section -->
   <div class="tiktok-section">
     <h2>TikTok Videos</h2>
-    <!--<p></p>-->
     <blockquote class="tiktok-embed" cite="https://www.tiktok.com/@astrojaket" data-unique-id="astrojaket" data-embed-type="creator" style="max-width: 780px; min-width: 288px;">
       <section>
         <a target="_blank" href="https://www.tiktok.com/@astrojaket?refer=creator_embed">@astrojaket</a>
@@ -30,13 +27,14 @@ title: Posts
   </div>
 </div>
 
-<!-- CSS for Layout -->
+<!-- CSS for Responsive Layout -->
 <style>
   .posts-container {
     display: flex;
     justify-content: space-around;
     align-items: flex-start;
     margin-top: 20px;
+    flex-wrap: wrap;
   }
 
   .bluesky-section, .tiktok-section {
@@ -45,6 +43,7 @@ title: Posts
     padding: 20px;
     border-radius: 12px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    margin-bottom: 20px;
   }
 
   h2 {
@@ -53,5 +52,16 @@ title: Posts
 
   p {
     color: #333;
+  }
+
+  @media (max-width: 768px) {
+    .posts-container {
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .bluesky-section, .tiktok-section {
+      width: 90%;
+    }
   }
 </style>

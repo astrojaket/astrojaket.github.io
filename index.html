@@ -13,7 +13,7 @@ title: Home
   <style>
     body {
       font-family: Avenir, sans-serif;
-      font-size: 20px; /* Set the font size to 20px */
+      font-size: 20px;
       margin: 0;
       padding: 0;
     }
@@ -30,22 +30,23 @@ title: Home
       justify-content: center;
       align-items: center;
       margin: 50px;
+      flex-wrap: wrap;
     }
 
     .about-text {
       flex: 1;
-      max-width: 50%;
-      margin-left: 20px; /* Add spacing between the text and the photo */
+      max-width: 600px;
+      margin: 20px;
       text-align: left;
     }
 
     .about-photo {
-      order: -1; /* Moves the photo to the left */
-      margin-right: 20px;
+      margin: 20px;
     }
 
     .profile-photo {
-      width: 300px;
+      width: 100%;
+      max-width: 300px;
       border-radius: 12px;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
@@ -57,6 +58,26 @@ title: Home
 
     .about-text a:hover {
       text-decoration: underline;
+    }
+
+    @media (max-width: 768px) {
+      .about-container {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .about-photo {
+        order: 0;
+        margin-bottom: 20px;
+      }
+
+      .profile-photo {
+        max-width: 200px;
+      }
+
+      .about-text {
+        max-width: 100%;
+      }
     }
   </style>
 </head>
