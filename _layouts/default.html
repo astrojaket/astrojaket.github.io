@@ -28,14 +28,16 @@
   <main>
     {{ content }}
   </main>
-<footer>
-  <div style="text-align: center; padding: 20px; background-color: #f9f9f9;">
-    <h3>Support Me</h3>
-    <a href="https://buymeacoffee.com/astrojake" target="_blank">
-      <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me a Coffee" width="200" />
-    </a>
-  </div>
-</footer>
+
+  <!-- Buy Me a Coffee Widget -->
+  <footer>
+    <div class="support-widget-container">
+      <h3>Support Me</h3>
+      <a href="https://buymeacoffee.com/astrojake" target="_blank">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me a Coffee" width="200" style="border-radius: 12px; border: 2px solid #6b5b95; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);"/>
+      </a>
+    </div>
+  </footer>
 </body>
 </html>
 
@@ -115,6 +117,35 @@
       gap: 10px;
       padding: 20px;
     }
+  }
+
+  /* Styling for the footer and Buy Me a Coffee widget */
+  footer {
+    background-color: #4b3a69;
+    padding: 20px 0;
+    text-align: center;
+    margin-top: 40px;
+  }
+
+  .support-widget-container {
+    background-color: #6b5b95;
+    border-radius: 12px;
+    padding: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .support-widget-container h3 {
+    color: white;
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+  }
+
+  .support-widget-container a img {
+    transition: transform 0.3s;
+  }
+
+  .support-widget-container a img:hover {
+    transform: scale(1.05);
   }
 </style>
 
