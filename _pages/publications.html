@@ -159,7 +159,18 @@ permalink: /publications/
     .publication-link:hover {
         text-decoration: underline;
     }
+    @media (max-width: 768px) {
+      .publications-container {
+        grid-template-columns: 1fr;
+      }
 
+      .publications-section h2 {
+        font-size: 1.2rem;
+      }
+
+      .publication-box {
+        padding: 0.8rem;
+      }
     strong {
         color: #B069DB;
     }
