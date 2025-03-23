@@ -33,9 +33,10 @@
   <footer>
     <div class="support-widget-container">
       <h3>Support Me</h3>
-      <a href="https://buymeacoffee.com/astrojake" target="_blank">
-        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me a Coffee" width="200" style="border-radius: 12px; border: 2px solid #6b5b95; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);"/>
-      </a>
+      <div id="bmc-widget-container">
+        <!-- Embed Buy Me a Coffee widget with iframe -->
+        <iframe src="https://buymeacoffee.com/astrojake?ref=widget" width="250" height="60" style="border: none; border-radius: 12px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);"></iframe>
+      </div>
     </div>
   </footer>
 </body>
@@ -140,11 +141,14 @@
     font-size: 1.2rem;
   }
 
-  .support-widget-container a img {
+  /* Styling for the iframe */
+  #bmc-widget-container iframe {
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s;
   }
 
-  .support-widget-container a img:hover {
+  #bmc-widget-container iframe:hover {
     transform: scale(1.05);
   }
 </style>
