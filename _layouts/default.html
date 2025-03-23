@@ -7,9 +7,13 @@
   <link rel="stylesheet" href="/assets/css/style.css" />
 </head>
 <body>
-  <!-- Improved Navigation Bar -->
+  <!-- Improved Navigation Bar with Mobile Support -->
   <header class="header">
     <div class="logo">Dr Jake Taylor</div>
+    
+    <!-- Hamburger Menu -->
+    <button class="hamburger" aria-label="Toggle navigation">&#9776;</button>
+
     <nav class="navbar">
       <ul>
         <li><a href="/">Home</a></li>
@@ -27,7 +31,7 @@
 </body>
 </html>
 
-<!-- CSS for Improved Navigation -->
+<!-- CSS for Improved Navigation with Mobile Support -->
 <style>
   body {
     font-family: Avenir, sans-serif;
@@ -42,12 +46,12 @@
     align-items: center;
     padding: 20px;
     background-color: #4b3a69;
+    position: relative;
   }
 
   .logo {
     font-size: 1.5rem;
     color: white;
-    font-weight: none;
   }
 
   .navbar ul {
@@ -68,4 +72,49 @@
   .navbar a:hover {
     color: #d3bce3;
   }
+
+  .hamburger {
+    display: none;
+    font-size: 24px;
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+  }
+
+  /* Mobile Styles */
+  @media (max-width: 768px) {
+    .hamburger {
+      display: block;
+    }
+
+    .navbar {
+      display: none;
+      flex-direction: column;
+      background-color: #4b3a69;
+      position: absolute;
+      top: 80px;
+      left: 0;
+      width: 100%;
+    }
+
+    .navbar.active {
+      display: flex;
+    }
+
+    .navbar ul {
+      flex-direction: column;
+      gap: 10px;
+      padding: 20px;
+    }
+  }
 </style>
+
+<script>
+  const hamburger = document.querySelector('.hamburger');
+  const navbar = document.querySelector('.navbar');
+
+  hamburger.addEventListener('click', () => {
+    navbar.classList.toggle('active');
+  });
+</script>
