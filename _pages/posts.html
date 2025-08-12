@@ -3,40 +3,28 @@ layout: default
 title: Posts
 ---
 
-<div class="posts-container">
-  <!-- Bluesky Section -->
-  <div class="bluesky-section">
-    <h2>Bluesky Posts</h2>
-    <script type="module" src="https://cdn.jsdelivr.net/npm/bsky-embed/dist/bsky-embed.es.js" async></script>
-    <bsky-embed
-      username="astrojake.bsky.social"
-      mode="white"
-      limit="5"
-    ></bsky-embed>
-  </div>
-
+<div class="posts-container"><p><a href="https://bsky.app/profile/astrojake.bsky.social" rel="noopener noreferrer" target="_blank">@astrojake on Bluesky</a></p>
+<!-- Bluesky Section -->
+<div class="bluesky-section">
+<h2>Bluesky Posts</h2>
+<script async="" src="https://cdn.jsdelivr.net/npm/bsky-embed/dist/bsky-embed.es.js" type="module"></script>
+<bsky-embed limit="5" mode="white" username="astrojake.bsky.social"></bsky-embed>
+</div>
 <!-- TikTok Section -->
-  <div class="tiktok-section">
-    <h2>TikTok Videos</h2>
-
-    <!-- TikTok Creator Embed -->
-    <blockquote class="tiktok-embed"
-                cite="https://www.tiktok.com/@astrojaket"
-                data-unique-id="astrojaket"
-                data-embed-type="creator"
-                style="max-width: 780px; min-width: 288px;">
-      <section>
-        <a target="_blank" href="https://www.tiktok.com/@astrojaket?refer=creator_embed">
+<div class="tiktok-section">
+<h2>TikTok Videos</h2>
+<!-- TikTok Creator Embed -->
+<blockquote cite="https://www.tiktok.com/@astrojaket" class="tiktok-embed" data-embed-type="creator" data-unique-id="astrojaket" style="max-width: 780px; min-width: 288px;">
+<section>
+<a href="https://www.tiktok.com/@astrojaket" rel="noopener noreferrer" target="_blank">
           @astrojaket
         </a>
-      </section>
-    </blockquote>
-
-    <!-- TikTok Embed Script -->
-    <script async src="https://www.tiktok.com/embed.js"></script>
-  </div>
+</section>
+</blockquote>
+<!-- TikTok Embed Script -->
+<script async="" src="https://www.tiktok.com/embed.js"></script>
 </div>
-
+</div>
 <!-- CSS for Responsive Layout -->
 <style>
   .posts-container {

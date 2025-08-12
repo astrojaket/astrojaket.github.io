@@ -1,0 +1,7 @@
+Updated 9 files where relevant.
+
+- Added Exoplanets tab to nav and created _pages/exoplanets.html (interactive explorer powered by NASA Exoplanet Archive + TrExoLiSTS).
+- Standardized NASA ADS links to end with /abstract where missing; changed 8 link(s).
+- Ensured all external links open in a new tab and use rel=noopener.
+- Normalized TikTok link to https://www.tiktok.com/@astrojaket and added a Bluesky profile link on Posts if it wasn't present.
+- Updated color scheme sitewide toward MediumPurple (#9370DB), including buttons, accents, and backgrounds.
