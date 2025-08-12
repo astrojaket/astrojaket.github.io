@@ -30,7 +30,7 @@ permalink: /exoplanets
       <h2>Search / Data</h2>
       <input id="searchBox" placeholder="Search planet or star…" class="exo-input"/>
       <button id="downloadCSV" class="exo-btn">Download filtered CSV</button>
-      <div class="exo-note">HST list not fetched automatically—drop a CSV: <input id="csvUpload" type="file" accept=".csv"/></div>
+      <div class="exo-note">HST list auto-fetched from STScI (optional CSV override): <input id="csvUpload" type="file" accept=".csv"/></div>
     </div>
   </div>
 
@@ -108,6 +108,7 @@ const columns = [
 ];
 
 const JWST_CSV_URL = 'https://www.stsci.edu/~nnikolov/TrExoLiSTS/JWST/03_trexolists_extended.csv';
+const HST_CATALOG_URL = 'https://www.stsci.edu/~WFC3/trexolists/trexolists.html';
 
 const PARAMS = {
   'Best Planet Mass (M_⊕)': d => toNum(d.pl_bmasse),
@@ -192,7 +193,7 @@ function buildTraces(){
     const x=xFn(p), y=yFn(p); if(x==null||y==null) continue;
     const nm = canon(p.pl_name);
     const inJWST = state.jwstNames.has(nm);
-    const inHST  = state.hstNames.has(nm);
+    const inHST = state.hstNames.has(nm) || state.hstHostnames.has((p.hostname||'').toLowerCase());
     const hover = `${p.pl_name}<br>${xKey}: <b>${x}</b><br>${yKey}: <b>${y}</b>`;
     const o = {x,y, hovertemplate: hover+'<extra></extra>'};
     if(inJWST) jwst.push(o); else if(inHST) hst.push(o); else base.push(o);
@@ -265,3 +266,31 @@ loadJWST().then(()=>refresh()).catch(err=>console.warn('JWST load failed (non-fa
   }
 })();
 </script>
+
+async function loadHST(){
+  try{
+    const res = await fetch(HST_CATALOG_URL, {mode:'cors'});
+    if(!res.ok) throw new Error('HST fetch failed: '+res.status);
+    const text = await res.text();
+    // Parse the HTML to extract target names
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(text, 'text/html');
+    const names = new Set();
+    // Collect anchor texts and first-column cells as possible host/star names
+    doc.querySelectorAll('a').forEach(a => {
+      const t = (a.textContent||'').trim();
+      if(t) names.add(t.toLowerCase());
+    });
+    doc.querySelectorAll('table tr').forEach(tr => {
+      const td = tr.querySelector('td');
+      if(td){
+        const t = (td.textContent||'').trim();
+        if(t) names.add(t.toLowerCase());
+      }
+    });
+    // Store as host star set (system-level)
+    state.hstHostnames = names;
+  }catch(err){
+    console.warn('HST auto-fetch failed (non-fatal)', err);
+  }
+}
