@@ -30,7 +30,7 @@ permalink: /exoplanets
       <h2>Search / Data</h2>
       <input id="searchBox" placeholder="Search planet or star…" class="exo-input"/>
       <button id="downloadCSV" class="exo-btn">Download filtered CSV</button>
-      <div class="exo-note">HST list not fetched automatically—drop a CSV: <input id="csvUpload" type="file" accept=".csv"/></div>
+      <div class="exo-note">HST list auto-fetched (WFC3 TrExoLiSTS). Optionally drop a CSV: <input id="csvUpload" type="file" accept=".csv"/></div>
     </div>
   </div>
 
@@ -100,13 +100,14 @@ body { background: var(--bg); }
 
 <script>
 const TAP_BASE = 'https://exoplanetarchive.ipac.caltech.edu/TAP/sync?query=';
-const TAP_FORMAT = '&format=json';
+const TAP_FORMAT = '&format=csv';
 const PS_TABLE = 'pscomppars';
 
 const columns = [
   'pl_name','hostname','pl_bmasse','pl_bmassj','pl_rade','pl_radj','pl_orbper','st_age','st_rad','disc_year','tran_flag'
 ];
 
+const HST_CATALOG_URL = 'https://www.stsci.edu/~WFC3/trexolists/trexolists_table.html';
 const JWST_CSV_URL = 'https://www.stsci.edu/~nnikolov/TrExoLiSTS/JWST/03_trexolists_extended.csv';
 
 const PARAMS = {
@@ -145,12 +146,41 @@ function download(filename, text){
 async function loadPS(){
   const sql = `select ${columns.join(',')} from ${PS_TABLE}`;
   const url = encodeTap(sql);
+  document.getElementById('endpoints').textContent = `TAP: ${url}
+JWST CSV: ${JWST_CSV_URL}`;
+  const res = await fetch(url, {mode:'cors'});
+  if(!res.ok) throw new Error('TAP fetch failed: '+res.status);
+  const text = await res.text();
+  // Parse CSV -> array of objects, with numeric columns as strings (we coerce later)
+  return d3.csvParse(text);
+} from ${PS_TABLE}`;
+  const url = encodeTap(sql);
   $('#endpoints').textContent = `TAP: ${url}\nJWST CSV: ${JWST_CSV_URL}`;
   const res = await fetch(url);
   if(!res.ok) throw new Error('TAP fetch failed: '+res.status);
   return await res.json();
 }
 
+
+async function loadHST(){
+  try{
+    const res = await fetch(HST_CATALOG_URL, {mode:'cors'});
+    const text = await res.text();
+    // Parse the table HTML and extract the "Target name" column (2nd column)
+    const doc = new DOMParser().parseFromString(text, 'text/html');
+    const targets = new Set();
+    // The big table is in trexolists_table.html as a plain table. Grab all anchor texts in the Target column.
+    doc.querySelectorAll('a[href*="exo.mast.stsci.edu"]').forEach(a=>{
+      const t = a.textContent.trim();
+      if(t) targets.add(t.toLowerCase());
+    });
+    // Map to hostname-only matching: mark any planet whose hostname matches one of these targets
+    state.hstNames = targets;
+    console.log('Loaded HST targets:', state.hstNames.size);
+  }catch(err){
+    console.warn('HST fetch failed (non-fatal):', err);
+  }
+}
 async function loadJWST(){
   try{
     const t = await (await fetch(JWST_CSV_URL)).text();
@@ -192,7 +222,7 @@ function buildTraces(){
     const x=xFn(p), y=yFn(p); if(x==null||y==null) continue;
     const nm = canon(p.pl_name);
     const inJWST = state.jwstNames.has(nm);
-    const inHST  = state.hstNames.has(nm);
+    const inHST  = state.hstNames.has(nm) || state.hstNames.has(canon(p.hostname));
     const hover = `${p.pl_name}<br>${xKey}: <b>${x}</b><br>${yKey}: <b>${y}</b>`;
     const o = {x,y, hovertemplate: hover+'<extra></extra>'};
     if(inJWST) jwst.push(o); else if(inHST) hst.push(o); else base.push(o);
@@ -247,9 +277,11 @@ function hookUI(){
 (async function init(){
   try{
     populateDropdowns(); hookUI();
-    const [ps] = await Promise.all([loadPS(), loadJWST()]);
+    const ps = await loadPS();
     state._all = ps; state.planets = ps; refresh();
     document.getElementById('status').textContent = `Loaded NASA Exoplanet Archive (rows: ${ps.length.toLocaleString()})`;
+    // Try to load JWST list, but don't fail if it errors
+    loadJWST().then(()=>refresh()).catch(err=>console.warn('JWST load failed (non-fatal)', err));
   }catch(err){
     console.error(err); document.getElementById('status').textContent = 'Failed to load data.';
   }
