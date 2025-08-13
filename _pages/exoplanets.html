@@ -139,7 +139,7 @@ permalink: /exoplanets
 <style>
 :root {
   --mpurple: #9370DB;   /* JWST observed */
-  --teal: #06b6d4;      /* JWST planned */
+  --teal: #E69F00;      /* JWST planned */
   --green: #10B981;     /* HST */
   --muted: #6b7280;
   --bg: #f6f4fb;
@@ -160,7 +160,7 @@ body { background: var(--bg); }
 .dot { display:inline-block; width:10px; height:10px; border-radius:999px; margin-right:.4rem; }
 .dot.pop { background:#9CA3AF; opacity:.8; }
 .dot.jwstobs { background:#9370DB; }
-.dot.jwstplan { background:#06b6d4; }
+.dot.jwstplan { background:#E69F00; }
 .dot.hst { background:#10B981; }
 .dot.diamond { clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); }
 .dot.square { border-radius: 3px; }
@@ -465,7 +465,7 @@ function buildTraces(){
     traces.push({
       name: 'JWST – Planned', type: baseType, mode: baseMode,
       x: plan.map(d=>d.x), y: plan.map(d=>d.y),
-      marker:{ symbol:'diamond', size: (useTSM||useESM) ? planSizes : 12, opacity:.95, color:'#06b6d4' },
+      marker:{ symbol:'diamond', size: (useTSM||useESM) ? planSizes : 12, opacity:.95, color:'#E69F00' },
       ...(showLabels ? { text: labelsPlan, textposition:'top center' } : {}),
       hovertemplate: '%{x}, %{y}<extra></extra>'
     });
