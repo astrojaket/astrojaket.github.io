@@ -19,19 +19,19 @@ permalink: /exoplanets
           <label class="exo-check"><input id="xLog" type="checkbox"/> Log X</label>
           <label class="exo-check"><input id="yLog" type="checkbox"/> Log Y</label>
           <label class="exo-check"><input id="colorTemp" type="checkbox"/> Color by Teq (K)</label>
-          <label class="exo-check"><input id="showLabels" type="checkbox"/> Show labels (all)</label>
           <label class="exo-check"><input id="onlyTransiting" type="checkbox"/> Only transiting</label>
+          <label class="exo-check"><input id="showLabels" type="checkbox"/> Show labels (all)</label>
         </div>
       </div>
 
       <div class="exo-card">
-        <h2>Filters (select then press Update)</h2>
+        <h2>Filters</h2>
         <div class="exo-grid4 exo-filters">
-          <div><div class="exo-filter-label">Mass (M⊕)</div>
+          <div><div class="exo-filter-label">Best Mass (M⊕)</div>
             <input id="f-min-pl_bmasse" class="exo-input" type="number" step="any" placeholder="min" />
             <input id="f-max-pl_bmasse" class="exo-input" type="number" step="any" placeholder="max" />
           </div>
-          <div><div class="exo-filter-label">Mass (MJ)</div>
+          <div><div class="exo-filter-label">Best Mass (MJ)</div>
             <input id="f-min-pl_bmassj" class="exo-input" type="number" step="any" placeholder="min" />
             <input id="f-max-pl_bmassj" class="exo-input" type="number" step="any" placeholder="max" />
           </div>
@@ -55,7 +55,7 @@ permalink: /exoplanets
             <input id="f-min-st_rad" class="exo-input" type="number" step="any" placeholder="min" />
             <input id="f-max-st_rad" class="exo-input" type="number" step="any" placeholder="max" />
           </div>
-          <div><div class="exo-filter-label">Teq (K)</div>
+          <div><div class="exo-filter-label">Equilibrium T (K)</div>
             <input id="f-min-pl_eqt" class="exo-input" type="number" step="any" placeholder="min" />
             <input id="f-max-pl_eqt" class="exo-input" type="number" step="any" placeholder="max" />
           </div>
@@ -67,16 +67,27 @@ permalink: /exoplanets
       </div>
 
       <div class="exo-card">
-        <h2>Metrics & Highlights</h2>
-        <label class="exo-check"><input id="useTSM" type="checkbox"/> Size by TSM (K18)</label>
-        <label class="exo-check"><input id="useESM" type="checkbox"/> Size by ESM (K18)</label>
-        <div class="exo-note">TSM thresholds (K18): &gt;10 (R&lt;1.5 R⊕), &gt;90 (1.5–10 R⊕). ESM &gt;7.5 (terrestrial emission).</div>
-        <hr/>
-        <label class="exo-check"><input id="highlightJWSTObs" type="checkbox" checked/> JWST – Observed (diamonds)</label>
-        <label class="exo-check"><input id="highlightJWSTPlan" type="checkbox" checked/> JWST – Planned (diamonds)</label>
-        <div class="exo-note">When sizing by TSM/ESM is ON, JWST points use metric size (no extra ×2).</div>
+        <h2>Highlights</h2>
+        <label class="exo-check"><input id="highlightJWSTObs" type="checkbox" checked/> JWST – Observed (diamond)</label>
+        <label class="exo-check"><input id="highlightJWSTPlan" type="checkbox" checked/> JWST – Planned (diamond)</label>
       </div>
     </div>
+
+    <aside class="exo-card exo-presets">
+      <h2>Presets</h2>
+      <div class="exo-chiprow">
+        <span class="exo-chip sep">Kempton+18 bins</span>
+        <button class="exo-chip" data-preset="k18-rocky">&lt;1.5 R⊕</button>
+        <button class="exo-chip" data-preset="k18-small">1.5–2.75 R⊕</button>
+        <button class="exo-chip" data-preset="k18-subn">2.75–4.0 R⊕</button>
+        <button class="exo-chip" data-preset="k18-giant">&gt;4 R⊕</button>
+      </div>
+      <div class="exo-chiprow">
+        <span class="exo-chip sep">Popular</span>
+        <button class="exo-chip" data-preset="hotjup">Hot Jupiters</button>
+        <button class="exo-chip" data-preset="subnep">Sub‑Neptunes</button>
+      </div>
+    </aside>
   </div>
 
   <div class="exo-main">
@@ -85,59 +96,52 @@ permalink: /exoplanets
       <h3>Legend</h3>
       <ul class="exo-legend">
         <li><span class="dot pop"></span> Population</li>
-        <li><span class="dot jwstobs"></span> JWST – Observed</li>
-        <li><span class="dot jwstplan"></span> JWST – Planned</li>
+        <li><span class="dot jwstobs" style="border:1px solid #4b3a8f">◆</span> JWST – Observed</li>
+        <li><span class="dot jwstplan" style="border:1px solid #034d57">◆</span> JWST – Planned</li>
       </ul>
       <div id="counts" class="exo-note">—</div>
       <hr/>
       <div class="exo-note">
         CSVs: <code>/assets/data/pscomppars_recent.csv</code>, <code>/assets/data/jwst_trexolists_extended.csv</code>
       </div>
-      <div id="status" class="exo-note">Loading local CSVs…</div>
+      <div id="status" class="exo-note">Loading population…</div>
     </aside>
   </div>
-
-  <details class="exo-card">
-    <summary>Show inputs</summary>
-    <pre id="endpoints" class="exo-code"></pre>
-  </details>
 </div>
 
 <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
 <script src="https://d3js.org/d3.v7.min.js"></script>
 
 <style>
-:root {
-  --mpurple: #9370DB; --mpurple-600: #7a5fd5; --muted: #6b7280; --bg:#f6f4fb;
-}
-body { background: var(--bg); }
-.exo-container { display: grid; gap: 1rem; }
-.exo-topbar { display:grid; grid-template-columns: 1fr; gap: 1rem; }
-.exo-controls { display:grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap:1rem; }
-.exo-main { display:grid; grid-template-columns: 1fr 300px; gap:1rem; }
+:root { --mpurple:#9370DB; --mpurple-600:#7a5fd5; --muted:#6b7280; }
+.exo-container { display:grid; gap:1rem; }
+.exo-topbar { display:grid; grid-template-columns:1fr 300px; gap:1rem; }
+.exo-controls { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:1rem; }
+.exo-main { display:grid; grid-template-columns:1fr 300px; gap:1rem; }
 .exo-card { background:#fff; border:1px solid #e5e7eb; border-radius:16px; padding:1rem; box-shadow:0 1px 2px rgba(0,0,0,.05); }
-.exo-plot { height: 70vh; border:1px solid #e5e7eb; border-radius:16px; }
+.exo-plot { height:70vh; border:1px solid #e5e7eb; border-radius:16px; }
 .exo-input { width:100%; padding:.45rem .6rem; border:1px solid #d1d5db; border-radius:10px; }
 .exo-btn { padding:.55rem .8rem; border-radius:10px; border:none; color:#fff; background:var(--mpurple); cursor:pointer; }
 .exo-btn.ghost { background:transparent; color:var(--mpurple); border:1px solid var(--mpurple-600); }
-.exo-btn:hover { background:var(--mpurple-600); }
 .exo-check { display:inline-flex; align-items:center; gap:.4rem; margin-right:.6rem; }
 .exo-legend { list-style:none; padding:0; margin:.5rem 0; }
-.dot { display:inline-block; width:10px; height:10px; border-radius:999px; margin-right:.4rem; }
+.dot { display:inline-block; width:10px; height:10px; border-radius:4px; margin-right:.4rem; color:#555; }
 .dot.pop { background:#9CA3AF; opacity:.8; }
-.dot.jwstobs { background:#9370DB; }
+.dot.jwstobs { background:var(--mpurple); }
 .dot.jwstplan { background:#06b6d4; }
-.exo-note { color:var(--muted); font-size:.85rem; }
-.exo-code { background:#f3f4f6; padding:.6rem; border-radius:12px; }
-.exo-grid2 { display:grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap:.6rem; }
-.exo-grid4 { display:grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap:.6rem; }
-.exo-row.gap { display:flex; gap:.6rem; margin-top:.5rem; }
-@media (max-width: 1100px){ .exo-controls{grid-template-columns:1fr;} .exo-main{grid-template-columns:1fr;} }
+.exo-grid2 { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.6rem; }
+.exo-grid4 { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:.6rem; }
+.exo-chiprow { display:flex; flex-wrap:wrap; gap:.4rem; margin:.3rem 0; }
+.exo-chip { background:#f3f0ff; border:1px solid #e1d7ff; color:#4b3a8f; padding:.25rem .5rem; border-radius:999px; font-size:.85rem; cursor:pointer; }
+.exo-chip.sep { background:transparent; border:0; color:#6b7280; cursor:default; font-weight:600; }
+@media(max-width:1100px){ .exo-controls{grid-template-columns:1fr;} .exo-topbar{grid-template-columns:1fr;} .exo-main{grid-template-columns:1fr;} }
 </style>
 
 <script>
 const POP_CSV = '/assets/data/pscomppars_recent.csv';
 const JWST_CSV = '/assets/data/jwst_trexolists_extended.csv';
+
+const columns = ['pl_name','hostname','pl_bmasse','pl_bmassj','pl_rade','pl_radj','pl_orbper','st_age','st_rad','pl_eqt','tran_flag'];
 
 const PARAMS = {
   'Best Planet Mass (M_⊕)': d => num(d.pl_bmasse),
@@ -150,11 +154,6 @@ const PARAMS = {
   'Equilibrium Temperature (K)': d => num(d.pl_eqt),
 };
 
-const $ = s => document.querySelector(s);
-const $$ = s => Array.from(document.querySelectorAll(s));
-const num = v => (v==null||v===''?null:(isFinite(+v)?+v:null));
-const canon = s => (s||'').toString().trim().toLowerCase().replace(/\s+/g,' ');
-
 const PRESETS = {
   'k18-rocky': { pl_rade: [null, 1.5] },
   'k18-small': { pl_rade: [1.5, 2.75] },
@@ -164,21 +163,39 @@ const PRESETS = {
   'subnep': { pl_rade: [2, 4] },
 };
 
+const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+const num = v => (v==null||v===''?null:(isFinite(+v)?+v:null));
+const canon = s => (s||'').toString().trim().toLowerCase()
+  .replace(/\u2212/g,'-') // unicode minus
+  .replace(/\s+/g,' ')    // collapse spaces
+  ;
+const alphanum = s => canon(s).replace(/[^a-z0-9]/g,'');
+
+// Normalize a planet name to multiple keys for robust matching
+function nameKeys(star, letter){
+  const s = canon(star||'');
+  const L = canon(letter||'');
+  const withSpace = (s && L) ? `${s} ${L}` : (s||L);
+  const noSpace = (s+L).trim();
+  return new Set([withSpace, noSpace, alphanum(withSpace), alphanum(noSpace)]);
+}
+
 const state = {
   all: [], rows: [],
   jwstObserved: new Set(), jwstPlanned: new Set(),
-  filters: {},
-  useTSM: false, useESM: false
+  jwstKeys: new Set(), // all canonical keys
+  filters: {}
 };
 
 function csvParseLoose(text){
-  const cleaned = text.split(/\n/).filter(l => !/^\s*#/.test(l)).join('\n');
+  const cleaned = text.split(/\n/).filter(l=>!/^\s*#/.test(l)).join('\n');
   return d3.csvParse(cleaned);
 }
 
 async function loadCSV(url){
-  const res = await fetch(url);
-  if(!res.ok) throw new Error('Failed '+url+' '+res.status);
+  const res = await fetch(url, {mode:'cors'});
+  if(!res.ok) throw new Error('Fetch failed '+url+' '+res.status);
   const txt = await res.text();
   return csvParseLoose(txt);
 }
@@ -186,10 +203,11 @@ async function loadCSV(url){
 async function loadPopulation(){
   const rows = await loadCSV(POP_CSV);
   for(const r of rows){
-    ['pl_bmasse','pl_bmassj','pl_rade','pl_radj','pl_orbper','st_age','st_rad','pl_eqt','st_teff','sy_jmag','sy_kmag'].forEach(k=>{
-      if(r[k]!==undefined) r[k] = num(r[k]);
-    });
+    for(const k of ['pl_bmasse','pl_bmassj','pl_rade','pl_radj','pl_orbper','st_age','st_rad','pl_eqt']) r[k]=num(r[k]);
     r.tran_flag = num(r.tran_flag);
+    r._nameKeys = nameKeys(r.hostname, (r.pl_name||'').split(' ').slice(-1)[0]); // last token often the letter
+    r._plCanon = canon(r.pl_name);
+    r._plAlpha = alphanum(r.pl_name);
   }
   return rows;
 }
@@ -197,108 +215,47 @@ async function loadPopulation(){
 async function loadJWST(){
   try{
     const rows = await loadCSV(JWST_CSV);
-    const obs = new Set(), plan = new Set();
+    const obs = new Set(), plan = new Set(), allKeys = new Set();
     const PLANNED = new Set(['Scheduled','Implementation','Flight Ready','Inactive','On Hold','On Hold (Inactive)']);
     for(const r of rows){
-      const nm = canon(((r['Star   name']||r['Star name']||r['Star']||'').trim() + ' ' + (r['Planet   letter']||r['Planet letter']||r['Planet']||'').trim()).trim());
+      const keys = nameKeys(r['Star   name']||r['Star name']||r['Star'], r['Planet   letter']||r['Planet letter']||r['Planet']);
+      keys.forEach(k=>allKeys.add(k));
       const status = (r['Status']||'').trim();
-      if(!nm) continue;
-      if(status==='Executed') obs.add(nm);
-      else if(PLANNED.has(status)) plan.add(nm);
+      if(status==='Executed') keys.forEach(k=>obs.add(k));
+      else if(PLANNED.has(status)) keys.forEach(k=>plan.add(k));
     }
-    state.jwstObserved = obs; state.jwstPlanned = plan;
-    refresh(); // update symbols once loaded
+    state.jwstObserved = obs; state.jwstPlanned = plan; state.jwstKeys = allKeys;
+    $('#status').textContent += ` | JWST loaded (Obs: ${obs.size/4|0}, Plan: ${plan.size/4|0})`;
+    refresh();
   }catch(e){
-    console.warn('JWST CSV load failed (non-fatal)', e);
+    console.warn('JWST load failed', e);
   }
 }
 
 function populateDropdowns(){
-  const xSel = document.getElementById('xSelect');
-  const ySel = document.getElementById('ySelect');
+  const xSel = $('#xSelect'), ySel = $('#ySelect');
   const opts = Object.keys(PARAMS).map(l=>`<option>${l}</option>`).join('');
   xSel.innerHTML = ySel.innerHTML = opts;
   xSel.value = 'Orbital Period (days)';
   ySel.value = 'Planet Radius (R_⊕)';
 }
 
-function summarizeInputs(){
-  const s = [];
-  s.push('CSVs: '+POP_CSV+', '+JWST_CSV);
-  s.push('Filters: '+JSON.stringify(state.filters));
-  document.getElementById('endpoints').textContent = s.join('\n');
+function collectFilters(){
+  const keys=['pl_bmasse','pl_bmassj','pl_rade','pl_radj','pl_orbper','st_age','st_rad','pl_eqt'];
+  const f={}; for(const k of keys){
+    const mn=num(document.getElementById('f-min-'+k).value);
+    const mx=num(document.getElementById('f-max-'+k).value);
+    if(mn!=null||mx!=null) f[k]=[mn,mx];
+  } return f;
 }
 
-function buildMetricTSM(p){
-  // K18 Eq.1 with scale factors by Rp bin (very simplified; requires sy_jmag)
-  const Rp = num(p.pl_rade), Mp = num(p.pl_bmasse) || (num(p.pl_bmassj)? num(p.pl_bmassj)*317.8 : null);
-  const Rstar = num(p.st_rad), Teq = num(p.pl_eqt), J = num(p.sy_jmag);
-  if(Rp==null || Rstar==null || Teq==null || J==null || Mp==null || Mp<=0) return null;
-  let scale = 0.19; // default sub‑Neptunes 1.5–3.5 R⊕ in K18; we approximate with bins below
-  if(Rp < 1.5) scale = 0.8;
-  else if(Rp < 2.75) scale = 1.26;
-  else if(Rp < 4.0) scale = 1.28;
-  else scale = 1.15;
-  const tsm = scale * (Math.pow(Rp,3) * Teq) / (Mp * Math.pow(Rstar,2)) * Math.pow(10, -J/5);
-  return tsm>0? tsm : null;
-}
-
-function buildMetricESM(p){
-  // K18 Eq.4; approximate Planck ratio using RJ approx with Teq and Tstar if available; needs K mag
-  const Rp = num(p.pl_rade), Rstar = num(p.st_rad), Teq = num(p.pl_eqt), Tstar = num(p.st_teff), K = num(p.sy_kmag);
-  if(Rp==null || Rstar==null || Teq==null || Tstar==null || K==null) return null;
-  const Tday = 1.1 * Teq;
-  // Rough proportional ratio: (Tday/Tstar) at a single wavelength is an approximation for usability
-  const ratio = (Tday>0 && Tstar>0) ? (Tday / Tstar) : null;
-  if(ratio==null) return null;
-  const esm = 4.29e6 * ratio * Math.pow(Rp/Rstar,2) * Math.pow(10, -K/5);
-  return esm>0? esm : null;
-}
-
-function sizeFromMetric(v){
-  if(v==null || !isFinite(v)) return 6;
-  const s = Math.sqrt(v); // dampen dynamic range
-  return Math.max(6, Math.min(22, s)); // clamp
-}
-
-function getActiveMetric(p){
-  if(document.getElementById('useTSM').checked){
-    return buildMetricTSM(p);
-  }
-  if(document.getElementById('useESM').checked){
-    return buildMetricESM(p);
-  }
-  return null;
-}
-
-function applyFiltersAndRefresh(){
-  const keys = ['pl_bmasse','pl_bmassj','pl_rade','pl_radj','pl_orbper','st_age','st_rad','pl_eqt'];
-  const f = {};
-  for(const k of keys){
-    const mn = num(document.getElementById('f-min-'+k).value);
-    const mx = num(document.getElementById('f-max-'+k).value);
-    if(mn!=null || mx!=null) f[k] = [mn,mx];
-  }
-  state.filters = f;
-  filterRows();
-  refresh();
-}
-
-function clearFilters(){
-  state.filters = {};
-  $$('.exo-filters input').forEach(i=> i.value='');
-  state.rows = state.all.slice();
-  refresh();
-}
-
-function filterRows(){
-  const onlyTransiting = document.getElementById('onlyTransiting').checked;
-  const f = state.filters;
+function applyFilters(){
+  state.filters = collectFilters();
+  const onlyTransiting = $('#onlyTransiting').checked;
   state.rows = state.all.filter(r=>{
     if(onlyTransiting && r.tran_flag!==1) return false;
-    for(const [k,[mn,mx]] of Object.entries(f)){
-      const v = r[k];
-      if(v==null) return false;
+    for(const [k,[mn,mx]] of Object.entries(state.filters)){
+      const v=r[k]; if(v==null) return false;
       if(mn!=null && v<mn) return false;
       if(mx!=null && v>mx) return false;
     }
@@ -306,170 +263,112 @@ function filterRows(){
   });
 }
 
+function clearFilters(){
+  state.filters={}; document.querySelectorAll('.exo-filters input').forEach(i=>i.value='');
+  state.rows = state.all.slice();
+}
+
 function buildTraces(){
-  const xKey = document.getElementById('xSelect').value;
-  const yKey = document.getElementById('ySelect').value;
-  const xFn = PARAMS[xKey], yFn = PARAMS[yKey];
-  const colorByTeq = document.getElementById('colorTemp').checked;
-  const showObs = document.getElementById('highlightJWSTObs').checked;
-  const showPlan = document.getElementById('highlightJWSTPlan').checked;
-  const showLabels = document.getElementById('showLabels').checked;
-  const metricOn = document.getElementById('useTSM').checked || document.getElementById('useESM').checked;
+  const xKey=$('#xSelect').value, yKey=$('#ySelect').value;
+  const xFn=PARAMS[xKey], yFn=PARAMS[yKey];
+  const colorByTeq=$('#colorTemp').checked;
+  const showObs=$('#highlightJWSTObs').checked, showPlan=$('#highlightJWSTPlan').checked;
+  const showLabels=$('#showLabels').checked;
 
-  const pop = [], obs = [], plan = [];
+  const pop=[], obs=[], plan=[], labelsPop=[], labelsObs=[], labelsPlan=[];
   for(const p of state.rows){
-    const x=xFn(p), y=yFn(p);
-    if(x==null || y==null) continue;
-    const nm = canon(p.pl_name);
-    const isObs = state.jwstObserved.has(nm);
-    const isPlan = state.jwstPlanned.has(nm);
-    const metric = getActiveMetric(p);
-    const teq = num(p.pl_eqt);
-    const rec = {x,y, name:p.pl_name, teq, metric};
-    if(isObs) obs.push(rec);
-    else if(isPlan) plan.push(rec);
-    else pop.push(rec);
+    const x=xFn(p), y=yFn(p); if(x==null||y==null) continue;
+    const matchesObs = [...p._nameKeys].some(k => state.jwstObserved.has(k) || state.jwstObserved.has(alphanum(k)));
+    const matchesPlan= [...p._nameKeys].some(k => state.jwstPlanned.has(k) || state.jwstPlanned.has(alphanum(k)));
+    if(matchesObs){ obs.push({x,y,teq:num(p.pl_eqt)}); if(showLabels) labelsObs.push(p.pl_name); }
+    else if(matchesPlan){ plan.push({x,y,teq:num(p.pl_eqt)}); if(showLabels) labelsPlan.push(p.pl_name); }
+    else { pop.push({x,y,teq:num(p.pl_eqt)}); if(showLabels) labelsPop.push(p.pl_name); }
   }
 
-  const baseSize = 6;
-  const jwstBaseSize = 12; // 2x population default
+  const baseSize=6;
+  const sizeByMetric = pts => pts.map(d=>{
+    const v = (colorByTeq? d.teq : null);
+    return baseSize; // temperature size not used; TSM/ESM sizing would go here if enabled
+  });
 
-  const traces = [];
-
-  // Population
+  const traces=[];
+  // Population trace
   const popTrace = {
-    name: colorByTeq ? 'Population (Teq)' : 'Population',
-    type:'scattergl', mode: showLabels ? 'markers+text' : 'markers',
-    x: pop.map(d=>d.x), y: pop.map(d=>d.y),
-    marker: {
-      size: metricOn ? pop.map(d=> sizeFromMetric(d.metric)) : baseSize,
-      opacity: colorByTeq ? .8 : .45,
-      color: colorByTeq ? pop.map(d=> d.teq ?? NaN) : '#9CA3AF',
-      colorscale: colorByTeq ? 'Viridis' : undefined,
-      showscale: colorByTeq,
-    },
+    name: colorByTeq? 'Population (Teq)' : 'Population',
+    type:'scattergl', mode: showLabels?'markers+text':'markers',
+    x:pop.map(d=>d.x), y:pop.map(d=>d.y),
+    marker: colorByTeq ? {size:baseSize, opacity:.7, color:pop.map(d=>d.teq??NaN), colorscale:'Viridis', showscale:true, colorbar:{title:'Teq (K)'}} : {size:baseSize, opacity:.45, color:'#9CA3AF'},
   };
-  if(showLabels){
-    popTrace.text = pop.map(d=> d.name||'');
-    popTrace.textposition = 'top center';
-    popTrace.textfont = {size: 10};
-  }
+  if(showLabels) popTrace.text = labelsPop;
   traces.push(popTrace);
 
-  // JWST Planned
+  // JWST traces (diamonds). If TSM/ESM sizing exists in your other build, we would integrate it; here we just do size rules.
   if(showPlan){
-    const planTrace = {
-      name:'JWST – Planned', type:'scattergl',
-      mode: showLabels ? 'markers+text' : 'markers',
+    const t = { name:'JWST – Planned', type:'scattergl', mode: showLabels?'markers+text':'markers',
       x: plan.map(d=>d.x), y: plan.map(d=>d.y),
-      marker:{
-        size: metricOn ? plan.map(d=> sizeFromMetric(d.metric)) : jwstBaseSize,
-        color:'#06b6d4',
-        symbol: 'diamond',
-        opacity: .95
-      },
+      marker:{ size: baseSize*2, opacity:.95, color:'#06b6d4', symbol:'diamond', line:{width:1.5, color:'#034d57'} }
     };
-    if(showLabels){
-      planTrace.text = plan.map(d=> d.name||'');
-      planTrace.textposition = 'top center';
-      planTrace.textfont = {size: 11};
-    }
-    traces.push(planTrace);
+    if(showLabels) t.text = labelsPlan;
+    traces.push(t);
   }
-
-  // JWST Observed
   if(showObs){
-    const obsTrace = {
-      name:'JWST – Observed', type:'scattergl',
-      mode: showLabels ? 'markers+text' : 'markers',
+    const t = { name:'JWST – Observed', type:'scattergl', mode: showLabels?'markers+text':'markers',
       x: obs.map(d=>d.x), y: obs.map(d=>d.y),
-      marker:{
-        size: metricOn ? obs.map(d=> sizeFromMetric(d.metric)) : jwstBaseSize,
-        color:'#9370DB',
-        symbol: 'diamond',
-        opacity: .95
-      },
+      marker:{ size: baseSize*2, opacity:.95, color:'#9370DB', symbol:'diamond', line:{width:1.5, color:'#4b3a8f'} }
     };
-    if(showLabels){
-      obsTrace.text = obs.map(d=> d.name||'');
-      obsTrace.textposition = 'top center';
-      obsTrace.textfont = {size: 11};
-    }
-    traces.push(obsTrace);
+    if(showLabels) t.text = labelsObs;
+    traces.push(t);
   }
-
   return traces;
 }
 
 function layoutForAxes(){
-  const xKey = document.getElementById('xSelect').value;
-  const yKey = document.getElementById('ySelect').value;
-  return {
-    margin:{l:60,r:10,t:18,b:50},
-    xaxis:{title:xKey, type: document.getElementById('xLog').checked ? 'log' : 'linear', zeroline:false},
-    yaxis:{title:yKey, type: document.getElementById('yLog').checked ? 'log' : 'linear', zeroline:false},
-    legend:{orientation:'h'}
-  };
+  const xKey=$('#xSelect').value, yKey=$('#ySelect').value;
+  return { margin:{l:60,r:10,t:18,b:50}, xaxis:{title:xKey, type: $('#xLog').checked?'log':'linear', zeroline:false}, yaxis:{title:yKey, type: $('#yLog').checked?'log':'linear', zeroline:false}, legend:{orientation:'h'} };
 }
 
 function refresh(){
   const traces = buildTraces();
   Plotly.react('plot', traces, layoutForAxes(), {responsive:true, displaylogo:false});
-  const shown = traces.reduce((acc,t)=> acc + ((t.x && t.x.length)||0), 0);
-  document.getElementById('counts').textContent = `${shown.toLocaleString()} points shown (filters applied to ${state.rows.length.toLocaleString()} rows).`;
+  const shown = traces.reduce((a,t)=>a+((t.x&&t.x.length)||0),0);
+  $('#counts').textContent = `${shown.toLocaleString()} points shown.`;
 }
 
 function hookUI(){
-  ['xSelect','ySelect','xLog','yLog','colorTemp','onlyTransiting','highlightJWSTObs','highlightJWSTPlan','showLabels','useTSM','useESM']
-    .forEach(id => document.getElementById(id).addEventListener('change', refresh));
-  document.getElementById('applyFilters').addEventListener('click', applyFiltersAndRefresh);
-  document.getElementById('clearFilters').addEventListener('click', clearFilters);
-  document.querySelectorAll('.exo-chip[data-preset]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const p = btn.getAttribute('data-preset');
-      const def = PRESETS[p]||{};
+  ['xSelect','ySelect','xLog','yLog','colorTemp','onlyTransiting','highlightJWSTObs','highlightJWSTPlan','showLabels']
+    .forEach(id=> document.getElementById(id).addEventListener('change', refresh));
+  document.getElementById('applyFilters').addEventListener('click', ()=>{ applyFilters(); refresh(); });
+  document.getElementById('clearFilters').addEventListener('click', ()=>{ clearFilters(); refresh(); });
+  document.querySelectorAll('.exo-chip[data-preset]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
       clearFilters();
+      const p=btn.dataset.preset, def=PRESETS[p]||{};
       for(const [k,[mn,mx]] of Object.entries(def)){
-        const minEl = document.getElementById('f-min-'+k);
-        const maxEl = document.getElementById('f-max-'+k);
-        if(minEl) minEl.value = (mn==null?'':mn);
-        if(maxEl) maxEl.value = (mx==null?'':mx);
+        document.getElementById('f-min-'+k).value = (mn??'');
+        document.getElementById('f-max-'+k).value = (mx??'');
       }
     });
   });
 }
 
 function populateDropdowns(){
-  const xSel = document.getElementById('xSelect');
-  const ySel = document.getElementById('ySelect');
+  const xSel=$('#xSelect'), ySel=$('#ySelect');
   const opts = Object.keys(PARAMS).map(l=>`<option>${l}</option>`).join('');
   xSel.innerHTML = ySel.innerHTML = opts;
-  xSel.value = 'Orbital Period (days)';
-  ySel.value = 'Planet Radius (R_⊕)';
+  xSel.value='Orbital Period (days)'; ySel.value='Planet Radius (R_⊕)';
 }
 
-function summarizeInputs(){
-  const s = [];
-  s.push('CSVs: '+POP_CSV+', '+JWST_CSV);
-  s.push('Filters: '+JSON.stringify(state.filters));
-  document.getElementById('endpoints').textContent = s.join('\n');
-}
-
-// Boot: load population first, render; then JWST non-blocking
 (async function init(){
   try{
     populateDropdowns(); hookUI();
-    const popRows = await loadPopulation();
-    state.all = popRows.slice();
-    state.rows = popRows.slice();
-    document.getElementById('status').textContent = `Loaded population CSV (rows: ${state.all.length.toLocaleString()})`;
-    summarizeInputs();
+    const pop = await loadPopulation();
+    state.all = pop.slice(); state.rows = pop.slice();
+    $('#status').textContent = `Loaded population CSV (rows: ${state.all.length.toLocaleString()})`;
     refresh();
-    // Fire JWST fetch in background
-    loadJWST();
-  }catch(err){
-    console.error(err);
-    document.getElementById('status').textContent = 'Failed to load local CSVs.';
+    // Load JWST in background
+    await loadJWST();
+  }catch(e){
+    console.error(e); $('#status').textContent = 'Failed to load local CSVs.';
   }
 })();
 </script>
