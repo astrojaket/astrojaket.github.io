@@ -260,7 +260,14 @@ async function loadCSV(url){
 async function loadPopulation(){
   const rows = await loadCSV(POP_CSV);
   const numCols = ['pl_bmasse','pl_bmassj','pl_rade','pl_radj','pl_orbper','st_age','st_rad','pl_eqt','st_teff','sy_jmag','sy_kmag','tran_flag','hostname','pl_name'];
-  for(const r of rows){ for(const k of numCols){ if(r[k] !== undefined) r[k] = num(r[k]) if (!isFinite(r[k])) r[k] = r[k]; } } // keep strings for hostname/pl_name
+  for (const r of rows) {
+    for (const k of numCols) {
+      if (r[k] !== undefined) {
+        const val = num(r[k]);
+        if (val !== null) r[k] = val;
+      }
+    }
+  } // keep strings for hostname/pl_name
 
   const variants = new Set();
   for(const r of rows){
