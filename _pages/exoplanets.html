@@ -21,8 +21,8 @@ permalink: /exoplanets
     </div>
     <div class="exo-card">
       <h2>Highlighting</h2>
-      <label class="exo-check"><input id="showJWSTObserved" type="checkbox" checked/> JWST – Observed (Executed)</label>
-      <label class="exo-check"><input id="showJWSTPlanned" type="checkbox" checked/> JWST – Planned</label>
+      <label class="exo-check"><input id="highlightJWSTObserved" type="checkbox" checked/> JWST – Observed</label>
+      <label class="exo-check"><input id="highlightJWSTPlanned" type="checkbox" checked/> JWST – Planned</label>
       <label class="exo-check"><input id="onlyTransiting" type="checkbox"/> Only transiting</label>
     </div>
     <div class="exo-card">
@@ -38,68 +38,169 @@ permalink: /exoplanets
       <h3>Legend</h3>
       <ul class="exo-legend">
         <li><span class="dot pop"></span> Population</li>
-        <li><span class="dot jwst"></span> JWST – Observed</li>
-        <li><span class="dot jwstP"></span> JWST – Planned</li>
+        <li><span class="dot jwstobs"></span> JWST – Observed</li>
+        <li><span class="dot jwstplan"></span> JWST – Planned</li>
       </ul>
       <div id="counts" class="exo-note">—</div>
       <hr/>
       <div class="exo-note">
-        Data: Local CSVs (NASA Exoplanet Archive pscomppars + JWST TrExoLiSTS extended)
+        Data: local CSVs from NASA Exoplanet Archive (pscomppars) and TrExoLiSTS (JWST).
       </div>
     </aside>
   </div>
 
   <details class="exo-card">
-    <summary>Show data files</summary>
+    <summary>Show data paths</summary>
     <pre id="endpoints" class="exo-code"></pre>
   </details>
 
   <div id="status" class="exo-note">Loading CSV files…</div>
 </div>
 
-<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
-<script src="https://d3js.org/d3.v7.min.js"></script>
-
 <style>
-:root { --mpurple:#9370DB; --ink:#1f2937; --muted:#6b7280; --card:#ffffff; --bg:#f6f4fb; }
-body { background: var(--bg); }
-.exo-container { display:grid; gap:1rem; }
-.exo-controls { display:grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap:1rem; }
-.exo-main { display:grid; grid-template-columns: 1fr 280px; gap:1rem; }
-.exo-card { background:var(--card); border:1px solid #e5e7eb; border-radius:16px; padding:1rem; box-shadow:0 1px 2px rgba(0,0,0,.05); }
-.exo-plot { height:68vh; background:#fff; border:1px solid #e5e7eb; border-radius:16px; }
-.exo-input { width:100%; padding:.5rem .6rem; border:1px solid #d1d5db; border-radius:12px; }
-.exo-btn { padding:.55rem .8rem; border-radius:12px; border:none; color:#fff; background:var(--mpurple); cursor:pointer; }
-.exo-btn:hover { filter:brightness(.95); }
-.exo-check { display:inline-flex; align-items:center; gap:.4rem; margin-right:.8rem; }
-.exo-legend { list-style:none; padding:0; margin:.5rem 0; }
+:root {
+  --mpurple: #9370DB;
+  --mpurple-600: #7a5fd5;
+  --muted: #6b7280;
+  --card: #ffffff;
+  --bg: #f6f4fb;
+}
+.exo-container { display: grid; gap: 1rem; }
+.exo-controls { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 1rem; }
+.exo-main { display: grid; grid-template-columns: 1fr 280px; gap: 1rem; }
+.exo-card { background: var(--card); border: 1px solid #e5e7eb; border-radius: 16px; padding: 1rem; box-shadow: 0 1px 2px rgba(0,0,0,.05); }
+.exo-plot { height: 68vh; background: #fff; border: 1px solid #e5e7eb; border-radius: 16px; }
+.exo-input { width: 100%; padding: .5rem .6rem; border: 1px solid #d1d5db; border-radius: 12px; }
+.exo-btn { padding: .55rem .8rem; border-radius: 12px; border: none; color: #fff; background: var(--mpurple); cursor: pointer; }
+.exo-btn:hover { background: var(--mpurple-600); }
+.exo-check { display: inline-flex; align-items: center; gap: .4rem; margin-right: .8rem; }
+.exo-legend { list-style: none; padding: 0; margin: .5rem 0; }
 .dot { display:inline-block; width:10px; height:10px; border-radius:999px; margin-right:.4rem; }
 .dot.pop { background:#9CA3AF; opacity:.8; }
-.dot.jwst { background: var(--mpurple); }
-.dot.jwstP { background: transparent; border:2px solid var(--mpurple); border-radius:999px; width:10px; height:10px; display:inline-block; }
-.exo-note { color:var(--muted); font-size:.85rem; }
-.exo-code { background:#f3f4f6; padding:.6rem; border-radius:12px; }
-@media (max-width: 960px){ .exo-controls{ grid-template-columns: 1fr; } .exo-main{ grid-template-columns: 1fr; } }
+.dot.jwstobs { background:#4F46E5; }
+.dot.jwstplan { background:#A78BFA; }
+.exo-note { color: var(--muted); font-size: .85rem; }
+.exo-code { background: #f3f4f6; padding: .6rem; border-radius: 12px; }
+@media (max-width: 960px){ .exo-controls{grid-template-columns:1fr;} .exo-main{grid-template-columns:1fr;} }
 </style>
 
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+<script src="https://d3js.org/d3.v7.min.js"></script>
 <script>
-const PS_CSV_URL = '/assets/data/pscomppars_recent.csv';
-const JWST_CSV_URL = '/assets/data/jwst_trexolists_extended.csv';
+const PS_CSV_URL = "{ '{' } '/assets/data/pscomppars_recent.csv' | relative_url { '}' }";
+const JWST_CSV_URL = "{ '{' } '/assets/data/jwst_trexolists_extended.csv' | relative_url { '}' }";
 
 const PARAMS = {
-  'Best Planet Mass (M_⊕)': d => num(d.pl_bmasse),
-  'Best Planet Mass (M_J)': d => num(d.pl_bmassj),
-  'Planet Radius (R_⊕)':    d => num(d.pl_rade),
-  'Planet Radius (R_J)':    d => num(d.pl_radj),
-  'Orbital Period (days)':  d => num(d.pl_orbper),
-  'Stellar Age (Gyr)':      d => num(d.st_age),
-  'Stellar Radius (R_☉)':   d => num(d.st_rad),
+  'Best Planet Mass (M_⊕)': d => toNum(d.pl_bmasse),
+  'Best Planet Mass (M_J)': d => toNum(d.pl_bmassj),
+  'Planet Radius (R_⊕)': d => toNum(d.pl_rade),
+  'Planet Radius (R_J)': d => toNum(d.pl_radj),
+  'Orbital Period (days)': d => toNum(d.pl_orbper),
+  'Stellar Age (Gyr)': d => toNum(d.st_age),
+  'Stellar Radius (R_☉)': d => toNum(d.st_rad),
+};
+
+const $ = sel => document.querySelector(sel);
+const canon = s => (s||'').toString().trim().toLowerCase().replace(/\s+/g,' ');
+const toNum = v => (v==null?null:(Number.isFinite(+v)?+v:null));
+const normName = (star,letter)=>{
+  const s=(star||'').toString().trim().replaceAll('\u2212','-');
+  const L=(letter||'').toString().trim().replaceAll('\u2212','-');
+  return (s&&L)?`${s} ${L}`:s||L||'';
 };
 
 const state = { planets:[], _all:[], jwstObserved:new Set(), jwstPlanned:new Set() };
 
-const canon = s => (s||'').toString().trim().toLowerCase();
-const num = v => (v==null?null:(Number.isFinite(+v)?+v:null));
+function csvFromObjects(arr){
+  const headers = Object.keys(arr[0]||{});
+  return [headers.join(','), ...arr.map(o=>headers.map(h=>o[h]??'').join(','))].join('\n');
+}
+function download(filename, text){
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([text], {type:'text/csv'}));
+  a.download = filename; a.click();
+}
+
+async function loadPopulation(){
+  const res = await fetch(PS_CSV_URL);
+  const text = await res.text();
+  const clean = text.split(/\n/).filter(line => !/^\s*#/.test(line)).join('\n');
+  const rows = d3.csvParse(clean);
+  return rows.map(r => ({ 
+    ...r,
+    pl_bmasse: toNum(r.pl_bmasse),
+    pl_bmassj: toNum(r.pl_bmassj),
+    pl_rade:   toNum(r.pl_rade),
+    pl_radj:   toNum(r.pl_radj),
+    pl_orbper: toNum(r.pl_orbper),
+    st_age:    toNum(r.st_age),
+    st_rad:    toNum(r.st_rad),
+    tran_flag: toNum(r.tran_flag)
+  }));
+}
+
+async function loadJWST(){
+  const res = await fetch(JWST_CSV_URL);
+  const text = await res.text();
+  const rows = d3.csvParse(text);
+  const observed = new Set();
+  const planned  = new Set();
+  const plannedStatuses = new Set(['Scheduled','Implementation','Flight Ready','Inactive','On Hold (Inactive)','On Hold']);
+  for(const r of rows){
+    const name = canon(normName(r['Star   name']||r['Star name']||r['Star'], r['Planet   letter']||r['Planet letter']||r['Planet']));
+    const status = (r['Status']||'').trim();
+    if(!name) continue;
+    if(status === 'Executed') observed.add(name);
+    else if(plannedStatuses.has(status)) planned.add(name);
+  }
+  state.jwstObserved = observed;
+  state.jwstPlanned  = planned;
+}
+
+function buildTraces(){
+  const xKey=$('#xSelect').value, yKey=$('#ySelect').value;
+  const xFn=PARAMS[xKey], yFn=PARAMS[yKey];
+  const onlyTransiting = $('#onlyTransiting').checked;
+  const showObs = $('#highlightJWSTObserved').checked;
+  const showPlan = $('#highlightJWSTPlanned').checked;
+  const pop=[], obs=[], plan=[];
+  for(const p of state.planets){
+    if(onlyTransiting && +p.tran_flag!==1) continue;
+    const x=xFn(p), y=yFn(p); if(x==null||y==null) continue;
+    const nm = canon(p.pl_name);
+    const isObs = state.jwstObserved.has(nm);
+    const isPlan = state.jwstPlanned.has(nm);
+    const hover = `${p.pl_name}<br>${xKey}: <b>${x}</b><br>${yKey}: <b>${y}</b>`;
+    const o = {x,y, hovertemplate: hover+'<extra></extra>'};
+    if(isObs && showObs) obs.push(o);
+    else if(isPlan && showPlan) plan.push(o);
+    else pop.push(o);
+  }
+  const traces=[
+    {name:'Population', type:'scattergl', mode:'markers', x:pop.map(d=>d.x), y:pop.map(d=>d.y), hovertemplate:pop.map(d=>d.hovertemplate), marker:{size:6, opacity:.45, color:'#9CA3AF'}},
+  ];
+  if(showObs) traces.push({name:'JWST – Observed', type:'scattergl', mode:'markers', x:obs.map(d=>d.x), y:obs.map(d=>d.y), hovertemplate:obs.map(d=>d.hovertemplate), marker:{size:8, opacity:.95, color:'#4F46E5'}});
+  if(showPlan) traces.push({name:'JWST – Planned', type:'scattergl', mode:'markers', x:plan.map(d=>d.x), y:plan.map(d=>d.y), hovertemplate:plan.map(d=>d.hovertemplate), marker:{size:8, opacity:.95, color:'#A78BFA'}});
+  return traces;
+}
+
+function layoutForAxes(){
+  const xKey=$('#xSelect').value, yKey=$('#ySelect').value;
+  return {
+    margin:{l:60,r:10,t:18,b:50},
+    xaxis:{title:xKey, type: $('#xLog').checked?'log':'linear', zeroline:false},
+    yaxis:{title:yKey, type: $('#yLog').checked?'log':'linear', zeroline:false},
+    legend:{orientation:'h'}
+  };
+}
+
+function refresh(){
+  Plotly.react('plot', buildTraces(), layoutForAxes(), {responsive:true, displaylogo:false});
+  const plot = document.getElementById('plot');
+  let shown = 0;
+  if(plot && plot.data) shown = plot.data.reduce((a,t)=>a+(t.x?.length||0),0);
+  document.getElementById('counts').textContent = `${shown.toLocaleString()} points shown.`;
+}
 
 function populateDropdowns(){
   const xSel = document.getElementById('xSelect');
@@ -111,115 +212,33 @@ function populateDropdowns(){
 }
 
 function hookUI(){
-  ['xSelect','ySelect','xLog','yLog','showJWSTObserved','showJWSTPlanned','onlyTransiting'].forEach(id=>document.getElementById(id).addEventListener('change', refresh));
+  ['xSelect','ySelect','xLog','yLog','onlyTransiting','highlightJWSTObserved','highlightJWSTPlanned'].forEach(id=>document.getElementById(id).addEventListener('change', refresh));
   document.getElementById('searchBox').addEventListener('input', e=>{
     const q = canon(e.target.value);
     if(!q){ state.planets = state._all; refresh(); return; }
-    state.planets = state._all.filter(p => canon(p.pl_name).includes(q) || canon(p.hostname).includes(q));
-    refresh();
+    state.planets = state._all.filter(p => canon(p.pl_name).includes(q) || canon(p.hostname).includes(q)); refresh();
   });
   document.getElementById('downloadCSV').addEventListener('click', ()=>{
     const xSel = document.getElementById('xSelect'); const ySel = document.getElementById('ySelect');
-    const xKey = xSel.value, yKey = ySel.value, xFn = PARAMS[xKey], yFn = PARAMS[yKey];
+    const xKey=xSel.value, yKey=ySel.value, xFn=PARAMS[xKey], yFn=PARAMS[yKey];
     const out = state.planets.map(p=>({pl_name:p.pl_name, hostname:p.hostname, x_param:xKey, x_value:xFn(p), y_param:yKey, y_value:yFn(p)})).filter(r=>r.x_value!=null&&r.y_value!=null);
-    const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv(out)], {type:'text/csv'})); a.download='exoplanet-explorer.csv'; a.click();
+    download('exoplanet-explorer.csv', csvFromObjects(out));
   });
-}
-
-function csv(arr){
-  if(!arr.length) return '';
-  const headers = Object.keys(arr[0]);
-  return [headers.join(','), ...arr.map(o=>headers.map(h=>o[h]??'').join(','))].join('\n');
-}
-
-async function loadPS(){
-  const res = await fetch(PS_CSV_URL);
-  if(!res.ok) throw new Error('PS CSV fetch failed: '+res.status);
-  const text = await res.text();
-  const lines = text.split(/\r?\n/).filter(l => !/^#/.test(l));
-  return d3.csvParse(lines.join('\n'));
-}
-
-async function loadJWST(){
-  try{
-    const res = await fetch(JWST_CSV_URL);
-    if(!res.ok) throw new Error('JWST CSV fetch failed: '+res.status);
-    const text = await res.text();
-    const rows = d3.csvParse(text);
-    const observed = new Set();
-    const planned  = new Set();
-    const OBS = new Set(['Executed']);
-    const PLAN = new Set(['Scheduled','Implementation','Flight Ready','Inactive','On Hold (Inactive)']);
-    for(const r of rows){
-      const host = (r['hostname_nn']||'').toString().trim();
-      const lettr = (r['letter_nn']||'').toString().trim();
-      const plname = (host && lettr) ? `${host} ${lettr}` : (r['pl_name']||'').toString().trim();
-      if(!plname) continue;
-      const status = (r['Status']||'').toString().trim();
-      const key = plname.toLowerCase();
-      if(OBS.has(status)) observed.add(key);
-      else if(PLAN.has(status)) planned.add(key);
-    }
-    state.jwstObserved = observed;
-    state.jwstPlanned  = planned;
-  }catch(err){ console.warn('JWST CSV load failed (non-fatal)', err); }
-}
-
-function buildTraces(){
-  const xKey=document.getElementById('xSelect').value, yKey=document.getElementById('ySelect').value;
-  const xFn=PARAMS[xKey], yFn=PARAMS[yKey];
-  const onlyTransiting = document.getElementById('onlyTransiting')?.checked || false;
-
-  const base=[], jwstObs=[], jwstPlan=[];
-  for(const p of state.planets){
-    if(onlyTransiting && +p.tran_flag!==1) continue;
-    const x=xFn(p), y=yFn(p); if(x==null||y==null) continue;
-    const key = canon(p.pl_name);
-    const isObs = state.jwstObserved.has(key);
-    const isPlan = state.jwstPlanned.has(key);
-    const hover = `${p.pl_name}<br>${xKey}: <b>${x}</b><br>${yKey}: <b>${y}</b>` + (isObs?'\nJWST: Observed':'') + (isPlan?'\nJWST: Planned':'');
-    const o = {x,y, hovertemplate: hover+'<extra></extra>'};
-    if(isObs) jwstObs.push(o);
-    else if(isPlan) jwstPlan.push(o);
-    else base.push(o);
-  }
-
-  const traces=[
-    {name:'Population', type:'scattergl', mode:'markers', x:base.map(d=>d.x), y:base.map(d=>d.y), hovertemplate:base.map(d=>d.hovertemplate), marker:{size:6, opacity:.45, color:'#9CA3AF'}},
-  ];
-  if(document.getElementById('showJWSTObserved')?.checked) traces.push({name:'JWST – Observed', type:'scattergl', mode:'markers', x:jwstObs.map(d=>d.x), y:jwstObs.map(d=>d.y), hovertemplate:jwstObs.map(d=>d.hovertemplate), marker:{size:8, opacity:.95, color:'#4F46E5'}});
-  if(document.getElementById('showJWSTPlanned')?.checked) traces.push({name:'JWST – Planned', type:'scattergl', mode:'markers', x:jwstPlan.map(d=>d.x), y:jwstPlan.map(d=>d.y), hovertemplate:jwstPlan.map(d=>d.hovertemplate), marker:{size:8, opacity:.0, line:{width:1, color:'#4F46E5'}, mode:'markers+lines', marker:{symbol:'circle-open'}});
-  return traces;
-}
-
-function layoutForAxes(){
-  const xKey=document.getElementById('xSelect').value, yKey=document.getElementById('ySelect').value;
-  return {
-    margin:{l:60,r:10,t:18,b:50},
-    xaxis:{title:xKey, type: document.getElementById('xLog').checked?'log':'linear', zeroline:false},
-    yaxis:{title:yKey, type: document.getElementById('yLog').checked?'log':'linear', zeroline:false},
-    legend:{orientation:'h'}
-  };
-}
-
-function refresh(){
-  Plotly.react('plot', buildTraces(), layoutForAxes(), {responsive:true, displaylogo:false});
-  const traces = document.getElementById('plot').data||[];
-  const shown = traces.reduce((a,t)=>a+(t.x?.length||0),0);
-  document.getElementById('counts').textContent = `${shown.toLocaleString()} points shown.`;
 }
 
 (async function init(){
   try{
     populateDropdowns(); hookUI();
-    const ps = await loadPS();
+    $('#endpoints').textContent = `Population CSV: ${PS_CSV_URL}\nJWST CSV: ${JWST_CSV_URL}`;
+    document.getElementById('status').textContent = 'Loading CSV files…';
+    const ps = await loadPopulation();
     state._all = ps; state.planets = ps; refresh();
-    document.getElementById('status').textContent = `Loaded PS CSV (rows: ${ps.length.toLocaleString()})`;
-    loadJWST().then(()=>refresh()).catch(()=>{});
-    document.getElementById('endpoints').textContent = `PS CSV: ${PS_CSV_URL}\nJWST CSV: ${JWST_CSV_URL}`;
+    document.getElementById('status').textContent = `Loaded local CSVs (rows: ${ps.length.toLocaleString()})`;
+    // Load JWST highlights in background
+    loadJWST().then(()=>refresh()).catch(err=>console.error('JWST CSV error', err));
   }catch(err){
     console.error(err);
-    document.getElementById('status').textContent = 'Failed to load data.';
+    document.getElementById('status').textContent = 'Failed to load local CSVs. See console for details.';
   }
 })();
 </script>
