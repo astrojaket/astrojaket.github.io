@@ -4,7 +4,7 @@ title: Exoplanets
 permalink: /exoplanets
 ---
 
-<!-- Exoplanet Explorer (Local CSVs, JWST diamonds, HST squares, robust matching) -->
+<!-- Exoplanet Explorer (Local CSVs, JWST/HST highlights, robust matching) -->
 <div id="exo-explorer" class="exo-container">
   <div class="exo-topbar">
     <div class="exo-controls">
@@ -139,7 +139,7 @@ permalink: /exoplanets
 <style>
 :root {
   --mpurple: #9370DB;   /* JWST observed */
-  --teal: #E69F00;      /* JWST planned */
+  --orange: #E69F00;    /* JWST planned */
   --green: #10B981;     /* HST */
   --muted: #6b7280;
   --bg: #f6f4fb;
@@ -230,18 +230,12 @@ function nameVariantsFromPlName(plname){
   return new Set([nm, nm.replace(/\s+/g,''), nm.replace(/-/g,' '), nm.replace(/\s+/g,'-')]);
 }
 function hostFromPlName(plname){
-  // strip ending planet letter patterns: " HD 189733 b" / "HD-189733-b" -> "hd 189733"
   const s = canon((plname||'').toString().replace(/\u2212/g,'-'));
   return s.replace(/[-\s]*[bcdefgh]$/,'').trim();
 }
 function variantSetForHost(name){
   const nm = canon(name);
-  return new Set([
-    nm,
-    nm.replace(/\s+/g,''),
-    nm.replace(/-/g,' '),
-    nm.replace(/\s+/g,'-')
-  ]);
+  return new Set([ nm, nm.replace(/\s+/g,''), nm.replace(/-/g,' '), nm.replace(/\s+/g,'-') ]);
 }
 
 // ---------------------------
@@ -250,7 +244,7 @@ function variantSetForHost(name){
 const state = { all: [], rows: [],
   jwstObserved: new Set(), jwstPlanned: new Set(),
   hstHostnames: new Set(),
-  hostVariantSet: new Set(),    // all host-name variants seen in population
+  hostVariantSet: new Set(),
   filters: {}, sizing: { tsm:false, esm:false }
 };
 
@@ -265,10 +259,9 @@ async function loadCSV(url){
 }
 async function loadPopulation(){
   const rows = await loadCSV(POP_CSV);
-  const numCols = ['pl_bmasse','pl_bmassj','pl_rade','pl_radj','pl_orbper','st_age','st_rad','pl_eqt','st_teff','sy_jmag','sy_kmag','tran_flag'];
-  for(const r of rows){ for(const k of numCols){ if(r[k] !== undefined) r[k] = num(r[k]); } }
+  const numCols = ['pl_bmasse','pl_bmassj','pl_rade','pl_radj','pl_orbper','st_age','st_rad','pl_eqt','st_teff','sy_jmag','sy_kmag','tran_flag','hostname','pl_name'];
+  for(const r of rows){ for(const k of numCols){ if(r[k] !== undefined) r[k] = num(r[k]) if (!isFinite(r[k])) r[k] = r[k]; } } // keep strings for hostname/pl_name
 
-  // Build variant set of host names from hostname + stripped pl_name
   const variants = new Set();
   for(const r of rows){
     if(r.hostname) variantSetForHost(r.hostname).forEach(v => variants.add(v));
@@ -301,28 +294,18 @@ async function loadHST(){
   try{
     const rows = await loadCSV(HST_CSV);
     const names = new Set();
-
-    // Try to find a likely "target" column case-insensitively
     const cols = rows.columns || Object.keys(rows[0]||{});
-    let targetCol = cols.find(c => /target\s*name/i.test(c)) ||
-                    cols.find(c => /^target$/i.test(c)) ||
-                    cols.find(c => /host/i.test(c)) ||
-                    cols.find(c => /star/i.test(c)) ||
-                    'Target Name';
+    let targetCol = cols.find(c => /target\s*name/i.test(c)) or cols.find(c => /^target$/i.test(c)) or cols.find(c => /host/i.test(c)) or cols.find(c => /star/i.test(c)) or 'Target Name';
 
     for(const r of rows){
       const cell = r[targetCol];
       if(!cell) continue;
-      // Split multiple names separated by commas, slashes, semicolons, or ' / '
-      const parts = cell.split(/[;,\/]|\s{2,}|\s+\/\s+/).map(s => s.trim()).filter(Boolean);
-      if(parts.length===0) parts.push(cell);
-
+      const parts = cell.split(/[;,\/]|\s{2,}|\s+\/\s+/).map(s => s.strip()).filter(Boolean);
+      if(parts.length===0) parts.append(cell)
       for(const raw of parts){
         let h = raw;
-        // Remove common annotations in parentheses or brackets
         h = h.replace(/\(.*?\)|\[.*?\]/g, '').trim();
         const variants = variantSetForHost(h);
-        // Keep only those that appear in the population variant set
         for(const v of variants){ if(state.hostVariantSet.has(v)) names.add(v); }
       }
     }
@@ -361,14 +344,23 @@ function computeESM(row){
 }
 
 // ---------------------------
+// UI defaults
+// ---------------------------
 function populateDropdowns(){
   const xSel = document.getElementById('xSelect');
   const ySel = document.getElementById('ySelect');
   const opts = Object.keys(PARAMS).map(l=>`<option>${l}</option>`).join('');
   xSel.innerHTML = ySel.innerHTML = opts;
-  xSel.value = 'Orbital Period (days)';
-  ySel.value = 'Planet Radius (R_⊕)';
+
+  // Defaults requested:
+  xSel.value = 'Best Planet Mass (M_J)';  // X-axis: MJ
+  ySel.value = 'Planet Radius (R_J)';     // Y-axis: RJ
+  document.getElementById('xLog').checked = true;  // log X
+  document.getElementById('yLog').checked = true;  // log Y
+  document.getElementById('onlyTransiting').checked = true; // transiting only
+  // JWST toggles are already checked in the HTML
 }
+
 function setFilter(id, val){ const el=document.getElementById(id); el.value = (val==null? '' : val); }
 
 function applyFiltersAndRefresh(){
@@ -403,6 +395,16 @@ function filterRows(){
 function buildTraces(){
   const xKey = document.getElementById('xSelect').value;
   const yKey = document.getElementById('ySelect').value;
+  const PARAMS = {
+    'Best Planet Mass (M_⊕)': d => num(d.pl_bmasse),
+    'Best Planet Mass (M_J)': d => num(d.pl_bmassj),
+    'Planet Radius (R_⊕)': d => num(d.pl_rade),
+    'Planet Radius (R_J)': d => num(d.pl_radj),
+    'Orbital Period (days)': d => num(d.pl_orbper),
+    'Stellar Age (Gyr)': d => num(d.st_age),
+    'Stellar Radius (R_☉)': d => num(d.st_rad),
+    'Equilibrium Temperature (K)': d => num(d.pl_eqt),
+  };
   const xFn = PARAMS[xKey], yFn = PARAMS[yKey];
   const colorByTeq = document.getElementById('colorTemp').checked;
   const showObs = document.getElementById('highlightJWSTObs').checked;
@@ -421,12 +423,11 @@ function buildTraces(){
     const variants = nameVariantsFromPlName(p.pl_name);
     const isObs = [...variants].some(v => state.jwstObserved.has(v));
     const isPlan = !isObs && [...variants].some(v => state.jwstPlanned.has(v));
-    // HST by host only
+
     const hostKey = variantSetForHost(p.hostname||'');
     let isHST = false;
     for(const v of hostKey){ if(state.hstHostnames.has(v)){ isHST=true; break; } }
 
-    // metric size
     let sizeVal = 6;
     if(useTSM || useESM){
       const metric = useTSM ? computeTSM(p) : computeESM(p);
@@ -513,7 +514,7 @@ function refresh(){
 
 function hookUI(){
   ['xSelect','ySelect','xLog','yLog','colorTemp','showLabels','onlyTransiting','highlightJWSTObs','highlightJWSTPlan','highlightHST','useTSM','useESM']
-    .forEach(id => document.getElementById(id).addEventListener('change', refresh));
+    .forEach(id => document.getElementById(id).addEventListener('change', () => { filterRows(); refresh(); }));
   document.getElementById('applyFilters').addEventListener('click', applyFiltersAndRefresh);
   document.getElementById('clearFilters').addEventListener('click', () => clearFilters());
   document.querySelectorAll('.exo-chip[data-preset]').forEach(btn => {
@@ -544,12 +545,17 @@ function summarizeInputs(){
 // ---------------------------
 (async function init(){
   try{
-    populateDropdowns(); hookUI();
+    populateDropdowns();
+    hookUI();
+
     const popRows = await loadPopulation();
     state.all = popRows.slice();
-    state.rows = popRows.slice();
+
+    // Apply defaults (transiting only) before first render
+    filterRows();
     document.getElementById('status').textContent = `Loaded population CSV (rows: ${state.all.length.toLocaleString()})`;
     refresh();
+
     // Non-blocking loads
     loadJWST();
     loadHST();
