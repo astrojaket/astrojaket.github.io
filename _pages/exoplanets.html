@@ -96,6 +96,10 @@ permalink: /exoplanets
         <label class="exo-check"><input id="useESM" type="checkbox"/> Size by ESM</label>
       </div>
       <div class="exo-note">
+        Sources: 
+        <a href="https://exoplanetarchive.ipac.caltech.edu/" target="_blank" rel="noopener">NASA Exoplanet Archive</a> (population), 
+        <a href="https://www.stsci.edu/~nnikolov/TrExoLiSTS/JWST/trexolists.html" target="_blank" rel="noopener">TrExoLiSTS – JWST</a>, 
+        <a href="https://www.stsci.edu/~WFC3/trexolists/trexolists.html" target="_blank" rel="noopener">TrExoLiSTS – HST</a>.<br/>
         TSM (transmission) & ESM (emission) per Kempton+2018. When enabled, marker size ∝ √metric (clamped).<br/>
         Threshold guide: TSM &gt; 10 (R&lt;1.5R⊕), TSM &gt; 90 (1.5–10R⊕), ESM &gt; 7.5 (terrestrial).<br/>
         If TSM/ESM sizing is ON, JWST/HST points follow the metric size (no extra ×2).
@@ -113,12 +117,6 @@ permalink: /exoplanets
         <li><span class="dot jwstplan diamond"></span> JWST – Planned (diamond)</li>
         <li><span class="dot hst square"></span> HST – Atmospheric (square)</li>
       </ul>
-      <div class="exo-note">
-        Sources: 
-        <a href="https://exoplanetarchive.ipac.caltech.edu/" target="_blank" rel="noopener">NASA Exoplanet Archive</a> (population), 
-        <a href="https://www.stsci.edu/~nnikolov/TrExoLiSTS/JWST/trexolists.html" target="_blank" rel="noopener">TrExoLiSTS – JWST</a>, 
-        <a href="https://www.stsci.edu/~WFC3/trexolists/trexolists.html" target="_blank" rel="noopener">TrExoLiSTS – HST</a>.
-      </div>
       <div id="counts" class="exo-note">—</div>
       <hr/>
       <div class="exo-note">
@@ -231,6 +229,20 @@ function nameVariantsFromPlName(plname){
   const nm = canon((plname||'').toString().replace(/\u2212/g,'-'));
   return new Set([nm, nm.replace(/\s+/g,''), nm.replace(/-/g,' '), nm.replace(/\s+/g,'-')]);
 }
+function hostFromPlName(plname){
+  // strip ending planet letter patterns: " HD 189733 b" / "HD-189733-b" -> "hd 189733"
+  const s = canon((plname||'').toString().replace(/\u2212/g,'-'));
+  return s.replace(/[-\s]*[bcdefgh]$/,'').trim();
+}
+function variantSetForHost(name){
+  const nm = canon(name);
+  return new Set([
+    nm,
+    nm.replace(/\s+/g,''),
+    nm.replace(/-/g,' '),
+    nm.replace(/\s+/g,'-')
+  ]);
+}
 
 // ---------------------------
 // State
@@ -238,6 +250,7 @@ function nameVariantsFromPlName(plname){
 const state = { all: [], rows: [],
   jwstObserved: new Set(), jwstPlanned: new Set(),
   hstHostnames: new Set(),
+  hostVariantSet: new Set(),    // all host-name variants seen in population
   filters: {}, sizing: { tsm:false, esm:false }
 };
 
@@ -254,6 +267,14 @@ async function loadPopulation(){
   const rows = await loadCSV(POP_CSV);
   const numCols = ['pl_bmasse','pl_bmassj','pl_rade','pl_radj','pl_orbper','st_age','st_rad','pl_eqt','st_teff','sy_jmag','sy_kmag','tran_flag'];
   for(const r of rows){ for(const k of numCols){ if(r[k] !== undefined) r[k] = num(r[k]); } }
+
+  // Build variant set of host names from hostname + stripped pl_name
+  const variants = new Set();
+  for(const r of rows){
+    if(r.hostname) variantSetForHost(r.hostname).forEach(v => variants.add(v));
+    if(r.pl_name) variantSetForHost(hostFromPlName(r.pl_name)).forEach(v => variants.add(v));
+  }
+  state.hostVariantSet = variants;
   return rows;
 }
 async function loadJWST(){
@@ -280,11 +301,30 @@ async function loadHST(){
   try{
     const rows = await loadCSV(HST_CSV);
     const names = new Set();
+
+    // Try to find a likely "target" column case-insensitively
+    const cols = rows.columns || Object.keys(rows[0]||{});
+    let targetCol = cols.find(c => /target\s*name/i.test(c)) ||
+                    cols.find(c => /^target$/i.test(c)) ||
+                    cols.find(c => /host/i.test(c)) ||
+                    cols.find(c => /star/i.test(c)) ||
+                    'Target Name';
+
     for(const r of rows){
-      const host = r['Target Name'] || r['Target'] || r['Star'] || r['hostname'] || r['Host Name'];
-      if(!host) continue;
-      const cleaned = host.toString().trim().replace(/\u2212/g,'-').toLowerCase();
-      names.add(cleaned);
+      const cell = r[targetCol];
+      if(!cell) continue;
+      // Split multiple names separated by commas, slashes, semicolons, or ' / '
+      const parts = cell.split(/[;,\/]|\s{2,}|\s+\/\s+/).map(s => s.trim()).filter(Boolean);
+      if(parts.length===0) parts.push(cell);
+
+      for(const raw of parts){
+        let h = raw;
+        // Remove common annotations in parentheses or brackets
+        h = h.replace(/\(.*?\)|\[.*?\]/g, '').trim();
+        const variants = variantSetForHost(h);
+        // Keep only those that appear in the population variant set
+        for(const v of variants){ if(state.hostVariantSet.has(v)) names.add(v); }
+      }
     }
     state.hstHostnames = names;
     const s = document.getElementById('status');
@@ -381,7 +421,10 @@ function buildTraces(){
     const variants = nameVariantsFromPlName(p.pl_name);
     const isObs = [...variants].some(v => state.jwstObserved.has(v));
     const isPlan = !isObs && [...variants].some(v => state.jwstPlanned.has(v));
-    const isHST = !isObs && !isPlan && state.hstHostnames.has(canon(p.hostname||''));
+    // HST by host only
+    const hostKey = variantSetForHost(p.hostname||'');
+    let isHST = false;
+    for(const v of hostKey){ if(state.hstHostnames.has(v)){ isHST=true; break; } }
 
     // metric size
     let sizeVal = 6;
@@ -478,7 +521,10 @@ function hookUI(){
       const p = btn.getAttribute('data-preset');
       const def = PRESETS[p]||{};
       $$('.exo-filters input').forEach(i=> i.value='');
-      for(const [k,[mn,mx]] of Object.entries(def)){ const a='f-min-'+k, b='f-max-'+k; const el1=document.getElementById(a), el2=document.getElementById(b); if(el1) el1.value=(mn??''); if(el2) el2.value=(mx??''); }
+      for(const [k,[mn,mx]] of Object.entries(def)){
+        const el1=document.getElementById('f-min-'+k), el2=document.getElementById('f-max-'+k);
+        if(el1) el1.value=(mn??''); if(el2) el2.value=(mx??'');
+      }
     });
   });
 }
