@@ -144,7 +144,7 @@ text-align: right ;
 }
 a:link, a:visited {
 	text-decoration:none;
-	color:#9370DB;
+	color:#B069DB;
 }
 a:hover, a:active{
 	color:#0099cc;
@@ -196,7 +196,7 @@ form, fieldset{
 /* Global Styles */
 body {
   font-family: Avenir, sans-serif;
-  background-color: #efe9ff; /* Light Purple Background */
+  background-color: #e6e1f5; /* Light Purple Background */
   margin: 0;
   padding: 0;
   color: #4b3a69;
