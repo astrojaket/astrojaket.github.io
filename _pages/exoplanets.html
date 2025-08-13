@@ -27,7 +27,7 @@ permalink: /exoplanets
     </div>
     <div class="exo-card">
       <h2>Search / Data</h2>
-      <input id="searchBox" placeholder="Search planet or star…" class="exo-input"/>
+      <input id="searchBox" placeholder="Search planet or host star…" class="exo-input"/>
       <button id="downloadCSV" class="exo-btn">Download filtered CSV</button>
     </div>
   </div>
@@ -38,24 +38,28 @@ permalink: /exoplanets
       <h3>Legend</h3>
       <ul class="exo-legend">
         <li><span class="dot pop"></span> Population</li>
-        <li><span class="dot jwstobs"></span> JWST – Observed</li>
-        <li><span class="dot jwstplan"></span> JWST – Planned</li>
+        <li><span class="dot jwstObs"></span> JWST – Observed</li>
+        <li><span class="dot jwstPlan"></span> JWST – Planned</li>
       </ul>
       <div id="counts" class="exo-note">—</div>
       <hr/>
       <div class="exo-note">
-        Data: local CSVs from NASA Exoplanet Archive (pscomppars) and TrExoLiSTS (JWST).
+        Data files: <code>/assets/data/pscomppars_recent.csv</code>, <code>/assets/data/jwst_trexolists_extended.csv</code>
       </div>
     </aside>
   </div>
 
   <details class="exo-card">
-    <summary>Show data paths</summary>
+    <summary>Show data file paths</summary>
     <pre id="endpoints" class="exo-code"></pre>
   </details>
 
   <div id="status" class="exo-note">Loading CSV files…</div>
 </div>
+
+<!-- libs -->
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+<script src="https://d3js.org/d3.v7.min.js"></script>
 
 <style>
 :root {
@@ -77,18 +81,23 @@ permalink: /exoplanets
 .exo-legend { list-style: none; padding: 0; margin: .5rem 0; }
 .dot { display:inline-block; width:10px; height:10px; border-radius:999px; margin-right:.4rem; }
 .dot.pop { background:#9CA3AF; opacity:.8; }
-.dot.jwstobs { background:#4F46E5; }
-.dot.jwstplan { background:#A78BFA; }
+.dot.jwstObs { background:#4F46E5; }
+.dot.jwstPlan { background:#A78BFA; }
 .exo-note { color: var(--muted); font-size: .85rem; }
 .exo-code { background: #f3f4f6; padding: .6rem; border-radius: 12px; }
-@media (max-width: 960px){ .exo-controls{grid-template-columns:1fr;} .exo-main{grid-template-columns:1fr;} }
+@media (max-width: 960px){
+  .exo-controls{ grid-template-columns: 1fr; }
+  .exo-main{ grid-template-columns: 1fr; }
+}
 </style>
 
-<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
-<script src="https://d3js.org/d3.v7.min.js"></script>
 <script>
-const PS_CSV_URL = "{ '{' } '/assets/data/pscomppars_recent.csv' | relative_url { '}' }";
-const JWST_CSV_URL = "{ '{' } '/assets/data/jwst_trexolists_extended.csv' | relative_url { '}' }";
+const POP_CSV = '/assets/data/pscomppars_recent.csv';
+const JWST_LOCAL_CSV = '/assets/data/jwst_trexolists_extended.csv';
+
+const columns = [
+  'pl_name','hostname','pl_bmasse','pl_bmassj','pl_rade','pl_radj','pl_orbper','st_age','st_rad','disc_year','tran_flag'
+];
 
 const PARAMS = {
   'Best Planet Mass (M_⊕)': d => toNum(d.pl_bmasse),
@@ -103,11 +112,6 @@ const PARAMS = {
 const $ = sel => document.querySelector(sel);
 const canon = s => (s||'').toString().trim().toLowerCase().replace(/\s+/g,' ');
 const toNum = v => (v==null?null:(Number.isFinite(+v)?+v:null));
-const normName = (star,letter)=>{
-  const s=(star||'').toString().trim().replaceAll('\u2212','-');
-  const L=(letter||'').toString().trim().replaceAll('\u2212','-');
-  return (s&&L)?`${s} ${L}`:s||L||'';
-};
 
 const state = { planets:[], _all:[], jwstObserved:new Set(), jwstPlanned:new Set() };
 
@@ -115,90 +119,83 @@ function csvFromObjects(arr){
   const headers = Object.keys(arr[0]||{});
   return [headers.join(','), ...arr.map(o=>headers.map(h=>o[h]??'').join(','))].join('\n');
 }
+
 function download(filename, text){
   const a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob([text], {type:'text/csv'}));
   a.download = filename; a.click();
 }
 
-async function loadPopulation(){
-  const res = await fetch(PS_CSV_URL);
+async function loadPS(){
+  const res = await fetch(POP_CSV);
+  if(!res.ok) throw new Error('Population CSV load failed: '+res.status);
   const text = await res.text();
-  const clean = text.split(/\n/).filter(line => !/^\s*#/.test(line)).join('\n');
-  const rows = d3.csvParse(clean);
-  return rows.map(r => ({ 
-    ...r,
-    pl_bmasse: toNum(r.pl_bmasse),
-    pl_bmassj: toNum(r.pl_bmassj),
-    pl_rade:   toNum(r.pl_rade),
-    pl_radj:   toNum(r.pl_radj),
-    pl_orbper: toNum(r.pl_orbper),
-    st_age:    toNum(r.st_age),
-    st_rad:    toNum(r.st_rad),
-    tran_flag: toNum(r.tran_flag)
-  }));
+  return d3.csvParse(text);
 }
 
 async function loadJWST(){
-  const res = await fetch(JWST_CSV_URL);
-  const text = await res.text();
-  const rows = d3.csvParse(text);
-  const observed = new Set();
-  const planned  = new Set();
-  const plannedStatuses = new Set(['Scheduled','Implementation','Flight Ready','Inactive','On Hold (Inactive)','On Hold']);
-  for(const r of rows){
-    const name = canon(normName(r['Star   name']||r['Star name']||r['Star'], r['Planet   letter']||r['Planet letter']||r['Planet']));
-    const status = (r['Status']||'').trim();
-    if(!name) continue;
-    if(status === 'Executed') observed.add(name);
-    else if(plannedStatuses.has(status)) planned.add(name);
+  try{
+    const r = await fetch(JWST_LOCAL_CSV);
+    if(!r.ok) throw new Error('local JWST not found');
+    const text = await r.text();
+    const rows = d3.csvParse(text);
+    const namesObserved = new Set();
+    const namesPlanned  = new Set();
+    const observedStatuses = new Set(['Executed']);
+    const plannedStatuses = new Set(['Scheduled','Implementation','Flight Ready','Inactive','On Hold (Inactive)','On Hold','Flight-ready']);
+    for(const r of rows){
+      const star = (r['Star   name'] || r['Star name'] || r['Star'] || '').trim();
+      const letter = (r['Planet   letter'] || r['Planet letter'] || r['Planet'] || '').trim();
+      const status = (r['Status'] || '').trim();
+      const nm = (star && letter) ? `${star} ${letter}` : (star || letter);
+      const key = (nm||'').toLowerCase();
+      if(!key) continue;
+      if(observedStatuses.has(status)) namesObserved.add(key);
+      else if(plannedStatuses.has(status)) namesPlanned.add(key);
+    }
+    state.jwstObserved = namesObserved;
+    state.jwstPlanned  = namesPlanned;
+  }catch(err){
+    console.warn('JWST local CSV load failed (non-fatal)', err);
   }
-  state.jwstObserved = observed;
-  state.jwstPlanned  = planned;
 }
 
 function buildTraces(){
-  const xKey=$('#xSelect').value, yKey=$('#ySelect').value;
+  const xKey=document.getElementById('xSelect').value, yKey=document.getElementById('ySelect').value;
   const xFn=PARAMS[xKey], yFn=PARAMS[yKey];
-  const onlyTransiting = $('#onlyTransiting').checked;
-  const showObs = $('#highlightJWSTObserved').checked;
-  const showPlan = $('#highlightJWSTPlanned').checked;
-  const pop=[], obs=[], plan=[];
+  const onlyTransiting = document.getElementById('onlyTransiting').checked;
+  const base=[], jwstObs=[], jwstPlan=[];
   for(const p of state.planets){
     if(onlyTransiting && +p.tran_flag!==1) continue;
     const x=xFn(p), y=yFn(p); if(x==null||y==null) continue;
-    const nm = canon(p.pl_name);
-    const isObs = state.jwstObserved.has(nm);
-    const isPlan = state.jwstPlanned.has(nm);
+    const key=(p.pl_name||'').toLowerCase();
     const hover = `${p.pl_name}<br>${xKey}: <b>${x}</b><br>${yKey}: <b>${y}</b>`;
-    const o = {x,y, hovertemplate: hover+'<extra></extra>'};
-    if(isObs && showObs) obs.push(o);
-    else if(isPlan && showPlan) plan.push(o);
-    else pop.push(o);
+    const o={x,y, hovertemplate: hover+'<extra></extra>'};
+    if(state.jwstObserved.has(key)) jwstObs.push(o);
+    else if(state.jwstPlanned.has(key)) jwstPlan.push(o);
+    else base.push(o);
   }
   const traces=[
-    {name:'Population', type:'scattergl', mode:'markers', x:pop.map(d=>d.x), y:pop.map(d=>d.y), hovertemplate:pop.map(d=>d.hovertemplate), marker:{size:6, opacity:.45, color:'#9CA3AF'}},
+    {name:'Population', type:'scattergl', mode:'markers', x:base.map(d=>d.x), y:base.map(d=>d.y), hovertemplate:base.map(d=>d.hovertemplate), marker:{size:6, opacity:.45, color:'#9CA3AF'}},
   ];
-  if(showObs) traces.push({name:'JWST – Observed', type:'scattergl', mode:'markers', x:obs.map(d=>d.x), y:obs.map(d=>d.y), hovertemplate:obs.map(d=>d.hovertemplate), marker:{size:8, opacity:.95, color:'#4F46E5'}});
-  if(showPlan) traces.push({name:'JWST – Planned', type:'scattergl', mode:'markers', x:plan.map(d=>d.x), y:plan.map(d=>d.y), hovertemplate:plan.map(d=>d.hovertemplate), marker:{size:8, opacity:.95, color:'#A78BFA'}});
+  if(document.getElementById('highlightJWSTObserved').checked) traces.push({name:'JWST – Observed', type:'scattergl', mode:'markers', x:jwstObs.map(d=>d.x), y:jwstObs.map(d=>d.y), hovertemplate:jwstObs.map(d=>d.hovertemplate), marker:{size:8, opacity:.9, color:'#4F46E5'}});
+  if(document.getElementById('highlightJWSTPlanned').checked) traces.push({name:'JWST – Planned', type:'scattergl', mode:'markers', x:jwstPlan.map(d=>d.x), y:jwstPlan.map(d=>d.y), hovertemplate:jwstPlan.map(d=>d.hovertemplate), marker:{size:8, opacity:.9, color:'#A78BFA'}});
   return traces;
 }
 
 function layoutForAxes(){
-  const xKey=$('#xSelect').value, yKey=$('#ySelect').value;
+  const xKey=document.getElementById('xSelect').value, yKey=document.getElementById('ySelect').value;
   return {
     margin:{l:60,r:10,t:18,b:50},
-    xaxis:{title:xKey, type: $('#xLog').checked?'log':'linear', zeroline:false},
-    yaxis:{title:yKey, type: $('#yLog').checked?'log':'linear', zeroline:false},
+    xaxis:{title:xKey, type: document.getElementById('xLog').checked?'log':'linear', zeroline:false},
+    yaxis:{title:yKey, type: document.getElementById('yLog').checked?'log':'linear', zeroline:false},
     legend:{orientation:'h'}
   };
 }
 
 function refresh(){
   Plotly.react('plot', buildTraces(), layoutForAxes(), {responsive:true, displaylogo:false});
-  const plot = document.getElementById('plot');
-  let shown = 0;
-  if(plot && plot.data) shown = plot.data.reduce((a,t)=>a+(t.x?.length||0),0);
+  const shown = Plotly.d3.select('#plot').node()?._fullData?.reduce((a,t)=>a+(t.x?.length||0),0) || 0;
   document.getElementById('counts').textContent = `${shown.toLocaleString()} points shown.`;
 }
 
@@ -212,15 +209,17 @@ function populateDropdowns(){
 }
 
 function hookUI(){
-  ['xSelect','ySelect','xLog','yLog','onlyTransiting','highlightJWSTObserved','highlightJWSTPlanned'].forEach(id=>document.getElementById(id).addEventListener('change', refresh));
+  ['xSelect','ySelect','xLog','yLog','highlightJWSTObserved','highlightJWSTPlanned','onlyTransiting'].forEach(id=>document.getElementById(id).addEventListener('change', refresh));
   document.getElementById('searchBox').addEventListener('input', e=>{
-    const q = canon(e.target.value);
+    const q = (e.target.value||'').toLowerCase();
     if(!q){ state.planets = state._all; refresh(); return; }
-    state.planets = state._all.filter(p => canon(p.pl_name).includes(q) || canon(p.hostname).includes(q)); refresh();
+    state.planets = state._all.filter(p => (p.pl_name||'').toLowerCase().includes(q) || (p.hostname||'').toLowerCase().includes(q));
+    refresh();
   });
   document.getElementById('downloadCSV').addEventListener('click', ()=>{
-    const xSel = document.getElementById('xSelect'); const ySel = document.getElementById('ySelect');
-    const xKey=xSel.value, yKey=ySel.value, xFn=PARAMS[xKey], yFn=PARAMS[yKey];
+    const xSel = document.getElementById('xSelect');
+    const ySel = document.getElementById('ySelect');
+    const xKey = xSel.value, yKey = ySel.value, xFn = PARAMS[xKey], yFn = PARAMS[yKey];
     const out = state.planets.map(p=>({pl_name:p.pl_name, hostname:p.hostname, x_param:xKey, x_value:xFn(p), y_param:yKey, y_value:yFn(p)})).filter(r=>r.x_value!=null&&r.y_value!=null);
     download('exoplanet-explorer.csv', csvFromObjects(out));
   });
@@ -228,17 +227,14 @@ function hookUI(){
 
 (async function init(){
   try{
+    document.getElementById('endpoints').textContent = `POP_CSV: ${POP_CSV}\nJWST_CSV: ${JWST_LOCAL_CSV}`;
     populateDropdowns(); hookUI();
-    $('#endpoints').textContent = `Population CSV: ${PS_CSV_URL}\nJWST CSV: ${JWST_CSV_URL}`;
-    document.getElementById('status').textContent = 'Loading CSV files…';
-    const ps = await loadPopulation();
+    const ps = await loadPS();
     state._all = ps; state.planets = ps; refresh();
     document.getElementById('status').textContent = `Loaded local CSVs (rows: ${ps.length.toLocaleString()})`;
-    // Load JWST highlights in background
-    loadJWST().then(()=>refresh()).catch(err=>console.error('JWST CSV error', err));
+    loadJWST().then(()=>refresh()).catch(err=>console.warn('JWST load failed (non-fatal)', err));
   }catch(err){
-    console.error(err);
-    document.getElementById('status').textContent = 'Failed to load local CSVs. See console for details.';
+    console.error(err); document.getElementById('status').textContent = 'Failed to load local CSVs.';
   }
 })();
 </script>
