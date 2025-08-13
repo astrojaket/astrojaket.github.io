@@ -259,7 +259,7 @@ async function loadCSV(url){
 }
 async function loadPopulation(){
   const rows = await loadCSV(POP_CSV);
-  const numCols = ['pl_bmasse','pl_bmassj','pl_rade','pl_radj','pl_orbper','st_age','st_rad','pl_eqt','st_teff','sy_jmag','sy_kmag','tran_flag','hostname','pl_name'];
+  const numCols = ['pl_bmasse','pl_bmassj','pl_rade','pl_radj','pl_orbper','st_age','st_rad','pl_eqt','st_teff','sy_jmag','sy_kmag','tran_flag'];
   for (const r of rows) {
     for (const k of numCols) {
       if (r[k] !== undefined) {
@@ -267,12 +267,11 @@ async function loadPopulation(){
         if (val !== null) r[k] = val;
       }
     }
-  } // keep strings for hostname/pl_name
-
+  }
   const variants = new Set();
-  for(const r of rows){
-    if(r.hostname) variantSetForHost(r.hostname).forEach(v => variants.add(v));
-    if(r.pl_name) variantSetForHost(hostFromPlName(r.pl_name)).forEach(v => variants.add(v));
+  for (const r of rows) {
+    if (r.hostname) variantSetForHost(r.hostname).forEach(v => variants.add(v));
+    if (r.pl_name) variantSetForHost(hostFromPlName(r.pl_name)).forEach(v => variants.add(v));
   }
   state.hostVariantSet = variants;
   return rows;
@@ -301,16 +300,25 @@ async function loadHST(){
   try{
     const rows = await loadCSV(HST_CSV);
     const names = new Set();
-    const cols = rows.columns || Object.keys(rows[0]||{});
-    let targetCol = cols.find(c => /target\s*name/i.test(c)) or cols.find(c => /^target$/i.test(c)) or cols.find(c => /host/i.test(c)) or cols.find(c => /star/i.test(c)) or 'Target Name';
+
+    // Try to discover a reasonable "target" column (case-insensitive)
+    const cols = rows.columns || Object.keys(rows[0] || {});
+    let targetCol = cols.find(c => /target\s*name/i.test(c)) ||
+                    cols.find(c => /^target$/i.test(c)) ||
+                    cols.find(c => /host/i.test(c)) ||
+                    cols.find(c => /star/i.test(c)) ||
+                    'Target Name';
 
     for(const r of rows){
       const cell = r[targetCol];
       if(!cell) continue;
-      const parts = cell.split(/[;,\/]|\s{2,}|\s+\/\s+/).map(s => s.strip()).filter(Boolean);
-      if(parts.length===0) parts.append(cell)
+      // Split on commas/semicolons/slashes or multiple spaces
+      const parts = cell.split(/[;,\/]|\s{2,}|\s+\/\s+/).map(s => s.trim()).filter(Boolean);
+      if(parts.length === 0) parts.push(cell);
+
       for(const raw of parts){
         let h = raw;
+        // Remove any annotation blocks
         h = h.replace(/\(.*?\)|\[.*?\]/g, '').trim();
         const variants = variantSetForHost(h);
         for(const v of variants){ if(state.hostVariantSet.has(v)) names.add(v); }
@@ -402,16 +410,6 @@ function filterRows(){
 function buildTraces(){
   const xKey = document.getElementById('xSelect').value;
   const yKey = document.getElementById('ySelect').value;
-  const PARAMS = {
-    'Best Planet Mass (M_⊕)': d => num(d.pl_bmasse),
-    'Best Planet Mass (M_J)': d => num(d.pl_bmassj),
-    'Planet Radius (R_⊕)': d => num(d.pl_rade),
-    'Planet Radius (R_J)': d => num(d.pl_radj),
-    'Orbital Period (days)': d => num(d.pl_orbper),
-    'Stellar Age (Gyr)': d => num(d.st_age),
-    'Stellar Radius (R_☉)': d => num(d.st_rad),
-    'Equilibrium Temperature (K)': d => num(d.pl_eqt),
-  };
   const xFn = PARAMS[xKey], yFn = PARAMS[yKey];
   const colorByTeq = document.getElementById('colorTemp').checked;
   const showObs = document.getElementById('highlightJWSTObs').checked;
