@@ -167,7 +167,14 @@ tr.selected{ background:#ede7fb; }
 const $ = s => document.querySelector(s);
 const $$ = s => Array.from(document.querySelectorAll(s));
 const num = v => (v==null || v==='') ? null : (isFinite(+v) ? +v : null);
-const canon = s => (s||'').toString().trim().toLowerCase().replace(/\u2212/g,'-').replace(/[\s]+/g,' ');
+// Normalize names: lowercase, trim, collapse spaces, convert NBSP, convert all dashes to '-'
+const canon = s => (s||'')
+  .toString()
+  .trim()
+  .toLowerCase()
+  .replace(/[\\u00a0]/g,' ')
+  .replace(/[\\u2010\\u2011\\u2012\\u2013\\u2014\\u2212]/g,'-')
+  .replace(/[\\s]+/g,' ');
 
 const CSV_URL = '/assets/data/pscomppars_recent.csv';
 let PLANETS = [];
@@ -185,12 +192,33 @@ async function loadCSV(){
   document.getElementById('planetList').innerHTML = names.map(n => `<option value="${n}">`).join('');
   document.getElementById('loadStatus').textContent = `Loaded local CSV (${rows.length.toLocaleString()} rows)`;
 }
+
+// Build a lookup map on demand using multiple keys per planet
+function getNameIndex(){
+  if(getNameIndex._idx) return getNameIndex._idx;
+  const idx = new Map();
+  for(const p of PLANETS){
+    const c = canon(p.pl_name);
+    if(!c) continue;
+    const k1 = c;
+    const k2 = c.replace(/\\s+/g,'');
+    const k3 = c.replace(/[\\s-]+/g,'');
+    if(!idx.has(k1)) idx.set(k1, p);
+    if(!idx.has(k2)) idx.set(k2, p);
+    if(!idx.has(k3)) idx.set(k3, p);
+  }
+  getNameIndex._idx = idx;
+  return idx;
+}
+
 function loadFromLocal(name){
   const nm = canon(name);
   if(!nm){ document.getElementById('loadStatus').textContent = 'Enter a planet name.'; return; }
-  let r = PLANETS.find(p => canon(p.pl_name) === nm) || PLANETS.find(p => canon(p.pl_name).replace(/\s+/g,'') === nm.replace(/\s+/g,''));
+  const idx = getNameIndex();
+  const r = idx.get(nm) || idx.get(nm.replace(/\\s+/g,'')) || idx.get(nm.replace(/[\\s-]+/g,''));
   if(!r){ document.getElementById('loadStatus').textContent = 'No match in CSV. Try the list.'; return; }
-  document.getElementById('plName').value = r.pl_name;
+
+  document.getElementById('plName').value = r.pl_name || name;
   if(r.ra!=null) document.getElementById('raDeg').value = r.ra;
   if(r.dec!=null) document.getElementById('decDeg').value = r.dec;
   if(r.pl_orbper!=null) document.getElementById('period').value = r.pl_orbper;
@@ -199,7 +227,7 @@ function loadFromLocal(name){
   document.getElementById('loadStatus').textContent = (r.tran_flag===1? 'Loaded from local CSV.' : 'Loaded (not flagged as transiting).');
 }
 
-// Time & astro
+// Time & astro helpers
 function toJD(date){ return date.getTime()/86400000 + 2440587.5; }
 function gmst(jd){
   const T = (jd - 2451545.0)/36525.0;
@@ -208,17 +236,15 @@ function gmst(jd){
   return g*Math.PI/180;
 }
 function altAz(jd, raDeg, decDeg, latDeg, lonDeg){
-  const ra = raDeg*Math.PI/180;
-  const dec = decDeg*Math.PI/180;
-  const lat = latDeg*Math.PI/180;
-  const lon = lonDeg*Math.PI/180;
+  const ra = raDeg*Math.PI/180, dec = decDeg*Math.PI/180;
+  const lat = latDeg*Math.PI/180, lon = lonDeg*Math.PI/180;
   const lst = gmst(jd) + lon;
   const H = lst - ra;
   const sinAlt = Math.sin(lat)*Math.sin(dec) + Math.cos(lat)*Math.cos(dec)*Math.cos(H);
-  const alt = Math.asin(Math.max(-1, Math.min(1, sinAlt)));
+  const alt = Math.asin(Math.max(-1,Math.min(1,sinAlt)));
   const cosAz = (Math.sin(dec) - Math.sin(alt)*Math.sin(lat)) / (Math.cos(alt)*Math.cos(lat));
-  let az = Math.acos(Math.max(-1, Math.min(1, cosAz)));
-  if (Math.sin(H) > 0) az = 2*Math.PI - az;
+  let az = Math.acos(Math.max(-1,Math.min(1,cosAz)));
+  if(Math.sin(H)>0) az = 2*Math.PI - az;
   return { altDeg: alt*180/Math.PI, azDeg: az*180/Math.PI, H };
 }
 function sunRaDec(jd){
@@ -261,14 +287,8 @@ function generateEphemerides(t0, period, fromJD, toJD, maxN){
   }
   return events;
 }
-function jdToISO(jd){
-  const ms = (jd - 2440587.5)*86400000;
-  return new Date(ms).toISOString().replace('.000','');
-}
-function jdToLocal(jd){
-  const ms = (jd - 2440587.5)*86400000;
-  return new Date(ms).toLocaleString();
-}
+function jdToISO(jd){ const ms=(jd-2440587.5)*86400000; return new Date(ms).toISOString().replace('.000',''); }
+function jdToLocal(jd){ const ms=(jd-2440587.5)*86400000; return new Date(ms).toLocaleString(); }
 
 function buildTable(rows, planet, site, site2){
   const wrap = document.getElementById('ephemTableWrap');
@@ -290,6 +310,7 @@ function buildTable(rows, planet, site, site2){
     wrap.querySelectorAll('tr').forEach(r => r.classList.remove('selected'));
     tr.classList.add('selected');
     const jd = +tr.getAttribute('data-jd');
+    // Reset then plot
     Plotly.purge('plotAlt'); Plotly.purge('plotAir'); Plotly.purge('plotPar');
     plotTransit(jd, +tr.dataset.ra, +tr.dataset.dec, +tr.dataset.lat, +tr.dataset.lon, +tr.dataset.dur, +(document.getElementById('minAlt').value));
   }));
@@ -304,8 +325,8 @@ function plotTransit(midJD, ra, dec, lat, lon, durHrs, minAlt){
   for(let i=0;i<n;i++){
     const jd = t1 + (i/(n-1))*(t2 - t1);
     const a = altAz(jd, ra, dec, lat, lon);
-    const alt = a.altDeg;
     xs.push(new Date((jd - 2440587.5)*86400000));
+    const alt = a.altDeg;
     alts.push(alt);
     airs.push( airmassKastenYoung(Math.max(5, alt)) );
     pars.push( parallacticAngle(a.H, lat, dec) );
@@ -399,19 +420,15 @@ function useMyLocation(){
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-  // Dates default: next 30 days
   const today = new Date();
   const to = new Date(Date.now() + 30*86400000);
   document.getElementById('fromDate').valueAsDate = today;
   document.getElementById('toDate').valueAsDate = to;
 
   await loadCSV();
-
-  // Default example
   document.getElementById('plName').value = 'WASP-43 b';
   loadFromLocal('WASP-43 b');
 
-  // Wire buttons
   document.getElementById('btnLoad').addEventListener('click', () => loadFromLocal(document.getElementById('plName').value));
   document.getElementById('btnGeo').addEventListener('click', useMyLocation);
   document.getElementById('btnEphem').addEventListener('click', onEphemerides);
