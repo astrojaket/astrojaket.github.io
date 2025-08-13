@@ -4,7 +4,7 @@ title: Exoplanets
 permalink: /exoplanets
 ---
 
-<!-- Exoplanet Explorer (Local CSVs, JWST diamonds, robust matching) -->
+<!-- Exoplanet Explorer (Local CSVs, JWST diamonds, HST squares, robust matching) -->
 <div id="exo-explorer" class="exo-container">
   <div class="exo-topbar">
     <div class="exo-controls">
@@ -71,7 +71,8 @@ permalink: /exoplanets
         <h2>Highlights</h2>
         <label class="exo-check"><input id="highlightJWSTObs" type="checkbox" checked/> JWST – Observed</label>
         <label class="exo-check"><input id="highlightJWSTPlan" type="checkbox" checked/> JWST – Planned</label>
-        <div class="exo-note">Observed = <b>Executed</b>. Planned = Scheduled / Implementation / Flight Ready / Inactive / On Hold.</div>
+        <label class="exo-check"><input id="highlightHST" type="checkbox" checked/> HST – Atmospheric</label>
+        <div class="exo-note">JWST Observed = <b>Executed</b>. JWST Planned = Scheduled / Implementation / Flight Ready / Inactive / On Hold.</div>
       </div>
     </div>
 
@@ -97,7 +98,7 @@ permalink: /exoplanets
       <div class="exo-note">
         TSM (transmission) & ESM (emission) per Kempton+2018. When enabled, marker size ∝ √metric (clamped).<br/>
         Threshold guide: TSM &gt; 10 (R&lt;1.5R⊕), TSM &gt; 90 (1.5–10R⊕), ESM &gt; 7.5 (terrestrial).<br/>
-        If TSM/ESM sizing is ON, JWST points follow the metric size (no extra ×2).
+        If TSM/ESM sizing is ON, JWST/HST points follow the metric size (no extra ×2).
       </div>
     </aside>
   </div>
@@ -110,11 +111,18 @@ permalink: /exoplanets
         <li><span class="dot pop"></span> Population</li>
         <li><span class="dot jwstobs diamond"></span> JWST – Observed (diamond)</li>
         <li><span class="dot jwstplan diamond"></span> JWST – Planned (diamond)</li>
+        <li><span class="dot hst square"></span> HST – Atmospheric (square)</li>
       </ul>
+      <div class="exo-note">
+        Sources: 
+        <a href="https://exoplanetarchive.ipac.caltech.edu/" target="_blank" rel="noopener">NASA Exoplanet Archive</a> (population), 
+        <a href="https://www.stsci.edu/~nnikolov/TrExoLiSTS/JWST/trexolists.html" target="_blank" rel="noopener">TrExoLiSTS – JWST</a>, 
+        <a href="https://www.stsci.edu/~WFC3/trexolists/trexolists.html" target="_blank" rel="noopener">TrExoLiSTS – HST</a>.
+      </div>
       <div id="counts" class="exo-note">—</div>
       <hr/>
       <div class="exo-note">
-        CSVs: <code>/assets/data/pscomppars_recent.csv</code>, <code>/assets/data/jwst_trexolists_extended.csv</code>
+        CSVs: <code>/assets/data/pscomppars_recent.csv</code>, <code>/assets/data/jwst_trexolists_extended.csv</code>, <code>/assets/data/HST_Trexolist.csv</code>
       </div>
       <div id="status" class="exo-note">Loading population CSV…</div>
     </aside>
@@ -132,8 +140,9 @@ permalink: /exoplanets
 
 <style>
 :root {
-  --mpurple: #9370DB;
-  --teal: #06b6d4;
+  --mpurple: #9370DB;   /* JWST observed */
+  --teal: #06b6d4;      /* JWST planned */
+  --green: #10B981;     /* HST */
   --muted: #6b7280;
   --bg: #f6f4fb;
 }
@@ -154,7 +163,9 @@ body { background: var(--bg); }
 .dot.pop { background:#9CA3AF; opacity:.8; }
 .dot.jwstobs { background:#9370DB; }
 .dot.jwstplan { background:#06b6d4; }
+.dot.hst { background:#10B981; }
 .dot.diamond { clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); }
+.dot.square { border-radius: 3px; }
 .exo-note { color: var(--muted); font-size: .85rem; }
 .exo-code { background:#f3f4f6; padding:.6rem; border-radius:12px; }
 .exo-grid2 { display:grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap:.6rem; }
@@ -176,6 +187,7 @@ body { background: var(--bg); }
 // ---------------------------
 const POP_CSV = '/assets/data/pscomppars_recent.csv';
 const JWST_CSV = '/assets/data/jwst_trexolists_extended.csv';
+const HST_CSV = '/assets/data/HST_Trexolist.csv';
 
 const PARAMS = {
   'Best Planet Mass (M_⊕)': d => num(d.pl_bmasse),
@@ -223,9 +235,9 @@ function nameVariantsFromPlName(plname){
 // ---------------------------
 // State
 // ---------------------------
-const state = {
-  all: [], rows: [],
+const state = { all: [], rows: [],
   jwstObserved: new Set(), jwstPlanned: new Set(),
+  hstHostnames: new Set(),
   filters: {}, sizing: { tsm:false, esm:false }
 };
 
@@ -240,7 +252,6 @@ async function loadCSV(url){
 }
 async function loadPopulation(){
   const rows = await loadCSV(POP_CSV);
-  // coerce numeric for commonly used columns
   const numCols = ['pl_bmasse','pl_bmassj','pl_rade','pl_radj','pl_orbper','st_age','st_rad','pl_eqt','st_teff','sy_jmag','sy_kmag','tran_flag'];
   for(const r of rows){ for(const k of numCols){ if(r[k] !== undefined) r[k] = num(r[k]); } }
   return rows;
@@ -265,9 +276,25 @@ async function loadJWST(){
     refresh();
   }catch(err){ console.warn('JWST CSV load failed (non-fatal):', err); }
 }
+async function loadHST(){
+  try{
+    const rows = await loadCSV(HST_CSV);
+    const names = new Set();
+    for(const r of rows){
+      const host = r['Target Name'] || r['Target'] || r['Star'] || r['hostname'] || r['Host Name'];
+      if(!host) continue;
+      const cleaned = host.toString().trim().replace(/\u2212/g,'-').toLowerCase();
+      names.add(cleaned);
+    }
+    state.hstHostnames = names;
+    const s = document.getElementById('status');
+    if(s) s.textContent = `${s.textContent} | HST loaded (${names.size})`;
+    refresh();
+  }catch(err){ console.warn('HST CSV load failed (non-fatal):', err); }
+}
 
 // ---------------------------
-// TSM / ESM helpers (lightweight, relative ranking only)
+// TSM / ESM helpers (relative)
 // ---------------------------
 function tsmScaleFactor(rpRe){
   if(rpRe==null) return null;
@@ -340,20 +367,21 @@ function buildTraces(){
   const colorByTeq = document.getElementById('colorTemp').checked;
   const showObs = document.getElementById('highlightJWSTObs').checked;
   const showPlan = document.getElementById('highlightJWSTPlan').checked;
+  const showHST = document.getElementById('highlightHST').checked;
   const showLabels = document.getElementById('showLabels').checked;
   const useTSM = document.getElementById('useTSM').checked;
   const useESM = document.getElementById('useESM').checked;
 
-  const pop = [], obs = [], plan = [];
-  const labelsPop=[], labelsObs=[], labelsPlan=[];
-  const popSizes=[], obsSizes=[], planSizes=[];
+  const pop = [], obs = [], plan = [], hst = [];
+  const labelsPop=[], labelsObs=[], labelsPlan=[], labelsHst=[];
+  const popSizes=[], obsSizes=[], planSizes=[], hstSizes=[];
 
   for(const p of state.rows){
     const x=xFn(p), y=yFn(p); if(x==null||y==null) continue;
-    // JWST membership
-    const vset = nameVariantsFromPlName(p.pl_name);
-    const isObs = [...vset].some(v => state.jwstObserved.has(v));
-    const isPlan = !isObs && [...vset].some(v => state.jwstPlanned.has(v));
+    const variants = nameVariantsFromPlName(p.pl_name);
+    const isObs = [...variants].some(v => state.jwstObserved.has(v));
+    const isPlan = !isObs && [...variants].some(v => state.jwstPlanned.has(v));
+    const isHST = !isObs && !isPlan && state.hstHostnames.has(canon(p.hostname||''));
 
     // metric size
     let sizeVal = 6;
@@ -364,6 +392,7 @@ function buildTraces(){
 
     if(isObs){ obs.push({x,y,teq:p.pl_eqt}); obsSizes.push(sizeVal); if(showLabels) labelsObs.push(p.pl_name||''); }
     else if(isPlan){ plan.push({x,y,teq:p.pl_eqt}); planSizes.push(sizeVal); if(showLabels) labelsPlan.push(p.pl_name||''); }
+    else if(isHST && showHST){ hst.push({x,y,teq:p.pl_eqt}); hstSizes.push(sizeVal); if(showLabels) labelsHst.push(p.pl_name||''); }
     else { pop.push({x,y,teq:p.pl_eqt}); popSizes.push((useTSM||useESM)? sizeVal : 6); if(showLabels) labelsPop.push(p.pl_name||''); }
   }
 
@@ -407,6 +436,16 @@ function buildTraces(){
       hovertemplate: '%{x}, %{y}<extra></extra>'
     });
   }
+  if(showHST){
+    traces.push({
+      name: 'HST – Atmospheric', type: baseType, mode: baseMode,
+      x: hst.map(d=>d.x), y: hst.map(d=>d.y),
+      marker:{ symbol:'square', size: (useTSM||useESM) ? hstSizes : 10, opacity:.95, color:'#10B981' },
+      ...(showLabels ? { text: labelsHst, textposition:'top center' } : {}),
+      hovertemplate: '%{x}, %{y}<extra></extra>'
+    });
+  }
+
   return traces;
 }
 
@@ -430,7 +469,7 @@ function refresh(){
 }
 
 function hookUI(){
-  ['xSelect','ySelect','xLog','yLog','colorTemp','showLabels','onlyTransiting','highlightJWSTObs','highlightJWSTPlan','useTSM','useESM']
+  ['xSelect','ySelect','xLog','yLog','colorTemp','showLabels','onlyTransiting','highlightJWSTObs','highlightJWSTPlan','highlightHST','useTSM','useESM']
     .forEach(id => document.getElementById(id).addEventListener('change', refresh));
   document.getElementById('applyFilters').addEventListener('click', applyFiltersAndRefresh);
   document.getElementById('clearFilters').addEventListener('click', () => clearFilters());
@@ -439,7 +478,7 @@ function hookUI(){
       const p = btn.getAttribute('data-preset');
       const def = PRESETS[p]||{};
       $$('.exo-filters input').forEach(i=> i.value='');
-      for(const [k,[mn,mx]] of Object.entries(def)){ setFilter('f-min-'+k, mn); setFilter('f-max-'+k, mx); }
+      for(const [k,[mn,mx]] of Object.entries(def)){ const a='f-min-'+k, b='f-max-'+k; const el1=document.getElementById(a), el2=document.getElementById(b); if(el1) el1.value=(mn??''); if(el2) el2.value=(mx??''); }
     });
   });
 }
@@ -465,7 +504,9 @@ function summarizeInputs(){
     state.rows = popRows.slice();
     document.getElementById('status').textContent = `Loaded population CSV (rows: ${state.all.length.toLocaleString()})`;
     refresh();
-    loadJWST(); // non-blocking
+    // Non-blocking loads
+    loadJWST();
+    loadHST();
   }catch(err){
     console.error(err);
     document.getElementById('status').textContent = 'Failed to load population CSV.';
