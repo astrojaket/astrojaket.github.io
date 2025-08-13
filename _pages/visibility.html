@@ -1,0 +1,355 @@
+---
+layout: default
+title: Visibility
+permalink: /visibility
+---
+
+<div class="vis-wrap">
+  <div class="vis-grid">
+    <section class="card">
+      <h1>Transit Visibility & Ephemerides</h1>
+      <p class="muted">Enter a planet or load from the NASA Exoplanet Archive, set your observing site, then generate upcoming transits and check visibility.</p>
+      <div class="grid2">
+        <label>Planet name
+          <input id="plName" class="input" placeholder="e.g. WASP-43 b">
+        </label>
+        <div class="row gap">
+          <button id="btnLoad" class="btn">Load from Exoplanet Archive</button>
+          <span id="loadStatus" class="muted"></span>
+        </div>
+      </div>
+
+      <div class="grid3 mt">
+        <label>RA (deg)
+          <input id="raDeg" class="input" type="number" step="any" placeholder="RA in degrees">
+        </label>
+        <label>Dec (deg)
+          <input id="decDeg" class="input" type="number" step="any" placeholder="Dec in degrees">
+        </label>
+        <label>Epoch T0 (BJD_TDB)
+          <input id="t0" class="input" type="number" step="any" placeholder="e.g. 2457000.1234">
+        </label>
+        <label>Period (days)
+          <input id="period" class="input" type="number" step="any" placeholder="e.g. 0.8135">
+        </label>
+        <label>Duration (hours)
+          <input id="durationHrs" class="input" type="number" step="any" placeholder="e.g. 1.3">
+        </label>
+        <label class="tooltip">Epoch system
+          <select id="epochSystem" class="input">
+            <option value="BJD_TDB" selected>BJD_TDB</option>
+            <option value="JD_UTC">JD_UTC (approx)</option>
+          </select>
+          <span class="tip">Archive values are commonly in BJD_TDB. We assume UTC display/output.</span>
+        </label>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Observing Site</h2>
+      <div class="grid4">
+        <label>Latitude (deg)
+          <input id="latDeg" class="input" type="number" step="any" placeholder="e.g. 28.3">
+        </label>
+        <label>Longitude (deg, East +)
+          <input id="lonDeg" class="input" type="number" step="any" placeholder="e.g. -16.5">
+        </label>
+        <label>Elevation (m)
+          <input id="elevM" class="input" type="number" step="1" placeholder="0">
+        </label>
+        <label>Min altitude (deg)
+          <input id="minAlt" class="input" type="number" step="any" value="30">
+        </label>
+      </div>
+      <div class="row gap mt">
+        <button id="btnGeo" class="btn ghost">Use my location</button>
+        <span class="muted">We won't store your location — used only in this browser.</span>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Ephemerides</h2>
+      <div class="grid3">
+        <label>From (UTC)
+          <input id="fromDate" class="input" type="date">
+        </label>
+        <label>To (UTC)
+          <input id="toDate" class="input" type="date">
+        </label>
+        <label>Max events
+          <input id="maxEvents" class="input" type="number" value="30" min="1" max="500">
+        </label>
+      </div>
+      <div class="row gap mt">
+        <button id="btnEphem" class="btn">Generate ephemerides</button>
+        <button id="btnClear" class="btn ghost">Clear</button>
+        <span id="ephemStatus" class="muted"></span>
+      </div>
+      <div id="ephemTableWrap" class="mt table-wrap"></div>
+    </section>
+
+    <section class="card">
+      <h2>Transit Altitude Plot (selected row)</h2>
+      <div id="plot" class="plot"></div>
+      <div class="muted">Click a row in the table to plot altitude across the transit (±1 duration).</div>
+    </section>
+  </div>
+
+  <aside class="card">
+    <h3>Notes & Sources</h3>
+    <ul class="notes">
+      <li>Population & planet parameters from the <a href="https://exoplanetarchive.ipac.caltech.edu/" target="_blank" rel="noopener">NASA Exoplanet Archive</a> (pscomppars).</li>
+      <li>Times are displayed in UTC and “Local” based on your browser timezone.</li>
+      <li>Altitude calculation uses an approximate sidereal-time transform (sufficient for planning).</li>
+      <li>For precise planning, always confirm with observatory-specific tools.</li>
+    </ul>
+  </aside>
+</div>
+
+<link rel="preconnect" href="https://cdn.plot.ly">
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+
+<style>
+:root{
+  --card:#fff; --border:#e5e7eb; --muted:#6b7280; --accent:#9370DB;
+}
+.vis-wrap{ display:grid; grid-template-columns: 1fr 320px; gap:1rem; }
+.vis-grid{ display:grid; gap:1rem; }
+.card{ background:var(--card); border:1px solid var(--border); border-radius:16px; padding:1rem; box-shadow:0 1px 2px rgba(0,0,0,.05); }
+.grid2{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.6rem; align-items:end; }
+.grid3{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:.6rem; }
+.grid4{ display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:.6rem; }
+.row.gap{ display:flex; gap:.6rem; align-items:center; }
+.mt{ margin-top:.6rem; }
+.muted{ color:var(--muted); font-size:.9rem; }
+.input{ width:100%; padding:.5rem .65rem; border:1px solid #d1d5db; border-radius:10px; }
+.btn{ background:var(--accent); color:#fff; border:none; border-radius:10px; padding:.55rem .8rem; cursor:pointer; }
+.btn.ghost{ background:transparent; color:var(--accent); border:1px solid var(--accent); }
+.plot{ height:50vh; border:1px solid var(--border); border-radius:16px; }
+.table-wrap{ overflow:auto; max-height:45vh; border:1px solid var(--border); border-radius:12px; }
+table{ width:100%; border-collapse:collapse; font-size:.95rem; }
+th, td{ padding:.4rem .5rem; border-bottom:1px solid #eee; }
+tr:hover{ background:#fafafa; cursor:pointer; }
+.tooltip{ position:relative; }
+.tooltip .tip{ position:absolute; left:0; top:100%; transform:translateY(4px); background:#111; color:#fff; padding:.3rem .5rem; border-radius:6px; font-size:.8rem; display:none; }
+.tooltip:hover .tip{ display:block; }
+@media (max-width:1100px){ .vis-wrap{ grid-template-columns:1fr; } .grid3{ grid-template-columns:1fr; } .grid4{ grid-template-columns:1fr; } }
+</style>
+
+<script>
+const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+const num = v => (v==null || v==='') ? null : (isFinite(+v) ? +v : null);
+
+// -------- Archive loader --------
+async function loadFromArchive(name){
+  const base = 'https://exoplanetarchive.ipac.caltech.edu/TAP/sync';
+  // fetch key fields if available
+  const q = `select pl_name,ra,dec,pl_orbper,pl_tranmid,pl_trandur,tranmid,tran_flag from pscomppars where pl_name like '${name.replace(/'/g,"''")}'`;
+  const url = base + '?query=' + encodeURIComponent(q) + '&format=json';
+  const res = await fetch(url, {mode:'cors'});
+  if(!res.ok) throw new Error('Archive request failed: '+res.status);
+  const arr = await res.json();
+  if(!Array.isArray(arr) || arr.length===0) throw new Error('No match found');
+  const r = arr[0];
+  // Map to fields; prefer pl_tranmid if present, else tranmid; duration days -> hours
+  const t0 = r.pl_tranmid ?? r.tranmid ?? null;
+  const durH = (r.pl_trandur!=null) ? (+r.pl_trandur*24) : null;
+  return {
+    pl_name: r.pl_name,
+    ra: num(r.ra),
+    dec: num(r.dec),
+    period: num(r.pl_orbper),
+    t0: num(t0),
+    durationHrs: num(durH),
+    tran_flag: r.tran_flag
+  };
+}
+
+// -------- Time & astronomy helpers --------
+function toJD(date){ // UTC Date -> JD UTC
+  return date.getTime()/86400000 + 2440587.5;
+}
+function gmst(jd){ // radians, simplified
+  const T = (jd - 2451545.0)/36525.0;
+  let gmst = 280.46061837 + 360.98564736629*(jd-2451545.0) + 0.000387933*T*T - T*T*T/38710000.0;
+  gmst = (gmst % 360 + 360) % 360;
+  return gmst * Math.PI/180;
+}
+function altAz(jd, raDeg, decDeg, latDeg, lonDeg){
+  const ra = raDeg*Math.PI/180, dec = decDeg*Math.PI/180;
+  const lat = latDeg*Math.PI/180, lon = lonDeg*Math.PI/180;
+  const lst = gmst(jd) + lon;
+  const H = lst - ra;
+  const sinAlt = Math.sin(lat)*Math.sin(dec) + Math.cos(lat)*Math.cos(dec)*Math.cos(H);
+  const alt = Math.asin(Math.max(-1,Math.min(1,sinAlt)));
+  const cosAz = (Math.sin(dec) - Math.sin(alt)*Math.sin(lat)) / (Math.cos(alt)*Math.cos(lat));
+  let az = Math.acos(Math.max(-1,Math.min(1,cosAz)));
+  if(Math.sin(H)>0) az = 2*Math.PI - az;
+  return { altDeg: alt*180/Math.PI, azDeg: az*180/Math.PI };
+}
+
+// -------- Ephemerides --------
+function generateEphemerides(t0, period, fromJD, toJD, maxN){
+  if(t0==null || period==null) return [];
+  const events = [];
+  // compute first k so that t = t0 + k*P >= fromJD
+  let k = Math.ceil((fromJD - t0)/period);
+  if(!isFinite(k)) k = 0;
+  for(let i=0; i<maxN; i++){
+    const t = t0 + (k+i)*period;
+    if(t > toJD) break;
+    events.push({ midJD: t, idx: k+i });
+  }
+  return events;
+}
+
+function jdToISO(jd){
+  const ms = (jd - 2440587.5)*86400000;
+  const d = new Date(ms);
+  return d.toISOString().replace('.000','');
+}
+function jdToLocal(jd){
+  const ms = (jd - 2440587.5)*86400000;
+  const d = new Date(ms);
+  return d.toLocaleString();
+}
+
+// -------- UI handlers --------
+async function onLoad(){
+  const name = $('#plName').value.trim();
+  $('#loadStatus').textContent = 'Loading…';
+  try{
+    const r = await loadFromArchive(name);
+    if(r.pl_name) $('#plName').value = r.pl_name;
+    if(r.ra!=null) $('#raDeg').value = r.ra;
+    if(r.dec!=null) $('#decDeg').value = r.dec;
+    if(r.period!=null) $('#period').value = r.period;
+    if(r.t0!=null) $('#t0').value = r.t0;
+    if(r.durationHrs!=null) $('#durationHrs').value = r.durationHrs;
+    if(r.tran_flag !== 1) {
+      $('#loadStatus').textContent = 'Loaded, but archive does not flag as transiting (tran_flag≠1).';
+    } else {
+      $('#loadStatus').textContent = 'Loaded from archive.';
+    }
+  }catch(err){
+    console.error(err);
+    $('#loadStatus').textContent = 'Load failed: ' + err.message;
+  }
+}
+
+function onGeo(){
+  if(!navigator.geolocation){ alert('Geolocation not available'); return; }
+  navigator.geolocation.getCurrentPosition(pos => {
+    $('#latDeg').value = pos.coords.latitude.toFixed(5);
+    $('#lonDeg').value = pos.coords.longitude.toFixed(5);
+    $('#elevM').value = Math.round(pos.coords.altitude || 0);
+  }, err => alert('Location failed: '+err.message), {enableHighAccuracy:true, timeout:8000});
+}
+
+function buildTable(rows, planet, site){
+  const wrap = $('#ephemTableWrap');
+  if(rows.length===0){ wrap.innerHTML = '<p class="muted">No events in range.</p>'; return; }
+  let html = '<table><thead><tr>' +
+    '<th>#</th><th>Mid (UTC)</th><th>Mid (Local)</th><th>Mid (JD)</th><th>Max Alt (deg)</th><th>Visible?</th>' +
+    '</tr></thead><tbody>';
+  for(const r of rows){
+    html += `<tr data-jd="${r.midJD}" data-ra="${planet.ra}" data-dec="${planet.dec}" data-lat="${site.lat}" data-lon="${site.lon}" data-dur="${planet.dur}">`+
+      `<td>${r.idx}</td>`+
+      `<td>${jdToISO(r.midJD)}</td>`+
+      `<td>${jdToLocal(r.midJD)}</td>`+
+      `<td>${r.midJD.toFixed(5)}</td>`+
+      `<td>${(r.maxAlt ?? NaN).toFixed(1)}</td>`+
+      `<td>${r.visible ? 'Yes' : 'No'}</td>`+
+      `</tr>`;
+  }
+  html += '</tbody></table>';
+  wrap.innerHTML = html;
+  wrap.querySelectorAll('tbody tr').forEach(tr => tr.addEventListener('click', () => {
+    const jd = +tr.getAttribute('data-jd');
+    plotTransitAltitude(jd, +tr.dataset.ra, +tr.dataset.dec, +tr.dataset.lat, +tr.dataset.lon, +tr.dataset.dur, +$('#minAlt').value);
+  }));
+}
+
+function plotTransitAltitude(midJD, ra, dec, lat, lon, durHrs, minAlt){
+  const n = 61; // ~5-min sampling for 5hr event
+  const halfDays = (isFinite(durHrs) ? (durHrs/2)/24 : 0.05); // fallback to 0.05 d (~72min) if unknown
+  const t1 = midJD - halfDays, t2 = midJD + halfDays;
+  const xs = [], alts = [];
+  for(let i=0;i<n;i++){
+    const jd = t1 + (i/(n-1))*(t2 - t1);
+    const a = altAz(jd, ra, dec, lat, lon).altDeg;
+    xs.push(new Date((jd - 2440587.5)*86400000));
+    alts.push(a);
+  }
+  const minAltArr = new Array(n).fill(minAlt);
+  Plotly.react('plot', [
+    {type:'scatter', mode:'lines', x:xs, y:alts, name:'Altitude (deg)'},
+    {type:'scatter', mode:'lines', x:xs, y:minAltArr, name:'Min Alt', line:{dash:'dash'}}
+  ], {
+    margin:{l:50,r:10,t:10,b:40},
+    xaxis:{title:'Time (UTC)'},
+    yaxis:{title:'Altitude (deg)'},
+    showlegend:true
+  }, {displaylogo:false, responsive:true});
+}
+
+function onEphemerides(){
+  const ra = num($('#raDeg').value);
+  const dec = num($('#decDeg').value);
+  const period = num($('#period').value);
+  const t0 = num($('#t0').value);
+  const dur = num($('#durationHrs').value);
+  const lat = num($('#latDeg').value);
+  const lon = num($('#lonDeg').value);
+  const minAlt = num($('#minAlt').value) ?? 30;
+  const maxEvents = Math.max(1, Math.min(500, +$('#maxEvents').value || 30));
+
+  if([ra,dec,period,t0,lat,lon].some(v => v==null)){
+    $('#ephemStatus').textContent = 'Please provide RA, Dec, Period, T0, Latitude, Longitude.';
+    return;
+  }
+
+  const from = $('#fromDate').value ? new Date($('#fromDate').value+'T00:00:00Z') : new Date();
+  const to = $('#toDate').value ? new Date($('#toDate').value+'T23:59:59Z') : new Date(Date.now()+30*86400000);
+  const fromJD = toJD(from), toJDv = toJD(to);
+
+  const events = generateEphemerides(t0, period, fromJD, toJDv, maxEvents);
+
+  // Visibility (sample each event around mid to get max alt and visibility flag)
+  for(const ev of events){
+    const halfDays = (isFinite(dur) ? (dur/2)/24 : 0.05);
+    const t1 = ev.midJD - halfDays, t2 = ev.midJD + halfDays;
+    let maxAlt = -90, seen = false;
+    const steps = 19;
+    for(let i=0;i<steps;i++){
+      const jd = t1 + (i/(steps-1))*(t2 - t1);
+      const a = altAz(jd, ra, dec, lat, lon).altDeg;
+      if(a > maxAlt) maxAlt = a;
+      if(a >= minAlt) seen = true;
+    }
+    ev.maxAlt = maxAlt;
+    ev.visible = seen;
+  }
+
+  buildTable(events, {ra,dec,dur}, {lat,lon});
+  $('#ephemStatus').textContent = `Generated ${events.length} event(s). Click a row to plot altitude.`;
+}
+
+// Defaults
+(function init(){
+  // Seed date range to the next 30 days
+  const today = new Date();
+  const to = new Date(Date.now() + 30*86400000);
+  $('#fromDate').valueAsDate = today;
+  $('#toDate').valueAsDate = to;
+
+  $('#btnLoad').addEventListener('click', onLoad);
+  $('#btnGeo').addEventListener('click', onGeo);
+  $('#btnEphem').addEventListener('click', onEphemerides);
+  $('#btnClear').addEventListener('click', () => { $('#ephemTableWrap').innerHTML=''; $('#ephemStatus').textContent=''; Plotly.purge('plot'); });
+
+  // Example planet to demonstrate (non-blocking)
+  // $('#plName').value = 'WASP-43 b';
+})();
+</script>
