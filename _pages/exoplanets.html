@@ -4,43 +4,91 @@ title: Exoplanets
 permalink: /exoplanets
 ---
 
+<!-- Exoplanet Explorer (local CSVs) -->
 <div id="exo-explorer" class="exo-container">
-  <div class="exo-controls">
-    <div class="exo-card">
-      <h2>Axes</h2>
-      <div class="exo-grid2">
-        <label>X axis
-          <select id="xSelect" class="exo-input"></select>
-        </label>
-        <label>Y axis
-          <select id="ySelect" class="exo-input"></select>
-        </label>
-        <label class="exo-check"><input id="xLog" type="checkbox"/> Log X</label>
-        <label class="exo-check"><input id="yLog" type="checkbox"/> Log Y</label>
+  <div class="exo-topbar">
+    <div class="exo-controls">
+      <div class="exo-card">
+        <h2>Axes</h2>
+        <div class="exo-grid2">
+          <label>X axis
+            <select id="xSelect" class="exo-input"></select>
+          </label>
+          <label>Y axis
+            <select id="ySelect" class="exo-input"></select>
+          </label>
+          <label class="exo-check"><input id="xLog" type="checkbox"/> Log X</label>
+          <label class="exo-check"><input id="yLog" type="checkbox"/> Log Y</label>
+          <label class="exo-check"><input id="colorTemp" type="checkbox"/> Color by Teq (K)</label>
+          <label class="exo-check"><input id="onlyTransiting" type="checkbox"/> Only transiting</label>
+        </div>
+      </div>
+
+      <div class="exo-card">
+        <h2>Filters (set limits then press Update)</h2>
+        <div class="exo-grid4 exo-filters">
+          <div><div class="exo-filter-label">Best Mass (M⊕)</div>
+            <input id="f-min-pl_bmasse" class="exo-input" type="number" step="any" placeholder="min" />
+            <input id="f-max-pl_bmasse" class="exo-input" type="number" step="any" placeholder="max" />
+          </div>
+          <div><div class="exo-filter-label">Best Mass (MJ)</div>
+            <input id="f-min-pl_bmassj" class="exo-input" type="number" step="any" placeholder="min" />
+            <input id="f-max-pl_bmassj" class="exo-input" type="number" step="any" placeholder="max" />
+          </div>
+          <div><div class="exo-filter-label">Radius (R⊕)</div>
+            <input id="f-min-pl_rade" class="exo-input" type="number" step="any" placeholder="min" />
+            <input id="f-max-pl_rade" class="exo-input" type="number" step="any" placeholder="max" />
+          </div>
+          <div><div class="exo-filter-label">Radius (RJ)</div>
+            <input id="f-min-pl_radj" class="exo-input" type="number" step="any" placeholder="min" />
+            <input id="f-max-pl_radj" class="exo-input" type="number" step="any" placeholder="max" />
+          </div>
+          <div><div class="exo-filter-label">Period (days)</div>
+            <input id="f-min-pl_orbper" class="exo-input" type="number" step="any" placeholder="min" />
+            <input id="f-max-pl_orbper" class="exo-input" type="number" step="any" placeholder="max" />
+          </div>
+          <div><div class="exo-filter-label">Stellar Age (Gyr)</div>
+            <input id="f-min-st_age" class="exo-input" type="number" step="any" placeholder="min" />
+            <input id="f-max-st_age" class="exo-input" type="number" step="any" placeholder="max" />
+          </div>
+          <div><div class="exo-filter-label">Stellar Radius (R☉)</div>
+            <input id="f-min-st_rad" class="exo-input" type="number" step="any" placeholder="min" />
+            <input id="f-max-st_rad" class="exo-input" type="number" step="any" placeholder="max" />
+          </div>
+          <div><div class="exo-filter-label">Equilibrium T (K)</div>
+            <input id="f-min-pl_eqt" class="exo-input" type="number" step="any" placeholder="min" />
+            <input id="f-max-pl_eqt" class="exo-input" type="number" step="any" placeholder="max" />
+          </div>
+        </div>
+        <div class="exo-row gap">
+          <button id="applyFilters" class="exo-btn">Update</button>
+          <button id="clearFilters" class="exo-btn ghost">Clear</button>
+        </div>
+      </div>
+
+      <div class="exo-card">
+        <h2>Highlights</h2>
+        <label class="exo-check"><input id="highlightJWSTObs" type="checkbox" checked/> JWST – Observed</label>
+        <label class="exo-check"><input id="highlightJWSTPlan" type="checkbox" checked/> JWST – Planned</label>
+        <div class="exo-note">Observed = Executed. Planned = Scheduled / Implementation / Flight Ready / Inactive / On Hold.</div>
       </div>
     </div>
 
-    <div class="exo-card">
-      <h2>Filters (min / max)</h2>
-      <div id="filters" class="exo-grid2"></div>
-      <div class="exo-filter-actions">
-        <button id="clearFilters" class="exo-btn ghost">Clear filters</button>
+    <aside class="exo-card exo-presets">
+      <h2>Presets</h2>
+      <div class="exo-chiprow">
+        <span class="exo-chip sep">Kempton+18 bins</span>
+        <button class="exo-chip" data-preset="k18-rocky">&lt;1.5 R⊕</button>
+        <button class="exo-chip" data-preset="k18-small">1.5–2.75 R⊕</button>
+        <button class="exo-chip" data-preset="k18-subn">2.75–4.0 R⊕</button>
+        <button class="exo-chip" data-preset="k18-giant">&gt;4 R⊕</button>
       </div>
-    </div>
-
-    <div class="exo-card">
-      <h2>Highlighting</h2>
-      <label class="exo-check"><input id="jwstObserved" type="checkbox" checked/> JWST – Observed (Executed)</label>
-      <label class="exo-check"><input id="jwstPlanned" type="checkbox" checked/> JWST – Planned (Scheduled/Implementation/etc.)</label>
-      <label class="exo-check"><input id="colorTeq" type="checkbox"/> Color by Equilibrium Temperature (K)</label>
-      <label class="exo-check"><input id="onlyTransiting" type="checkbox"/> Only transiting</label>
-    </div>
-
-    <div class="exo-card">
-      <h2>Search / Data</h2>
-      <input id="searchBox" placeholder="Search planet or star…" class="exo-input"/>
-      <button id="downloadCSV" class="exo-btn">Download filtered CSV</button>
-    </div>
+      <div class="exo-chiprow">
+        <span class="exo-chip sep">Popular</span>
+        <button class="exo-chip" data-preset="hotjup">Hot Jupiters</button>
+        <button class="exo-chip" data-preset="subnep">Sub‑Neptunes</button>
+      </div>
+    </aside>
   </div>
 
   <div class="exo-main">
@@ -49,17 +97,22 @@ permalink: /exoplanets
       <h3>Legend</h3>
       <ul class="exo-legend">
         <li><span class="dot pop"></span> Population</li>
-        <li><span class="dot jwstObs"></span> JWST – Observed</li>
-        <li><span class="dot jwstPlan"></span> JWST – Planned</li>
+        <li><span class="dot jwstobs"></span> JWST – Observed</li>
+        <li><span class="dot jwstplan"></span> JWST – Planned</li>
       </ul>
       <div id="counts" class="exo-note">—</div>
       <hr/>
-      <div class="exo-note small" id="status">Loading CSV files…</div>
-      <div class="exo-note small">
-        Data: /assets/data/pscomppars_recent.csv & /assets/data/jwst_trexolists_extended.csv
+      <div class="exo-note">
+        Data files: <code>/assets/data/pscomppars_recent.csv</code>, <code>/assets/data/jwst_trexolists_extended.csv</code>
       </div>
+      <div id="status" class="exo-note">Loading local CSVs…</div>
     </aside>
   </div>
+
+  <details class="exo-card">
+    <summary>Show inputs</summary>
+    <pre id="endpoints" class="exo-code"></pre>
+  </details>
 </div>
 
 <!-- libs -->
@@ -70,217 +123,255 @@ permalink: /exoplanets
 :root {
   --mpurple: #9370DB;
   --mpurple-600: #7a5fd5;
-  --bg: #f6f4fb;
   --muted: #6b7280;
-  --card: #ffffff;
+  --ink: #111827;
+  --bg: #f6f4fb;
 }
+body { background: var(--bg); }
 .exo-container { display: grid; gap: 1rem; }
+.exo-topbar { display:grid; grid-template-columns: 1fr 300px; gap: 1rem; }
 .exo-controls { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 1rem; }
-.exo-main { display: grid; grid-template-columns: 1fr 280px; gap: 1rem; }
-.exo-card { background: var(--card); border: 1px solid #e5e7eb; border-radius: 16px; padding: 1rem; box-shadow: 0 1px 2px rgba(0,0,0,.05); }
-.exo-plot { height: 68vh; background: #fff; border: 1px solid #e5e7eb; border-radius: 16px; }
-.exo-input { width: 100%; padding: .5rem .6rem; border: 1px solid #d1d5db; border-radius: 12px; }
-.exo-btn { padding: .55rem .8rem; border-radius: 12px; border: none; color: #fff; background: var(--mpurple); cursor: pointer; }
+.exo-main { display: grid; grid-template-columns: 1fr 300px; gap: 1rem; }
+.exo-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 16px; padding: 1rem; box-shadow: 0 1px 2px rgba(0,0,0,.05); }
+.exo-plot { height: 70vh; border: 1px solid #e5e7eb; border-radius: 16px; }
+.exo-input { width: 100%; padding: .45rem .6rem; border: 1px solid #d1d5db; border-radius: 10px; }
+.exo-btn { padding: .55rem .8rem; border-radius: 10px; border: none; color: #fff; background: var(--mpurple); cursor: pointer; }
+.exo-btn.ghost { background: transparent; color: var(--mpurple); border: 1px solid var(--mpurple-600); }
 .exo-btn:hover { background: var(--mpurple-600); }
-.exo-btn.ghost { background: transparent; color: var(--mpurple); border: 1px solid var(--mpurple); }
-.exo-check { display: inline-flex; align-items: center; gap: .4rem; margin-right: .8rem; }
-.exo-legend { list-style: none; padding: 0; margin: .5rem 0; }
+.exo-check { display:inline-flex; align-items:center; gap:.4rem; margin-right:.6rem; }
+.exo-legend { list-style:none; padding:0; margin:.5rem 0; }
 .dot { display:inline-block; width:10px; height:10px; border-radius:999px; margin-right:.4rem; }
 .dot.pop { background:#9CA3AF; opacity:.8; }
-.dot.jwstObs { background:#4338CA; }
-.dot.jwstPlan { background:#06B6D4; }
-.exo-note { color: var(--muted); font-size: .9rem; }
-.exo-note.small { font-size: .8rem; }
-.exo-grid2 { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: .6rem; }
-.exo-filter { display:flex; align-items:center; gap:.4rem; }
-.exo-filter input { width: 100%; }
-@media (max-width: 960px){
+.dot.jwstobs { background:var(--mpurple); }
+.dot.jwstplan { background:#06b6d4; }
+.exo-note { color: var(--muted); font-size: .85rem; }
+.exo-code { background:#f3f4f6; padding:.6rem; border-radius:12px; }
+.exo-grid2 { display:grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap:.6rem; }
+.exo-grid4 { display:grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap:.6rem; }
+.exo-row.gap { display:flex; gap:.6rem; margin-top:.5rem; }
+.exo-presets .exo-chiprow { display:flex; flex-wrap:wrap; align-items:center; gap:.4rem; margin-bottom:.4rem; }
+.exo-chip { background:#f3f0ff; border:1px solid #e1d7ff; color:#4b3a8f; padding:.25rem .5rem; border-radius:999px; font-size:.85rem; cursor:pointer; }
+.exo-chip.sep { background:transparent; border:0; color:#6b7280; cursor:default; font-weight:600; }
+@media (max-width: 1100px){
   .exo-controls{ grid-template-columns: 1fr; }
+  .exo-topbar{ grid-template-columns: 1fr; }
   .exo-main{ grid-template-columns: 1fr; }
 }
 </style>
 
 <script>
-const PS_CSV = '/assets/data/pscomppars_recent.csv';
+// ---------------------------
+// Config & columns
+// ---------------------------
+const POP_CSV = '/assets/data/pscomppars_recent.csv';
 const JWST_CSV = '/assets/data/jwst_trexolists_extended.csv';
 
-// Columns we use (must exist in population CSV)
-const columns = ['pl_name','hostname','pl_bmasse','pl_bmassj','pl_rade','pl_radj','pl_orbper','st_age','st_rad','pl_eqt','tran_flag'];
+const columns = [
+  'pl_name','hostname','pl_bmasse','pl_bmassj','pl_rade','pl_radj',
+  'pl_orbper','st_age','st_rad','pl_eqt','tran_flag'
+];
 
 const PARAMS = {
-  'Best Planet Mass (M_⊕)': d => toNum(d.pl_bmasse),
-  'Best Planet Mass (M_J)': d => toNum(d.pl_bmassj),
-  'Planet Radius (R_⊕)': d => toNum(d.pl_rade),
-  'Planet Radius (R_J)': d => toNum(d.pl_radj),
-  'Orbital Period (days)': d => toNum(d.pl_orbper),
-  'Stellar Age (Gyr)': d => toNum(d.st_age),
-  'Stellar Radius (R_☉)': d => toNum(d.st_rad),
-  'Equilibrium Temperature (K)': d => toNum(d.pl_eqt),
+  'Best Planet Mass (M_⊕)': d => num(d.pl_bmasse),
+  'Best Planet Mass (M_J)': d => num(d.pl_bmassj),
+  'Planet Radius (R_⊕)': d => num(d.pl_rade),
+  'Planet Radius (R_J)': d => num(d.pl_radj),
+  'Orbital Period (days)': d => num(d.pl_orbper),
+  'Stellar Age (Gyr)': d => num(d.st_age),
+  'Stellar Radius (R_☉)': d => num(d.st_rad),
+  'Equilibrium Temperature (K)': d => num(d.pl_eqt),
 };
 
+const PRESETS = {
+  // Kempton+2018 TSM radius bins
+  'k18-rocky': { pl_rade: [null, 1.5] },
+  'k18-small': { pl_rade: [1.5, 2.75] },
+  'k18-subn':  { pl_rade: [2.75, 4.0] },
+  'k18-giant': { pl_rade: [4.0, null] },
+  // Popular shorthand
+  'hotjup': { pl_rade: [8, null], pl_eqt: [1000, null] },
+  'subnep': { pl_rade: [2, 4] },
+};
+
+// ---------------------------
+// Utilities
+// ---------------------------
 const $ = sel => document.querySelector(sel);
 const $$ = sel => Array.from(document.querySelectorAll(sel));
-const canon = s => (s||'').toString().trim().toLowerCase().replace(/\\s+/g,' ');
-const toNum = v => (v==null||v==='')?null:(Number.isFinite(+v)?+v:null);
+const num = v => (v==null || v==='' ? null : (isFinite(+v)? +v : null));
+const canon = s => (s||'').toString().trim().toLowerCase().replace(/\s+/g,' ');
 
+function csvParseLoose(text){
+  // ignore comment lines starting with # (some Archive dumps include headers/comments)
+  const cleaned = text.split(/\n/).filter(l => !/^\s*#/.test(l)).join('\n');
+  return d3.csvParse(cleaned);
+}
+
+function setFilter(id, val){
+  const el = document.getElementById(id);
+  el.value = (val==null? '' : val);
+}
+
+// ---------------------------
+// State
+// ---------------------------
 const state = {
-  planets:[],
-  _all:[],
-  filters: {}, // {label:{min:null,max:null}}
-  jwstObservedNames: new Set(),
-  jwstPlannedNames: new Set(),
+  all: [],              // full population (CSV rows as objects)
+  rows: [],             // filtered rows to plot
+  jwstObserved: new Set(), // pl_name canonical
+  jwstPlanned: new Set(),
+  filters: {}           // key -> [min,max] numeric
 };
 
-function buildFiltersUI(){
-  const container = document.getElementById('filters');
-  container.innerHTML = '';
-  Object.keys(PARAMS).forEach(label => {
-    // Skip temperature here? User asked all parameters incl. temp; we'll include it.
-    const idBase = label.replace(/[^a-z0-9]/gi,'_').toLowerCase();
-    const wrap = document.createElement('div');
-    wrap.className = 'exo-filter';
-    wrap.innerHTML = `
-      <label style="grid-column:1 / -1; font-size:.85rem; color:#374151">${label}</label>
-      <input type="number" step="any" class="exo-input" id="${idBase}_min" placeholder="min" />
-      <input type="number" step="any" class="exo-input" id="${idBase}_max" placeholder="max" />
-    `;
-    container.appendChild(wrap);
-    state.filters[label] = {min:null, max:null};
-
-    const minEl = wrap.querySelector(`#${idBase}_min`);
-    const maxEl = wrap.querySelector(`#${idBase}_max`);
-    const onChange = () => {
-      const vmin = minEl.value === '' ? null : +minEl.value;
-      const vmax = maxEl.value === '' ? null : +maxEl.value;
-      state.filters[label] = {min:vmin, max:vmax};
-      refresh();
-    };
-    minEl.addEventListener('input', onChange);
-    maxEl.addEventListener('input', onChange);
-  });
-
-  // Clear button
-  document.getElementById('clearFilters').addEventListener('click', () => {
-    for(const k of Object.keys(state.filters)){ state.filters[k] = {min:null, max:null}; }
-    $$('#filters input').forEach(i=>i.value='');
-    refresh();
-  });
+// ---------------------------
+// Loaders
+// ---------------------------
+async function loadCSV(url){
+  const res = await fetch(url, {mode:'cors'});
+  if(!res.ok) throw new Error('Failed to fetch '+url+' '+res.status);
+  const txt = await res.text();
+  return csvParseLoose(txt);
 }
 
-function applyFilters(p){
-  for(const [label, range] of Object.entries(state.filters)){
-    const fn = PARAMS[label];
-    const val = fn(p);
-    if(range.min!=null && (val==null || !(val>=range.min))) return false;
-    if(range.max!=null && (val==null || !(val<=range.max))) return false;
+async function loadPopulation(){
+  const rows = await loadCSV(POP_CSV);
+  // Coerce types for the columns we care about
+  for(const r of rows){
+    for(const k of ['pl_bmasse','pl_bmassj','pl_rade','pl_radj','pl_orbper','st_age','st_rad','pl_eqt']){
+      if (r[k] !== undefined) r[k] = num(r[k]);
+    }
+    if (r['tran_flag'] !== undefined) r['tran_flag'] = num(r['tran_flag']);
   }
-  return true;
+  return rows;
 }
 
+async function loadJWST(){
+  const rows = await loadCSV(JWST_CSV);
+  const obs = new Set(), plan = new Set();
+  const PLANNED = new Set(['Scheduled','Implementation','Flight Ready','Inactive','On Hold','On Hold (Inactive)']);
+  for(const r of rows){
+    // JWST CSV columns: expect 'Star   name','Planet   letter','Status' etc.
+    const nm = canon(((r['Star   name']||r['Star name']||r['Star']||'').trim() + ' ' + (r['Planet   letter']||r['Planet letter']||r['Planet']||'').trim()).trim());
+    const status = (r['Status']||'').trim();
+    if(!nm) continue;
+    if(status === 'Executed') obs.add(nm);
+    else if(PLANNED.has(status)) plan.add(nm);
+  }
+  return {obs, plan};
+}
+
+// ---------------------------
 function populateDropdowns(){
   const xSel = document.getElementById('xSelect');
   const ySel = document.getElementById('ySelect');
   const opts = Object.keys(PARAMS).map(l=>`<option>${l}</option>`).join('');
   xSel.innerHTML = ySel.innerHTML = opts;
   xSel.value = 'Orbital Period (days)';
-  ySel.value = 'Best Planet Mass (M_⊕)';
+  ySel.value = 'Planet Radius (R_⊕)';
+}
+
+function applyFiltersAndRefresh(){
+  // Build current filter object from inputs
+  const keys = ['pl_bmasse','pl_bmassj','pl_rade','pl_radj','pl_orbper','st_age','st_rad','pl_eqt'];
+  const f = {};
+  for(const k of keys){
+    const minv = num(document.getElementById('f-min-'+k).value);
+    const maxv = num(document.getElementById('f-max-'+k).value);
+    if(minv!=null || maxv!=null) f[k] = [minv, maxv];
+  }
+  state.filters = f;
+  filterRows();
+  refresh();
+}
+
+function clearFilters(){
+  Object.keys(state.filters).forEach(k=> delete state.filters[k]);
+  $$('.exo-filters input').forEach(i=> i.value='');
+  state.rows = state.all.slice();
+  refresh();
+}
+
+function filterRows(){
+  const onlyTransiting = document.getElementById('onlyTransiting').checked;
+  const f = state.filters;
+  state.rows = state.all.filter(r => {
+    if (onlyTransiting && r.tran_flag !== 1) return false;
+    for(const [k, range] of Object.entries(f)){
+      const v = r[k];
+      if(v==null) return false;
+      const [mn, mx] = range;
+      if(mn!=null && v<mn) return false;
+      if(mx!=null && v>mx) return false;
+    }
+    return true;
+  });
 }
 
 function buildTraces(){
-  const xLabel = document.getElementById('xSelect').value;
-  const yLabel = document.getElementById('ySelect').value;
-  const xFn = PARAMS[xLabel], yFn = PARAMS[yLabel];
-  const onlyTransiting = document.getElementById('onlyTransiting').checked;
-  const colorTeq = document.getElementById('colorTeq').checked;
+  const xKey = document.getElementById('xSelect').value;
+  const yKey = document.getElementById('ySelect').value;
+  const xFn = PARAMS[xKey], yFn = PARAMS[yKey];
+  const colorByTeq = document.getElementById('colorTemp').checked;
+  const showObs = document.getElementById('highlightJWSTObs').checked;
+  const showPlan = document.getElementById('highlightJWSTPlan').checked;
 
-  const base=[], jwstObs=[], jwstPlan=[];
-  const teqVals=[]; const popX=[]; const popY=[]; const popHover=[];
-
-  const hasTeq = state._all.some(d => toNum(d.pl_eqt)!=null);
-
-  for(const p of state.planets){
-    if(onlyTransiting && +p.tran_flag !== 1) continue;
-    if(!applyFilters(p)) continue;
-
-    const x = xFn(p), y = yFn(p);
+  const pop = [], obs = [], plan = [];
+  for(const p of state.rows){
+    const x=xFn(p), y=yFn(p);
     if(x==null || y==null) continue;
-
-    const name = p.pl_name;
-    const nm = canon(name);
-    const isObs = state.jwstObservedNames.has(nm);
-    const isPlan = state.jwstPlannedNames.has(nm);
-
-    const hover = `${name}<br>${xLabel}: <b>${x}</b><br>${yLabel}: <b>${y}</b>` + (toNum(p.pl_eqt)!=null?`<br>Teq: ${toNum(p.pl_eqt)} K`:'') + (p.hostname?`<br>${p.hostname}`:'');
-
-    if(colorTeq && hasTeq){
-      // build separate population trace with colorbar, and overlay JWST rings
-      popX.push(x); popY.push(y); popHover.push(hover); teqVals.push(toNum(p.pl_eqt));
-      if(isObs) jwstObs.push({x, y, hover, name});
-      else if(isPlan) jwstPlan.push({x, y, hover, name});
-    }else{
-      // color by category
-      const pt = {x,y,hover};
-      if(isObs) jwstObs.push(pt);
-      else if(isPlan) jwstPlan.push(pt);
-      else base.push(pt);
-    }
+    const nm = canon(p.pl_name);
+    const isObs = state.jwstObserved.has(nm);
+    const isPlan = state.jwstPlanned.has(nm);
+    const t = {x, y, teq: num(p.pl_eqt)};
+    if(isObs) obs.push(t);
+    else if(isPlan) plan.push(t);
+    else pop.push(t);
   }
 
   const traces = [];
-  if(colorTeq && teqVals.length){
+  if(colorByTeq){
+    // Color population by Teq; JWST as outlined rings on top
     traces.push({
       name: 'Population (Teq)',
-      type: 'scattergl',
-      mode: 'markers',
-      x: popX, y: popY,
-      hovertemplate: popHover.map(h=>h+'<extra></extra>'),
-      marker: { size: 6, opacity: 0.7, color: teqVals, colorscale: 'Viridis', colorbar: { title: 'Teq (K)' } }
+      type: 'scattergl', mode:'markers',
+      x: pop.map(d=>d.x), y: pop.map(d=>d.y),
+      marker: {
+        size: 6, opacity: .7,
+        color: pop.map(d => d.teq ?? NaN),
+        colorbar: {title:'Teq (K)'},
+        colorscale: 'Viridis',
+        showscale: true
+      },
+      hovertemplate: '%{x}, %{y}<extra></extra>'
     });
-    if(document.getElementById('jwstObserved').checked && jwstObs.length){
-      traces.push({
-        name: 'JWST – Observed',
-        type: 'scattergl', mode:'markers',
-        x: jwstObs.map(d=>d.x), y: jwstObs.map(d=>d.y),
-        hovertemplate: jwstObs.map(d=>d.hover+'<extra></extra>'),
-        marker: { size: 10, opacity: 1, color: 'rgba(0,0,0,0)', line: {width: 2, color: '#4338CA'} }
-      });
-    }
-    if(document.getElementById('jwstPlanned').checked && jwstPlan.length){
-      traces.push({
-        name: 'JWST – Planned',
-        type: 'scattergl', mode:'markers',
-        x: jwstPlan.map(d=>d.x), y: jwstPlan.map(d=>d.y),
-        hovertemplate: jwstPlan.map(d=>d.hover+'<extra></extra>'),
-        marker: { size: 10, opacity: 1, color: 'rgba(0,0,0,0)', line: {width: 2, color: '#06B6D4'} }
-      });
-    }
+    if(showPlan) traces.push({
+      name: 'JWST – Planned',
+      type:'scattergl', mode:'markers',
+      x: plan.map(d=>d.x), y: plan.map(d=>d.y),
+      marker:{ size:10, opacity:.95, color:'#06b6d4', line:{width:1.5, color:'#034d57'} },
+      hovertemplate: '%{x}, %{y}<extra></extra>'
+    });
+    if(showObs) traces.push({
+      name: 'JWST – Observed',
+      type:'scattergl', mode:'markers',
+      x: obs.map(d=>d.x), y: obs.map(d=>d.y),
+      marker:{ size:10, opacity:.95, color:'#9370DB', line:{width:1.5, color:'#4b3a8f'} },
+      hovertemplate: '%{x}, %{y}<extra></extra>'
+    });
   }else{
-    // classic coloring
+    // Classic palette
     traces.push({
-      name: 'Population',
-      type: 'scattergl', mode: 'markers',
-      x: base.map(d=>d.x), y: base.map(d=>d.y),
-      hovertemplate: base.map(d=>d.hover+'<extra></extra>'),
-      marker: { size: 6, opacity: 0.45, color: '#9CA3AF' }
+      name: 'Population', type:'scattergl', mode:'markers',
+      x: pop.map(d=>d.x), y: pop.map(d=>d.y),
+      marker:{ size:6, opacity:.45, color:'#9CA3AF' },
+      hovertemplate: '%{x}, %{y}<extra></extra>'
     });
-    if(document.getElementById('jwstObserved').checked && jwstObs.length){
-      traces.push({
-        name: 'JWST – Observed',
-        type: 'scattergl', mode:'markers',
-        x: jwstObs.map(d=>d.x), y: jwstObs.map(d=>d.y),
-        hovertemplate: jwstObs.map(d=>d.hover+'<extra></extra>'),
-        marker: { size: 8, opacity: 0.95, color: '#4338CA' }
-      });
-    }
-    if(document.getElementById('jwstPlanned').checked && jwstPlan.length){
-      traces.push({
-        name: 'JWST – Planned',
-        type: 'scattergl', mode:'markers',
-        x: jwstPlan.map(d=>d.x), y: jwstPlan.map(d=>d.y),
-        hovertemplate: jwstPlan.map(d=>d.hover+'<extra></extra>'),
-        marker: { size: 8, opacity: 0.95, color: '#06B6D4' }
-      });
-    }
+    if(showPlan) traces.push({ name:'JWST – Planned', type:'scattergl', mode:'markers',
+      x: plan.map(d=>d.x), y: plan.map(d=>d.y),
+      marker:{ size:8, opacity:.9, color:'#06b6d4' }, hovertemplate:'%{x}, %{y}<extra></extra>' });
+    if(showObs) traces.push({ name:'JWST – Observed', type:'scattergl', mode:'markers',
+      x: obs.map(d=>d.x), y: obs.map(d=>d.y),
+      marker:{ size:8, opacity:.9, color:'#9370DB' }, hovertemplate:'%{x}, %{y}<extra></extra>' });
   }
   return traces;
 }
@@ -290,8 +381,8 @@ function layoutForAxes(){
   const yKey = document.getElementById('ySelect').value;
   return {
     margin:{l:60,r:10,t:18,b:50},
-    xaxis:{title:xKey, type: document.getElementById('xLog').checked?'log':'linear', zeroline:false},
-    yaxis:{title:yKey, type: document.getElementById('yLog').checked?'log':'linear', zeroline:false},
+    xaxis:{title:xKey, type: document.getElementById('xLog').checked ? 'log' : 'linear', zeroline:false},
+    yaxis:{title:yKey, type: document.getElementById('yLog').checked ? 'log' : 'linear', zeroline:false},
     legend:{orientation:'h'}
   };
 }
@@ -299,86 +390,58 @@ function layoutForAxes(){
 function refresh(){
   const traces = buildTraces();
   Plotly.react('plot', traces, layoutForAxes(), {responsive:true, displaylogo:false});
-  const shown = traces.reduce((acc, t) => acc + ((t.x && t.x.length) || 0), 0);
-  document.getElementById('counts').textContent = `${shown.toLocaleString()} points shown.`;
-}
-
-function downloadCSV(){
-  const xLabel = document.getElementById('xSelect').value;
-  const yLabel = document.getElementById('ySelect').value;
-  const xFn = PARAMS[xLabel], yFn = PARAMS[yLabel];
-  const rows = state.planets.filter(applyFilters).map(p => ({
-    pl_name: p.pl_name, hostname: p.hostname,
-    x_param: xLabel, x_value: xFn(p),
-    y_param: yLabel, y_value: yFn(p),
-    pl_eqt: toNum(p.pl_eqt),
-  })).filter(r => r.x_value!=null && r.y_value!=null);
-  const headers = Object.keys(rows[0]||{});
-  const csv = [headers.join(','), ...rows.map(o=>headers.map(h=>o[h]??'').join(','))].join('\\n');
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv'}));
-  a.download = 'exoplanet-explorer-filtered.csv';
-  a.click();
-}
-
-async function loadPopulation(){
-  const text = await (await fetch(PS_CSV)).text();
-  // Strip comment lines starting with #
-  const clean = text.split(/\\r?\\n/).filter(line => !/^\\s*#/.test(line)).join('\\n');
-  const rows = d3.csvParse(clean);
-  // Ensure required columns exist
-  const have = Object.keys(rows[0]||{});
-  const missing = columns.filter(c => !have.includes(c));
-  if(missing.length){ console.warn('Missing columns in population CSV:', missing); }
-  return rows;
-}
-
-async function loadJWST(){
-  try{
-    const text = await (await fetch(JWST_CSV)).text();
-    const rows = d3.csvParse(text);
-    const obs = new Set(); const plan = new Set();
-    const plannedStatuses = new Set(['Scheduled','Implementation','Flight Ready','Inactive','On Hold','On Hold (Inactive)']);
-    for(const r of rows){
-      // TrExoLiSTS columns vary; try robust name/letter extraction
-      const name = canon(((r['Star   name']||r['Star name']||r['Star']||'') + ' ' + (r['Planet   letter']||r['Planet letter']||r['Planet']||'')).trim());
-      const status = (r['Status']||'').trim();
-      if(!name) continue;
-      if(status === 'Executed') obs.add(name);
-      else if(plannedStatuses.has(status)) plan.add(name);
-    }
-    state.jwstObservedNames = obs;
-    state.jwstPlannedNames = plan;
-  }catch(e){
-    console.warn('JWST CSV failed (non-fatal):', e);
-  }
+  const shown = traces.reduce((acc,t)=> acc + ((t.x && t.x.length)||0), 0);
+  document.getElementById('counts').textContent = `${shown.toLocaleString()} points shown (filters applied to ${state.rows.length.toLocaleString()} rows).`;
 }
 
 function hookUI(){
-  ['xSelect','ySelect','xLog','yLog','jwstObserved','jwstPlanned','colorTeq','onlyTransiting'].forEach(id=>{
-    document.getElementById(id).addEventListener('change', refresh);
+  // Axes/log toggles refresh instantly
+  ['xSelect','ySelect','xLog','yLog','colorTemp','onlyTransiting','highlightJWSTObs','highlightJWSTPlan']
+    .forEach(id => document.getElementById(id).addEventListener('change', refresh));
+  // Filters only apply when clicking Update
+  document.getElementById('applyFilters').addEventListener('click', applyFiltersAndRefresh);
+  document.getElementById('clearFilters').addEventListener('click', () => clearFilters());
+  // Presets
+  document.querySelectorAll('.exo-chip[data-preset]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const p = btn.getAttribute('data-preset');
+      const def = PRESETS[p]||{};
+      // Clear then apply
+      clearFilters();
+      for(const [k,[mn,mx]] of Object.entries(def)){
+        setFilter('f-min-'+k, mn);
+        setFilter('f-max-'+k, mx);
+      }
+      // Do not auto-apply; require Update to respect user's request
+    });
   });
-  document.getElementById('searchBox').addEventListener('input', e=>{
-    const q = canon(e.target.value);
-    if(!q){ state.planets = state._all; refresh(); return; }
-    state.planets = state._all.filter(p => canon(p.pl_name).includes(q) || canon(p.hostname).includes(q));
-    refresh();
-  });
-  document.getElementById('downloadCSV').addEventListener('click', downloadCSV);
 }
 
+function summarizeInputs(){
+  const s = [];
+  s.push('Population CSV: '+POP_CSV);
+  s.push('JWST CSV: '+JWST_CSV);
+  s.push('Filters: '+JSON.stringify(state.filters));
+  document.getElementById('endpoints').textContent = s.join('\n');
+}
+
+// ---------------------------
+// Boot
+// ---------------------------
 (async function init(){
   try{
-    populateDropdowns();
-    buildFiltersUI();
-    hookUI();
-    const [ps] = await Promise.all([loadPopulation(), loadJWST()]);
-    state._all = ps; state.planets = ps;
-    document.getElementById('status').textContent = `Loaded local CSVs (rows: ${ps.length})`;
+    populateDropdowns(); hookUI();
+    const [popRows, jwst] = await Promise.all([loadPopulation(), loadJWST()]);
+    state.all = popRows.slice();
+    state.rows = popRows.slice();
+    state.jwstObserved = jwst.obs;
+    state.jwstPlanned = jwst.plan;
+    document.getElementById('status').textContent = `Loaded local CSVs (rows: ${state.all.length.toLocaleString()})`;
+    summarizeInputs();
     refresh();
   }catch(err){
     console.error(err);
-    document.getElementById('status').textContent = 'Failed to load data.';
+    document.getElementById('status').textContent = 'Failed to load local CSVs.';
   }
 })();
 </script>
