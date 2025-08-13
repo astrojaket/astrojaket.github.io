@@ -7,14 +7,16 @@ permalink: /visibility
 <div class="vis-wrap">
   <div class="vis-grid">
     <section class="card">
-      <h1>Transit Visibility & Ephemerides</h1>
-      <p class="muted">Enter a planet or load from the NASA Exoplanet Archive, set your observing site, then generate upcoming transits and check visibility.</p>
+      <h1 class="site-title">Transit Visibility & Ephemerides</h1>
+      <p class="muted">Select a planet from the local CSV (same dataset as the Exoplanets page), set your observing site(s), then generate upcoming transits and check visibility.</p>
+
       <div class="grid2">
         <label>Planet name
-          <input id="plName" class="input" placeholder="e.g. WASP-43 b">
+          <input id="plName" class="input" list="planetList" placeholder="e.g. WASP-43 b">
+          <datalist id="planetList"></datalist>
         </label>
         <div class="row gap">
-          <button id="btnLoad" class="btn">Load from Exoplanet Archive</button>
+          <button id="btnLoad" class="btn">Load from local CSV</button>
           <span id="loadStatus" class="muted"></span>
         </div>
       </div>
@@ -40,13 +42,13 @@ permalink: /visibility
             <option value="BJD_TDB" selected>BJD_TDB</option>
             <option value="JD_UTC">JD_UTC (approx)</option>
           </select>
-          <span class="tip">Archive values are commonly in BJD_TDB. We assume UTC display/output.</span>
+          <span class="tip">CSV values in pscomppars are commonly BJD_TDB. We display in UTC.</span>
         </label>
       </div>
     </section>
 
     <section class="card">
-      <h2>Observing Site</h2>
+      <h2>Observing Site(s)</h2>
       <div class="grid4">
         <label>Latitude (deg)
           <input id="latDeg" class="input" type="number" step="any" placeholder="e.g. 28.3">
@@ -63,8 +65,25 @@ permalink: /visibility
       </div>
       <div class="row gap mt">
         <button id="btnGeo" class="btn ghost">Use my location</button>
-        <span class="muted">We won't store your location — used only in this browser.</span>
+        <label class="check"><input id="nightOnly" type="checkbox" checked> Require night (Sun alt ≤ −12° at some point)</label>
       </div>
+      <details class="mt">
+        <summary class="muted">Add a second site (optional)</summary>
+        <div class="grid4 mt">
+          <label>Lat2 (deg)
+            <input id="latDeg2" class="input" type="number" step="any">
+          </label>
+          <label>Lon2 (deg, East +)
+            <input id="lonDeg2" class="input" type="number" step="any">
+          </label>
+          <label>Elev2 (m)
+            <input id="elevM2" class="input" type="number" step="1">
+          </label>
+          <label>Min alt 2 (deg)
+            <input id="minAlt2" class="input" type="number" step="any" placeholder="30">
+          </label>
+        </div>
+      </details>
     </section>
 
     <section class="card">
@@ -83,36 +102,42 @@ permalink: /visibility
       <div class="row gap mt">
         <button id="btnEphem" class="btn">Generate ephemerides</button>
         <button id="btnClear" class="btn ghost">Clear</button>
+        <button id="btnICS" class="btn ghost">Export selected to .ics</button>
         <span id="ephemStatus" class="muted"></span>
       </div>
       <div id="ephemTableWrap" class="mt table-wrap"></div>
     </section>
 
     <section class="card">
-      <h2>Transit Altitude Plot (selected row)</h2>
-      <div id="plot" class="plot"></div>
-      <div class="muted">Click a row in the table to plot altitude across the transit (±1 duration).</div>
+      <h2>Transit Altitude / Airmass / Parallactic Angle (selected row)</h2>
+      <div id="plotAlt" class="plot"></div>
+      <div id="plotAir" class="plot small"></div>
+      <div id="plotPar" class="plot small"></div>
+      <div class="muted">Click a row in the table to plot; shaded region shows ±1 transit duration.</div>
     </section>
   </div>
 
   <aside class="card">
     <h3>Notes & Sources</h3>
     <ul class="notes">
-      <li>Population & planet parameters from the <a href="https://exoplanetarchive.ipac.caltech.edu/" target="_blank" rel="noopener">NASA Exoplanet Archive</a> (pscomppars).</li>
-      <li>Times are displayed in UTC and “Local” based on your browser timezone.</li>
-      <li>Altitude calculation uses an approximate sidereal-time transform (sufficient for planning).</li>
-      <li>For precise planning, always confirm with observatory-specific tools.</li>
+      <li>Planet parameters loaded from <code>/assets/data/pscomppars_recent.csv</code> (same as the Exoplanets page).</li>
+      <li>Times displayed in UTC and Local (browser timezone). T0 assumed BJD_TDB; displayed without relativistic corrections.</li>
+      <li>Night check uses an approximate solar position; suitable for planning. Confirm with observatory tools.</li>
+      <li>Airmass uses Kasten–Young 1989 approximation; Parallactic angle uses standard formula.</li>
     </ul>
   </aside>
 </div>
 
 <link rel="preconnect" href="https://cdn.plot.ly">
 <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+<script src="https://d3js.org/d3.v7.min.js"></script>
 
 <style>
 :root{
   --card:#fff; --border:#e5e7eb; --muted:#6b7280; --accent:#9370DB;
 }
+/* Heading style to match site (MediumPurple accent) */
+.site-title{ font-size:1.9rem; margin:0 0 .25rem 0; color:var(--accent); font-weight:700; letter-spacing:.1px; }
 .vis-wrap{ display:grid; grid-template-columns: 1fr 320px; gap:1rem; }
 .vis-grid{ display:grid; gap:1rem; }
 .card{ background:var(--card); border:1px solid var(--border); border-radius:16px; padding:1rem; box-shadow:0 1px 2px rgba(0,0,0,.05); }
@@ -125,11 +150,13 @@ permalink: /visibility
 .input{ width:100%; padding:.5rem .65rem; border:1px solid #d1d5db; border-radius:10px; }
 .btn{ background:var(--accent); color:#fff; border:none; border-radius:10px; padding:.55rem .8rem; cursor:pointer; }
 .btn.ghost{ background:transparent; color:var(--accent); border:1px solid var(--accent); }
-.plot{ height:50vh; border:1px solid var(--border); border-radius:16px; }
+.plot{ height:48vh; border:1px solid var(--border); border-radius:16px; margin-bottom:.6rem; }
+.plot.small{ height:32vh; }
 .table-wrap{ overflow:auto; max-height:45vh; border:1px solid var(--border); border-radius:12px; }
 table{ width:100%; border-collapse:collapse; font-size:.95rem; }
 th, td{ padding:.4rem .5rem; border-bottom:1px solid #eee; }
 tr:hover{ background:#fafafa; cursor:pointer; }
+.check{ display:inline-flex; align-items:center; gap:.4rem; }
 .tooltip{ position:relative; }
 .tooltip .tip{ position:absolute; left:0; top:100%; transform:translateY(4px); background:#111; color:#fff; padding:.3rem .5rem; border-radius:6px; font-size:.8rem; display:none; }
 .tooltip:hover .tip{ display:block; }
@@ -141,35 +168,50 @@ const $ = s => document.querySelector(s);
 const $$ = s => Array.from(document.querySelectorAll(s));
 const num = v => (v==null || v==='') ? null : (isFinite(+v) ? +v : null);
 
-// -------- Archive loader --------
-async function loadFromArchive(name){
-  const base = 'https://exoplanetarchive.ipac.caltech.edu/TAP/sync';
-  // fetch key fields if available
-  const q = `select pl_name,ra,dec,pl_orbper,pl_tranmid,pl_trandur,tranmid,tran_flag from pscomppars where pl_name like '${name.replace(/'/g,"''")}'`;
-  const url = base + '?query=' + encodeURIComponent(q) + '&format=json';
-  const res = await fetch(url, {mode:'cors'});
-  if(!res.ok) throw new Error('Archive request failed: '+res.status);
-  const arr = await res.json();
-  if(!Array.isArray(arr) || arr.length===0) throw new Error('No match found');
-  const r = arr[0];
-  // Map to fields; prefer pl_tranmid if present, else tranmid; duration days -> hours
-  const t0 = r.pl_tranmid ?? r.tranmid ?? null;
-  const durH = (r.pl_trandur!=null) ? (+r.pl_trandur*24) : null;
-  return {
-    pl_name: r.pl_name,
-    ra: num(r.ra),
-    dec: num(r.dec),
-    period: num(r.pl_orbper),
-    t0: num(t0),
-    durationHrs: num(durH),
-    tran_flag: r.tran_flag
-  };
+const CSV_URL = '/assets/data/pscomppars_recent.csv';
+let PLANETS = [];
+
+// -------- Load local CSV & seed datalist --------
+async function loadCSV(){
+  const res = await fetch(CSV_URL, {mode:'cors'});
+  if(!res.ok) throw new Error('Failed to fetch local CSV');
+  const txt = await res.text();
+  const rows = d3.csvParse(txt);
+  // numeric coercion
+  const numCols = ['ra','dec','pl_orbper','pl_tranmid','pl_trandur','tran_flag'];
+  for(const r of rows){
+    for(const k of numCols){
+      if(r[k] !== undefined){ const v = num(r[k]); if(v!==null) r[k]=v; }
+    }
+  }
+  PLANETS = rows;
+  // datalist
+  const dl = $('#planetList');
+  dl.innerHTML = rows.slice(0,20000).map(r => `<option value="${r.pl_name}">`).join('');
+  $('#loadStatus').textContent = `Loaded local CSV (${rows.length.toLocaleString()} rows)`;
+}
+
+// -------- Load planet from local array --------
+function loadFromLocal(name){
+  if(!PLANETS.length){ $('#loadStatus').textContent = 'CSV not loaded yet.'; return; }
+  const nm = name.trim().toLowerCase();
+  const r = PLANETS.find(p => (p.pl_name||'').toLowerCase() === nm);
+  if(!r){ $('#loadStatus').textContent = 'No exact match in CSV.'; return; }
+  if(r.pl_name) $('#plName').value = r.pl_name;
+  if(r.ra!=null) $('#raDeg').value = r.ra;
+  if(r.dec!=null) $('#decDeg').value = r.dec;
+  if(r.pl_orbper!=null) $('#period').value = r.pl_orbper;
+  if(r.pl_tranmid!=null) $('#t0').value = r.pl_tranmid;
+  if(r.pl_trandur!=null) $('#durationHrs').value = (+r.pl_trandur)*24;
+  if(r.tran_flag !== 1) {
+    $('#loadStatus').textContent = 'Loaded, but not flagged as transiting (tran_flag≠1).';
+  } else {
+    $('#loadStatus').textContent = 'Loaded from local CSV.';
+  }
 }
 
 // -------- Time & astronomy helpers --------
-function toJD(date){ // UTC Date -> JD UTC
-  return date.getTime()/86400000 + 2440587.5;
-}
+function toJD(date){ return date.getTime()/86400000 + 2440587.5; } // UTC Date -> JD UTC
 function gmst(jd){ // radians, simplified
   const T = (jd - 2451545.0)/36525.0;
   let gmst = 280.46061837 + 360.98564736629*(jd-2451545.0) + 0.000387933*T*T - T*T*T/38710000.0;
@@ -186,14 +228,40 @@ function altAz(jd, raDeg, decDeg, latDeg, lonDeg){
   const cosAz = (Math.sin(dec) - Math.sin(alt)*Math.sin(lat)) / (Math.cos(alt)*Math.cos(lat));
   let az = Math.acos(Math.max(-1,Math.min(1,cosAz)));
   if(Math.sin(H)>0) az = 2*Math.PI - az;
-  return { altDeg: alt*180/Math.PI, azDeg: az*180/Math.PI };
+  return { altDeg: alt*180/Math.PI, azDeg: az*180/Math.PI, H };
+}
+function sunRaDec(jd){ // approximate solar position (sufficient for night check)
+  const n = jd - 2451545.0;
+  let L = (280.460 + 0.9856474*n) % 360; if(L<0)L+=360;
+  let g = (357.528 + 0.9856003*n) * Math.PI/180;
+  const lam = (L + 1.915*Math.sin(g) + 0.020*Math.sin(2*g)) * Math.PI/180;
+  const eps = (23.439 - 0.0000004*n) * Math.PI/180;
+  const ra = Math.atan2(Math.cos(eps)*Math.sin(lam), Math.cos(lam));
+  const dec = Math.asin(Math.sin(eps)*Math.sin(lam));
+  return { ra: (ra+2*Math.PI)%(2*Math.PI), dec };
+}
+function sunAlt(jd, latDeg, lonDeg){
+  const s = sunRaDec(jd);
+  const a = altAz(jd, s.ra*180/Math.PI, s.dec*180/Math.PI, latDeg, lonDeg);
+  return a.altDeg;
+}
+function airmassKastenYoung(altDeg){
+  const z = (90 - altDeg) * Math.PI/180;
+  const X = 1/ (Math.cos(z) + 0.50572 * Math.pow(96.07995 - (z*180/Math.PI), -1.6364));
+  return X;
+}
+function parallacticAngle(H, latDeg, decDeg){
+  const φ = latDeg*Math.PI/180;
+  const δ = decDeg*Math.PI/180;
+  const sinq = Math.sin(H) * Math.cos(φ);
+  const cosq = Math.cos(φ)*Math.tan(δ) - Math.sin(φ)*Math.cos(H);
+  return Math.atan2(sinq, cosq) * 180/Math.PI; // degrees
 }
 
 // -------- Ephemerides --------
 function generateEphemerides(t0, period, fromJD, toJD, maxN){
   if(t0==null || period==null) return [];
   const events = [];
-  // compute first k so that t = t0 + k*P >= fromJD
   let k = Math.ceil((fromJD - t0)/period);
   if(!isFinite(k)) k = 0;
   for(let i=0; i<maxN; i++){
@@ -215,83 +283,74 @@ function jdToLocal(jd){
   return d.toLocaleString();
 }
 
-// -------- UI handlers --------
-async function onLoad(){
-  const name = $('#plName').value.trim();
-  $('#loadStatus').textContent = 'Loading…';
-  try{
-    const r = await loadFromArchive(name);
-    if(r.pl_name) $('#plName').value = r.pl_name;
-    if(r.ra!=null) $('#raDeg').value = r.ra;
-    if(r.dec!=null) $('#decDeg').value = r.dec;
-    if(r.period!=null) $('#period').value = r.period;
-    if(r.t0!=null) $('#t0').value = r.t0;
-    if(r.durationHrs!=null) $('#durationHrs').value = r.durationHrs;
-    if(r.tran_flag !== 1) {
-      $('#loadStatus').textContent = 'Loaded, but archive does not flag as transiting (tran_flag≠1).';
-    } else {
-      $('#loadStatus').textContent = 'Loaded from archive.';
-    }
-  }catch(err){
-    console.error(err);
-    $('#loadStatus').textContent = 'Load failed: ' + err.message;
-  }
-}
-
-function onGeo(){
-  if(!navigator.geolocation){ alert('Geolocation not available'); return; }
-  navigator.geolocation.getCurrentPosition(pos => {
-    $('#latDeg').value = pos.coords.latitude.toFixed(5);
-    $('#lonDeg').value = pos.coords.longitude.toFixed(5);
-    $('#elevM').value = Math.round(pos.coords.altitude || 0);
-  }, err => alert('Location failed: '+err.message), {enableHighAccuracy:true, timeout:8000});
-}
-
-function buildTable(rows, planet, site){
+// -------- UI & logic --------
+function buildTable(rows, planet, site, site2){
   const wrap = $('#ephemTableWrap');
   if(rows.length===0){ wrap.innerHTML = '<p class="muted">No events in range.</p>'; return; }
   let html = '<table><thead><tr>' +
-    '<th>#</th><th>Mid (UTC)</th><th>Mid (Local)</th><th>Mid (JD)</th><th>Max Alt (deg)</th><th>Visible?</th>' +
-    '</tr></thead><tbody>';
+    '<th>#</th><th>Mid (UTC)</th><th>Mid (Local)</th><th>Mid (JD)</th><th>Max Alt (deg)</th><th>Visible?</th>';
+  if(site2) html += '<th>Max Alt 2</th><th>Visible 2?</th>';
+  html += '</tr></thead><tbody>';
   for(const r of rows){
-    html += `<tr data-jd="${r.midJD}" data-ra="${planet.ra}" data-dec="${planet.dec}" data-lat="${site.lat}" data-lon="${site.lon}" data-dur="${planet.dur}">`+
+    html += `<tr data-jd="${r.midJD}" data-ra="${planet.ra}" data-dec="${planet.dec}" data-lat="${site.lat}" data-lon="${site.lon}" data-dur="${planet.dur}"` +
+            (site2? ` data-lat2="${site2.lat}" data-lon2="${site2.lon}"` : '') + '>' +
       `<td>${r.idx}</td>`+
       `<td>${jdToISO(r.midJD)}</td>`+
       `<td>${jdToLocal(r.midJD)}</td>`+
       `<td>${r.midJD.toFixed(5)}</td>`+
       `<td>${(r.maxAlt ?? NaN).toFixed(1)}</td>`+
       `<td>${r.visible ? 'Yes' : 'No'}</td>`+
+      (site2? `<td>${(r.maxAlt2 ?? NaN).toFixed(1)}</td><td>${r.visible2 ? 'Yes' : 'No'}</td>` : '') +
       `</tr>`;
   }
   html += '</tbody></table>';
   wrap.innerHTML = html;
   wrap.querySelectorAll('tbody tr').forEach(tr => tr.addEventListener('click', () => {
     const jd = +tr.getAttribute('data-jd');
-    plotTransitAltitude(jd, +tr.dataset.ra, +tr.dataset.dec, +tr.dataset.lat, +tr.dataset.lon, +tr.dataset.dur, +$('#minAlt').value);
+    plotTransit(jd, +tr.dataset.ra, +tr.dataset.dec, +tr.dataset.lat, +tr.dataset.lon, +tr.dataset.dur, +$('#minAlt').value);
   }));
 }
 
-function plotTransitAltitude(midJD, ra, dec, lat, lon, durHrs, minAlt){
-  const n = 61; // ~5-min sampling for 5hr event
-  const halfDays = (isFinite(durHrs) ? (durHrs/2)/24 : 0.05); // fallback to 0.05 d (~72min) if unknown
-  const t1 = midJD - halfDays, t2 = midJD + halfDays;
-  const xs = [], alts = [];
+function plotTransit(midJD, ra, dec, lat, lon, durHrs, minAlt){
+  const n = 121;
+  const halfDays = (isFinite(durHrs) ? (durHrs/2)/24 : 0.05);
+  const pad = Math.max(halfDays, 0.05);
+  const t1 = midJD - pad, t2 = midJD + pad;
+  const xs = [], alts = [], airs = [], pars = [], sunAlts = [];
   for(let i=0;i<n;i++){
     const jd = t1 + (i/(n-1))*(t2 - t1);
-    const a = altAz(jd, ra, dec, lat, lon).altDeg;
+    const a = altAz(jd, ra, dec, lat, lon);
+    const alt = a.altDeg;
     xs.push(new Date((jd - 2440587.5)*86400000));
-    alts.push(a);
+    alts.push(alt);
+    airs.push( airmassKastenYoung(Math.max(5, alt)) ); // clamp low alt to avoid blow-up
+    pars.push( parallacticAngle(a.H, lat, dec) );
+    sunAlts.push( sunAlt(jd, lat, lon) );
   }
   const minAltArr = new Array(n).fill(minAlt);
-  Plotly.react('plot', [
+  const shapes = [{
+    type:'rect', xref:'x', yref:'paper', y0:0, y1:1, x0: xs[Math.floor(n/2 - (n*halfDays/(t2-t1)))],
+    x1: xs[Math.ceil(n/2 + (n*halfDays/(t2-t1)))], fillcolor:'rgba(147,112,219,0.08)', line:{width:0}
+  }];
+
+  Plotly.react('plotAlt', [
     {type:'scatter', mode:'lines', x:xs, y:alts, name:'Altitude (deg)'},
-    {type:'scatter', mode:'lines', x:xs, y:minAltArr, name:'Min Alt', line:{dash:'dash'}}
+    {type:'scatter', mode:'lines', x:xs, y:minAltArr, name:'Min Alt', line:{dash:'dash'}},
+    {type:'scatter', mode:'lines', x:xs, y:sunAlts, name:'Sun Alt (deg)', line:{dash:'dot'}}
   ], {
     margin:{l:50,r:10,t:10,b:40},
     xaxis:{title:'Time (UTC)'},
     yaxis:{title:'Altitude (deg)'},
-    showlegend:true
+    shapes, showlegend:true
   }, {displaylogo:false, responsive:true});
+
+  Plotly.react('plotAir', [
+    {type:'scatter', mode:'lines', x:xs, y:airs, name:'Airmass'}
+  ], {margin:{l:50,r:10,t:10,b:40}, xaxis:{title:'Time (UTC)'}, yaxis:{title:'Airmass'}}, {displaylogo:false, responsive:true});
+
+  Plotly.react('plotPar', [
+    {type:'scatter', mode:'lines', x:xs, y:pars, name:'Parallactic Angle'}
+  ], {margin:{l:50,r:10,t:10,b:40}, xaxis:{title:'Time (UTC)'}, yaxis:{title:'Parallactic Angle (deg)'}}, {displaylogo:false, responsive:true});
 }
 
 function onEphemerides(){
@@ -303,7 +362,12 @@ function onEphemerides(){
   const lat = num($('#latDeg').value);
   const lon = num($('#lonDeg').value);
   const minAlt = num($('#minAlt').value) ?? 30;
+  const nightOnly = $('#nightOnly').checked;
   const maxEvents = Math.max(1, Math.min(500, +$('#maxEvents').value || 30));
+
+  const lat2 = num($('#latDeg2').value), lon2 = num($('#lonDeg2').value);
+  const minAlt2 = num($('#minAlt2').value) ?? minAlt;
+  const hasSite2 = isFinite(lat2) && isFinite(lon2);
 
   if([ra,dec,period,t0,lat,lon].some(v => v==null)){
     $('#ephemStatus').textContent = 'Please provide RA, Dec, Period, T0, Latitude, Longitude.';
@@ -316,27 +380,80 @@ function onEphemerides(){
 
   const events = generateEphemerides(t0, period, fromJD, toJDv, maxEvents);
 
-  // Visibility (sample each event around mid to get max alt and visibility flag)
+  // Visibility + night filter
   for(const ev of events){
     const halfDays = (isFinite(dur) ? (dur/2)/24 : 0.05);
     const t1 = ev.midJD - halfDays, t2 = ev.midJD + halfDays;
-    let maxAlt = -90, seen = false;
-    const steps = 19;
+    let maxAlt = -90, seen = false, nightSeen = !nightOnly;
+    let maxAlt2 = -90, seen2 = false, nightSeen2 = !nightOnly;
+    const steps = 31;
     for(let i=0;i<steps;i++){
       const jd = t1 + (i/(steps-1))*(t2 - t1);
       const a = altAz(jd, ra, dec, lat, lon).altDeg;
       if(a > maxAlt) maxAlt = a;
       if(a >= minAlt) seen = true;
+      if(nightOnly && sunAlt(jd, lat, lon) <= -12) nightSeen = true;
+
+      if(hasSite2){
+        const a2 = altAz(jd, ra, dec, lat2, lon2).altDeg;
+        if(a2 > maxAlt2) maxAlt2 = a2;
+        if(a2 >= minAlt2) seen2 = true;
+        if(nightOnly && sunAlt(jd, lat2, lon2) <= -12) nightSeen2 = true;
+      }
     }
     ev.maxAlt = maxAlt;
-    ev.visible = seen;
+    ev.visible = seen && nightSeen;
+    if(hasSite2){
+      ev.maxAlt2 = maxAlt2;
+      ev.visible2 = seen2 && nightSeen2;
+    }
   }
 
-  buildTable(events, {ra,dec,dur}, {lat,lon});
-  $('#ephemStatus').textContent = `Generated ${events.length} event(s). Click a row to plot altitude.`;
+  buildTable(events, {ra,dec,dur}, {lat,lon}, hasSite2? {lat:lat2, lon:lon2} : null);
+  $('#ephemStatus').textContent = `Generated ${events.length} event(s). Click a row to plot altitude/airmass/parallactic angle.`;
+
+  // Allow selecting a row for ICS export
+  $('#ephemTableWrap').addEventListener('click', (e) => {
+    const tr = e.target.closest('tr');
+    if(!tr) return;
+    $('#ephemTableWrap').querySelectorAll('tr').forEach(r => r.classList.remove('selected'));
+    tr.classList.add('selected');
+  });
 }
 
-// Defaults
+function exportICS(){
+  const tr = $('#ephemTableWrap tr.selected');
+  if(!tr){ alert('Select a row first.'); return; }
+  const name = $('#plName').value || 'Exoplanet Transit';
+  const jd = +tr.getAttribute('data-jd');
+  const dur = Math.max(0.5, num($('#durationHrs').value) || 2.0); // hrs
+  const startMs = (jd - 2440587.5)*86400000 - (dur/2)*3600000;
+  const endMs = (jd - 2440587.5)*86400000 + (dur/2)*3600000;
+  const dtStart = new Date(startMs).toISOString().replace(/[-:]/g,'').replace('.000','');
+  const dtEnd = new Date(endMs).toISOString().replace(/[-:]/g,'').replace('.000','');
+
+  const ics = [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//astrojake.com//Visibility//EN',
+    'BEGIN:VEVENT',
+    `UID:${Date.now()}@astrojake.com`,
+    `DTSTAMP:${new Date().toISOString().replace(/[-:]/g,'').replace('.000','')}`,
+    `DTSTART:${dtStart}`,
+    `DTEND:${dtEnd}`,
+    `SUMMARY:${name} transit`,
+    'END:VEVENT',
+    'END:VCALENDAR'
+  ].join('\r\n');
+
+  const blob = new Blob([ics], {type:'text/calendar;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `${name.replace(/\s+/g,'_')}_transit.ics`;
+  document.body.appendChild(a); a.click(); a.remove();
+}
+
+// Defaults & hooks
 (function init(){
   // Seed date range to the next 30 days
   const today = new Date();
@@ -344,12 +461,19 @@ function onEphemerides(){
   $('#fromDate').valueAsDate = today;
   $('#toDate').valueAsDate = to;
 
-  $('#btnLoad').addEventListener('click', onLoad);
-  $('#btnGeo').addEventListener('click', onGeo);
+  loadCSV();
+  $('#btnLoad').addEventListener('click', () => loadFromLocal($('#plName').value));
+  $('#plName').addEventListener('change', (e)=> { if(e.target.value) loadFromLocal(e.target.value); });
+  $('#btnGeo').addEventListener('click', () => {
+    if(!navigator.geolocation){ alert('Geolocation not available'); return; }
+    navigator.geolocation.getCurrentPosition(pos => {
+      $('#latDeg').value = pos.coords.latitude.toFixed(5);
+      $('#lonDeg').value = pos.coords.longitude.toFixed(5);
+      $('#elevM').value = Math.round(pos.coords.altitude || 0);
+    }, err => alert('Location failed: '+err.message), {enableHighAccuracy:true, timeout:8000});
+  });
   $('#btnEphem').addEventListener('click', onEphemerides);
-  $('#btnClear').addEventListener('click', () => { $('#ephemTableWrap').innerHTML=''; $('#ephemStatus').textContent=''; Plotly.purge('plot'); });
-
-  // Example planet to demonstrate (non-blocking)
-  // $('#plName').value = 'WASP-43 b';
+  $('#btnClear').addEventListener('click', () => { $('#ephemTableWrap').innerHTML=''; $('#ephemStatus').textContent=''; Plotly.purge('plotAlt'); Plotly.purge('plotAir'); Plotly.purge('plotPar'); });
+  $('#btnICS').addEventListener('click', exportICS);
 })();
 </script>
