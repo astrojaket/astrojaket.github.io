@@ -4,7 +4,6 @@ title: Exoplanets
 permalink: /exoplanets
 ---
 
-<!-- Exoplanet Explorer (local CSVs) -->
 <div id="exo-explorer" class="exo-container">
   <div class="exo-topbar">
     <div class="exo-controls">
@@ -25,7 +24,7 @@ permalink: /exoplanets
       </div>
 
       <div class="exo-card">
-        <h2>Filters (set limits then press Update)</h2>
+        <h2>Filters (press Update)</h2>
         <div class="exo-grid4 exo-filters">
           <div><div class="exo-filter-label">Best Mass (M⊕)</div>
             <input id="f-min-pl_bmasse" class="exo-input" type="number" step="any" placeholder="min" />
@@ -70,6 +69,7 @@ permalink: /exoplanets
         <h2>Highlights</h2>
         <label class="exo-check"><input id="highlightJWSTObs" type="checkbox" checked/> JWST – Observed</label>
         <label class="exo-check"><input id="highlightJWSTPlan" type="checkbox" checked/> JWST – Planned</label>
+        <label class="exo-check"><input id="showLabels" type="checkbox"/> Show labels (all)</label>
         <div class="exo-note">Observed = Executed. Planned = Scheduled / Implementation / Flight Ready / Inactive / On Hold.</div>
       </div>
     </div>
@@ -88,6 +88,15 @@ permalink: /exoplanets
         <button class="exo-chip" data-preset="hotjup">Hot Jupiters</button>
         <button class="exo-chip" data-preset="subnep">Sub‑Neptunes</button>
       </div>
+      <hr/>
+      <h3 class="mt-1">TSM &amp; ESM (Kempton+2018)</h3>
+      <div class="exo-checkcol">
+        <label class="exo-check"><input id="enableTSM" type="checkbox"/> Scale size by TSM</label>
+        <label class="exo-check"><input id="enableESM" type="checkbox"/> Scale size by ESM</label>
+      </div>
+      <div class="exo-note small">
+        TSM ≈ (scale) × (R<sup>3</sup><sub>p</sub> · T<sub>eq</sub>) / (M<sub>p</sub> · R<sup>2</sup><sub>★</sub>) · 10<sup>−m<sub>J</sub>/5</sup>. Thresholds: TSM &gt; 10 for R<sub>p</sub>&lt;1.5 R⊕; TSM &gt; 90 for 1.5–10 R⊕. ESM ≈ 4.29×10<sup>6</sup> · [B<sub>7.5</sub>(1.1T<sub>eq</sub>)/B<sub>7.5</sub>(T★)] · (R<sub>p</sub>/R★)<sup>2</sup> · 10<sup>−m<sub>K</sub>/5</sup>. Recommended ESM &gt; 7.5 for terrestrial planets.
+      </div>
     </aside>
   </div>
 
@@ -103,7 +112,7 @@ permalink: /exoplanets
       <div id="counts" class="exo-note">—</div>
       <hr/>
       <div class="exo-note">
-        Data files: <code>/assets/data/pscomppars_recent.csv</code>, <code>/assets/data/jwst_trexolists_extended.csv</code>
+        CSVs: <code>/assets/data/pscomppars_recent.csv</code>, <code>/assets/data/jwst_trexolists_extended.csv</code>
       </div>
       <div id="status" class="exo-note">Loading local CSVs…</div>
     </aside>
@@ -115,43 +124,39 @@ permalink: /exoplanets
   </details>
 </div>
 
-<!-- libs -->
 <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
 <script src="https://d3js.org/d3.v7.min.js"></script>
 
 <style>
-:root {
-  --mpurple: #9370DB;
-  --mpurple-600: #7a5fd5;
-  --muted: #6b7280;
-  --ink: #111827;
-  --bg: #f6f4fb;
-}
-body { background: var(--bg); }
-.exo-container { display: grid; gap: 1rem; }
-.exo-topbar { display:grid; grid-template-columns: 1fr 300px; gap: 1rem; }
-.exo-controls { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 1rem; }
-.exo-main { display: grid; grid-template-columns: 1fr 300px; gap: 1rem; }
-.exo-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 16px; padding: 1rem; box-shadow: 0 1px 2px rgba(0,0,0,.05); }
-.exo-plot { height: 70vh; border: 1px solid #e5e7eb; border-radius: 16px; }
-.exo-input { width: 100%; padding: .45rem .6rem; border: 1px solid #d1d5db; border-radius: 10px; }
-.exo-btn { padding: .55rem .8rem; border-radius: 10px; border: none; color: #fff; background: var(--mpurple); cursor: pointer; }
-.exo-btn.ghost { background: transparent; color: var(--mpurple); border: 1px solid var(--mpurple-600); }
-.exo-btn:hover { background: var(--mpurple-600); }
-.exo-check { display:inline-flex; align-items:center; gap:.4rem; margin-right:.6rem; }
-.exo-legend { list-style:none; padding:0; margin:.5rem 0; }
-.dot { display:inline-block; width:10px; height:10px; border-radius:999px; margin-right:.4rem; }
-.dot.pop { background:#9CA3AF; opacity:.8; }
-.dot.jwstobs { background:var(--mpurple); }
-.dot.jwstplan { background:#06b6d4; }
-.exo-note { color: var(--muted); font-size: .85rem; }
-.exo-code { background:#f3f4f6; padding:.6rem; border-radius:12px; }
-.exo-grid2 { display:grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap:.6rem; }
-.exo-grid4 { display:grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap:.6rem; }
-.exo-row.gap { display:flex; gap:.6rem; margin-top:.5rem; }
-.exo-presets .exo-chiprow { display:flex; flex-wrap:wrap; align-items:center; gap:.4rem; margin-bottom:.4rem; }
-.exo-chip { background:#f3f0ff; border:1px solid #e1d7ff; color:#4b3a8f; padding:.25rem .5rem; border-radius:999px; font-size:.85rem; cursor:pointer; }
-.exo-chip.sep { background:transparent; border:0; color:#6b7280; cursor:default; font-weight:600; }
+:root { --mpurple:#9370DB; --mpurple-600:#7a5fd5; --muted:#6b7280; --ink:#111827; --bg:#f6f4fb; }
+body{ background:var(--bg); }
+.exo-container{ display:grid; gap:1rem; }
+.exo-topbar{ display:grid; grid-template-columns: 1fr 320px; gap:1rem; }
+.exo-controls{ display:grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap:1rem; }
+.exo-main{ display:grid; grid-template-columns: 1fr 320px; gap:1rem; }
+.exo-card{ background:#fff; border:1px solid #e5e7eb; border-radius:16px; padding:1rem; box-shadow:0 1px 2px rgba(0,0,0,.05); }
+.exo-plot{ height: 70vh; border:1px solid #e5e7eb; border-radius:16px; }
+.exo-input{ width:100%; padding:.45rem .6rem; border:1px solid #d1d5db; border-radius:10px; }
+.exo-btn{ padding:.55rem .8rem; border-radius:10px; border:none; color:#fff; background:var(--mpurple); cursor:pointer; }
+.exo-btn.ghost{ background:transparent; color:var(--mpurple); border:1px solid var(--mpurple-600); }
+.exo-btn:hover{ background:var(--mpurple-600); }
+.exo-check{ display:inline-flex; align-items:center; gap:.4rem; margin-right:.6rem; }
+.exo-checkcol{ display:flex; flex-direction:column; gap:.3rem; }
+.exo-legend{ list-style:none; padding:0; margin:.5rem 0; }
+.dot{ display:inline-block; width:10px; height:10px; border-radius:999px; margin-right:.4rem; }
+.dot.pop{ background:#9CA3AF; opacity:.8; }
+.dot.jwstobs{ background:var(--mpurple); }
+.dot.jwstplan{ background:#06b6d4; }
+.exo-note{ color:var(--muted); font-size:.85rem; }
+.exo-note.small{ font-size:.78rem; }
+.exo-code{ background:#f3f4f6; padding:.6rem; border-radius:12px; }
+.exo-grid2{ display:grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap:.6rem; }
+.exo-grid4{ display:grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap:.6rem; }
+.exo-row.gap{ display:flex; gap:.6rem; margin-top:.5rem; }
+.exo-presets .exo-chiprow{ display:flex; flex-wrap:wrap; align-items:center; gap:.4rem; margin-bottom:.4rem; }
+.exo-chip{ background:#f3f0ff; border:1px solid #e1d7ff; color:#4b3a8f; padding:.25rem .5rem; border-radius:999px; font-size:.85rem; cursor:pointer; }
+.exo-chip.sep{ background:transparent; border:0; color:#6b7280; cursor:default; font-weight:600; }
+.mt-1{ margin-top:.4rem; }
 @media (max-width: 1100px){
   .exo-controls{ grid-template-columns: 1fr; }
   .exo-topbar{ grid-template-columns: 1fr; }
@@ -160,16 +165,8 @@ body { background: var(--bg); }
 </style>
 
 <script>
-// ---------------------------
-// Config & columns
-// ---------------------------
 const POP_CSV = '/assets/data/pscomppars_recent.csv';
 const JWST_CSV = '/assets/data/jwst_trexolists_extended.csv';
-
-const columns = [
-  'pl_name','hostname','pl_bmasse','pl_bmassj','pl_rade','pl_radj',
-  'pl_orbper','st_age','st_rad','pl_eqt','tran_flag'
-];
 
 const PARAMS = {
   'Best Planet Mass (M_⊕)': d => num(d.pl_bmasse),
@@ -183,49 +180,31 @@ const PARAMS = {
 };
 
 const PRESETS = {
-  // Kempton+2018 TSM radius bins
   'k18-rocky': { pl_rade: [null, 1.5] },
   'k18-small': { pl_rade: [1.5, 2.75] },
   'k18-subn':  { pl_rade: [2.75, 4.0] },
   'k18-giant': { pl_rade: [4.0, null] },
-  // Popular shorthand
   'hotjup': { pl_rade: [8, null], pl_eqt: [1000, null] },
   'subnep': { pl_rade: [2, 4] },
 };
 
-// ---------------------------
-// Utilities
-// ---------------------------
 const $ = sel => document.querySelector(sel);
 const $$ = sel => Array.from(document.querySelectorAll(sel));
 const num = v => (v==null || v==='' ? null : (isFinite(+v)? +v : null));
 const canon = s => (s||'').toString().trim().toLowerCase().replace(/\s+/g,' ');
 
 function csvParseLoose(text){
-  // ignore comment lines starting with # (some Archive dumps include headers/comments)
   const cleaned = text.split(/\n/).filter(l => !/^\s*#/.test(l)).join('\n');
   return d3.csvParse(cleaned);
 }
 
-function setFilter(id, val){
-  const el = document.getElementById(id);
-  el.value = (val==null? '' : val);
-}
-
-// ---------------------------
-// State
-// ---------------------------
 const state = {
-  all: [],              // full population (CSV rows as objects)
-  rows: [],             // filtered rows to plot
-  jwstObserved: new Set(), // pl_name canonical
-  jwstPlanned: new Set(),
-  filters: {}           // key -> [min,max] numeric
+  all: [], rows: [],
+  jwstObserved: new Set(), jwstPlanned: new Set(),
+  filters: {},
+  haveTSM: false, haveESM: false,
 };
 
-// ---------------------------
-// Loaders
-// ---------------------------
 async function loadCSV(url){
   const res = await fetch(url, {mode:'cors'});
   if(!res.ok) throw new Error('Failed to fetch '+url+' '+res.status);
@@ -235,11 +214,9 @@ async function loadCSV(url){
 
 async function loadPopulation(){
   const rows = await loadCSV(POP_CSV);
-  // Coerce types for the columns we care about
+  const nums = ['pl_bmasse','pl_bmassj','pl_rade','pl_radj','pl_orbper','st_age','st_rad','pl_eqt','st_teff','sy_jmag','sy_kmag'];
   for(const r of rows){
-    for(const k of ['pl_bmasse','pl_bmassj','pl_rade','pl_radj','pl_orbper','st_age','st_rad','pl_eqt']){
-      if (r[k] !== undefined) r[k] = num(r[k]);
-    }
+    for(const k of nums) if (r[k] !== undefined) r[k] = num(r[k]);
     if (r['tran_flag'] !== undefined) r['tran_flag'] = num(r['tran_flag']);
   }
   return rows;
@@ -250,7 +227,6 @@ async function loadJWST(){
   const obs = new Set(), plan = new Set();
   const PLANNED = new Set(['Scheduled','Implementation','Flight Ready','Inactive','On Hold','On Hold (Inactive)']);
   for(const r of rows){
-    // JWST CSV columns: expect 'Star   name','Planet   letter','Status' etc.
     const nm = canon(((r['Star   name']||r['Star name']||r['Star']||'').trim() + ' ' + (r['Planet   letter']||r['Planet letter']||r['Planet']||'').trim()).trim());
     const status = (r['Status']||'').trim();
     if(!nm) continue;
@@ -260,7 +236,9 @@ async function loadJWST(){
   return {obs, plan};
 }
 
-// ---------------------------
+// Filters
+function setFilter(id, val){ const el = document.getElementById(id); el.value = (val==null? '' : val); }
+
 function populateDropdowns(){
   const xSel = document.getElementById('xSelect');
   const ySel = document.getElementById('ySelect');
@@ -270,8 +248,16 @@ function populateDropdowns(){
   ySel.value = 'Planet Radius (R_⊕)';
 }
 
+function summarizeInputs(){
+  const s = [];
+  s.push('Population CSV: '+POP_CSV);
+  s.push('JWST CSV: '+JWST_CSV);
+  s.push('Filters: '+JSON.stringify(state.filters));
+  s.push('TSM available: '+state.haveTSM+'; ESM available: '+state.haveESM);
+  document.getElementById('endpoints').textContent = s.join('\n');
+}
+
 function applyFiltersAndRefresh(){
-  // Build current filter object from inputs
   const keys = ['pl_bmasse','pl_bmassj','pl_rade','pl_radj','pl_orbper','st_age','st_rad','pl_eqt'];
   const f = {};
   for(const k of keys){
@@ -296,15 +282,81 @@ function filterRows(){
   const f = state.filters;
   state.rows = state.all.filter(r => {
     if (onlyTransiting && r.tran_flag !== 1) return false;
-    for(const [k, range] of Object.entries(f)){
+    for(const [k,[mn,mx]] of Object.entries(f)){
       const v = r[k];
       if(v==null) return false;
-      const [mn, mx] = range;
       if(mn!=null && v<mn) return false;
       if(mx!=null && v>mx) return false;
     }
     return true;
   });
+}
+
+// --- TSM/ESM ---
+// Scale factors per K18 Table 1 (approx; near-realistic normalization)
+const SCALE_TSM = (rp) => {
+  if (rp==null) return 1;
+  if (rp < 1.5) return 0.190;      // rocky
+  if (rp < 2.75) return 1.26;      // small sub-N
+  if (rp < 4.0) return 1.28;       // large sub-N
+  return 1.15;                     // sub-Jovians (4-10 R⊕), extend >10 similarly
+};
+
+function haveTSMfields(r){ return (r.pl_rade!=null && (r.pl_bmasse!=null || r.pl_bmassj!=null) && r.st_rad!=null && (r.sy_jmag!=null || r.sy_kmag!=null || r.sy_vmag!=null || r.sy_gaiamag!=null || r.sy_tmag!=null) && r.pl_eqt!=null); }
+function haveESMfields(r){ return (r.pl_rade!=null && r.st_rad!=null && r.st_teff!=null && (r.sy_kmag!=null || r.sy_jmag!=null) && r.pl_eqt!=null); }
+
+function approxJmag(r){
+  // Prefer sy_jmag. If not, fall back to sy_kmag+color or sy_tmag; keep simple if missing.
+  return r.sy_jmag ?? r.sy_kmag ?? r.sy_tmag ?? r.sy_vmag ?? r.sy_gaiamag ?? null;
+}
+
+function TSM_value(r){
+  const Rp = r.pl_rade;                  // R_earth
+  const Mp = r.pl_bmasse ?? (r.pl_bmassj!=null ? r.pl_bmassj*317.828 : null); // M_earth
+  const Rstar = r.st_rad;                // R_sun
+  const Teq = r.pl_eqt;
+  const mJ = approxJmag(r);
+  if (Rp==null || Mp==null || Rstar==null || Teq==null || mJ==null) return null;
+  const scale = SCALE_TSM(Rp);
+  return scale * ( (Rp*Rp*Rp) * Teq ) / ( Mp * (Rstar*Rstar) ) * Math.pow(10, -mJ/5);
+}
+
+function planck_7p5um(T){
+  // B_lambda at 7.5 micron, units cancel in ratio so absolute constant doesn't matter
+  const h = 6.62607015e-34, c = 2.99792458e8, k = 1.380649e-23;
+  const lambda = 7.5e-6;
+  const x = (h*c)/(lambda*k*T);
+  return (2*h*c*c)/(Math.pow(lambda,5)) * 1/(Math.exp(x)-1);
+}
+
+function ESM_value(r){
+  const RpRe = r.pl_rade;      // R_earth
+  const RstarRs = r.st_rad;    // R_sun
+  const Teq = r.pl_eqt;
+  const Tstar = r.st_teff;
+  const mK = (r.sy_kmag ?? r.sy_jmag ?? null);
+  if (RpRe==null || RstarRs==null || Teq==null || Tstar==null || mK==null) return null;
+  // Convert radii to same units ratio (R_earth / R_sun)
+  const Re_over_Rs = (RpRe * 6.371e6) / (RstarRs * 6.957e8);
+  const Tday = 1.10 * Teq;
+  const ratioB = planck_7p5um(Tday) / planck_7p5um(Tstar);
+  return 4.29e6 * ratioB * (Re_over_Rs*Re_over_Rs) * Math.pow(10, -mK/5);
+}
+
+function computeMetric(r){
+  const tsm = TSM_value(r);
+  const esm = ESM_value(r);
+  r._tsm = tsm;
+  r._esm = esm;
+}
+
+// --- Traces ---
+function markerSizeFromMetric(val, kind){
+  // Use sqrt scaling to compress dynamic range; clamp sizes
+  if (val==null || !isFinite(val) || val<=0) return 6;
+  const s = Math.sqrt(val);
+  const k = (kind==='ESM') ? 0.6 : 0.35; // slightly different spreads
+  return Math.max(6, Math.min(24, 4 + k*s));
 }
 
 function buildTraces(){
@@ -314,6 +366,10 @@ function buildTraces(){
   const colorByTeq = document.getElementById('colorTemp').checked;
   const showObs = document.getElementById('highlightJWSTObs').checked;
   const showPlan = document.getElementById('highlightJWSTPlan').checked;
+  const showLabels = document.getElementById('showLabels').checked;
+  const sizeByTSM = document.getElementById('enableTSM').checked;
+  const sizeByESM = document.getElementById('enableESM').checked;
+  const jwstDiamond = true;
 
   const pop = [], obs = [], plan = [];
   for(const p of state.rows){
@@ -322,56 +378,65 @@ function buildTraces(){
     const nm = canon(p.pl_name);
     const isObs = state.jwstObserved.has(nm);
     const isPlan = state.jwstPlanned.has(nm);
-    const t = {x, y, teq: num(p.pl_eqt)};
-    if(isObs) obs.push(t);
-    else if(isPlan) plan.push(t);
-    else pop.push(t);
+
+    let size = 6;
+    if(sizeByTSM && p._tsm!=null) size = markerSizeFromMetric(p._tsm, 'TSM');
+    else if(sizeByESM && p._esm!=null) size = markerSizeFromMetric(p._esm, 'ESM');
+    else if ((isObs || isPlan) && !sizeByTSM && !sizeByESM){
+      size = 12; // x2 of default for JWST when not using metric sizing
+    }
+
+    const base = {
+      x, y, name:p.pl_name,
+      text: showLabels ? p.pl_name : null,
+      textposition: 'top center',
+      hovertemplate: `${p.pl_name}<extra></extra>`
+    };
+    const rec = { ...base, size, teq: num(p.pl_eqt) };
+    if(isObs) obs.push(rec);
+    else if(isPlan) plan.push(rec);
+    else pop.push(rec);
   }
 
   const traces = [];
+  // Population
   if(colorByTeq){
-    // Color population by Teq; JWST as outlined rings on top
     traces.push({
       name: 'Population (Teq)',
-      type: 'scattergl', mode:'markers',
+      type: 'scattergl', mode:'markers+text',
       x: pop.map(d=>d.x), y: pop.map(d=>d.y),
-      marker: {
-        size: 6, opacity: .7,
-        color: pop.map(d => d.teq ?? NaN),
-        colorbar: {title:'Teq (K)'},
-        colorscale: 'Viridis',
-        showscale: true
-      },
-      hovertemplate: '%{x}, %{y}<extra></extra>'
-    });
-    if(showPlan) traces.push({
-      name: 'JWST – Planned',
-      type:'scattergl', mode:'markers',
-      x: plan.map(d=>d.x), y: plan.map(d=>d.y),
-      marker:{ size:10, opacity:.95, color:'#06b6d4', line:{width:1.5, color:'#034d57'} },
-      hovertemplate: '%{x}, %{y}<extra></extra>'
-    });
-    if(showObs) traces.push({
-      name: 'JWST – Observed',
-      type:'scattergl', mode:'markers',
-      x: obs.map(d=>d.x), y: obs.map(d=>d.y),
-      marker:{ size:10, opacity:.95, color:'#9370DB', line:{width:1.5, color:'#4b3a8f'} },
-      hovertemplate: '%{x}, %{y}<extra></extra>'
+      text: pop.map(d=>d.text), textposition: 'top center', textfont:{size:10},
+      marker: { size: pop.map(d=>d.size), opacity:.75, color: pop.map(d=>d.teq ?? NaN), colorscale:'Viridis', showscale:true, colorbar:{title:'Teq (K)'} },
+      hovertemplate: '%{text}<br>%{x}, %{y}<extra></extra>'
     });
   }else{
-    // Classic palette
     traces.push({
-      name: 'Population', type:'scattergl', mode:'markers',
+      name: 'Population',
+      type:'scattergl', mode:'markers+text',
       x: pop.map(d=>d.x), y: pop.map(d=>d.y),
-      marker:{ size:6, opacity:.45, color:'#9CA3AF' },
-      hovertemplate: '%{x}, %{y}<extra></extra>'
+      text: pop.map(d=>d.text), textposition: 'top center', textfont:{size:10},
+      marker:{ size: pop.map(d=>d.size), opacity:.45, color:'#9CA3AF' },
+      hovertemplate: '%{text}<br>%{x}, %{y}<extra></extra>'
     });
-    if(showPlan) traces.push({ name:'JWST – Planned', type:'scattergl', mode:'markers',
+  }
+  // JWST planned / observed overlays
+  if(showPlan){
+    traces.push({
+      name: 'JWST – Planned', type:'scattergl', mode:'markers+text',
       x: plan.map(d=>d.x), y: plan.map(d=>d.y),
-      marker:{ size:8, opacity:.9, color:'#06b6d4' }, hovertemplate:'%{x}, %{y}<extra></extra>' });
-    if(showObs) traces.push({ name:'JWST – Observed', type:'scattergl', mode:'markers',
+      text: plan.map(d=>d.text), textposition: 'top center', textfont:{size:11},
+      marker:{ size: plan.map(d=>d.size), opacity:.95, color:'#06b6d4', symbol: jwstDiamond?'diamond':'circle' },
+      hovertemplate: '%{text}<br>%{x}, %{y}<extra></extra>'
+    });
+  }
+  if(showObs){
+    traces.push({
+      name: 'JWST – Observed', type:'scattergl', mode:'markers+text',
       x: obs.map(d=>d.x), y: obs.map(d=>d.y),
-      marker:{ size:8, opacity:.9, color:'#9370DB' }, hovertemplate:'%{x}, %{y}<extra></extra>' });
+      text: obs.map(d=>d.text), textposition: 'top center', textfont:{size:11, color:'#3b2c86'},
+      marker:{ size: obs.map(d=>d.size), opacity:.95, color:'#9370DB', symbol: jwstDiamond?'diamond':'circle' },
+      hovertemplate: '%{text}<br>%{x}, %{y}<extra></extra>'
+    });
   }
   return traces;
 }
@@ -395,47 +460,42 @@ function refresh(){
 }
 
 function hookUI(){
-  // Axes/log toggles refresh instantly
-  ['xSelect','ySelect','xLog','yLog','colorTemp','onlyTransiting','highlightJWSTObs','highlightJWSTPlan']
+  ['xSelect','ySelect','xLog','yLog','colorTemp','onlyTransiting','highlightJWSTObs','highlightJWSTPlan','showLabels','enableTSM','enableESM']
     .forEach(id => document.getElementById(id).addEventListener('change', refresh));
-  // Filters only apply when clicking Update
   document.getElementById('applyFilters').addEventListener('click', applyFiltersAndRefresh);
   document.getElementById('clearFilters').addEventListener('click', () => clearFilters());
-  // Presets
   document.querySelectorAll('.exo-chip[data-preset]').forEach(btn => {
     btn.addEventListener('click', () => {
       const p = btn.getAttribute('data-preset');
       const def = PRESETS[p]||{};
-      // Clear then apply
       clearFilters();
       for(const [k,[mn,mx]] of Object.entries(def)){
         setFilter('f-min-'+k, mn);
         setFilter('f-max-'+k, mx);
       }
-      // Do not auto-apply; require Update to respect user's request
     });
   });
 }
 
-function summarizeInputs(){
-  const s = [];
-  s.push('Population CSV: '+POP_CSV);
-  s.push('JWST CSV: '+JWST_CSV);
-  s.push('Filters: '+JSON.stringify(state.filters));
-  document.getElementById('endpoints').textContent = s.join('\n');
+function computeAvailability(){
+  // Check if enough columns exist to compute metrics for at least one row
+  state.haveTSM = state.all.some(haveTSMfields);
+  state.haveESM = state.all.some(haveESMfields);
+  if(!state.haveTSM) document.getElementById('enableTSM').disabled = true;
+  if(!state.haveESM) document.getElementById('enableESM').disabled = true;
 }
 
-// ---------------------------
-// Boot
-// ---------------------------
 (async function init(){
   try{
     populateDropdowns(); hookUI();
     const [popRows, jwst] = await Promise.all([loadPopulation(), loadJWST()]);
     state.all = popRows.slice();
-    state.rows = popRows.slice();
+    // Compute metrics once
+    state.all.forEach(computeMetric);
+    state.rows = state.all.slice();
     state.jwstObserved = jwst.obs;
     state.jwstPlanned = jwst.plan;
+    computeAvailability();
     document.getElementById('status').textContent = `Loaded local CSVs (rows: ${state.all.length.toLocaleString()})`;
     summarizeInputs();
     refresh();
