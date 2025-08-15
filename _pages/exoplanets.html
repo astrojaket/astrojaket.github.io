@@ -571,14 +571,14 @@ function buildTraces(){
       x: pop.map(d=>d.x), y: pop.map(d=>d.y), hovertext: pop.map(d=>d.name),
       marker: { size: popSizes, opacity: popOpacities, symbol: popSymbols,
                 color: pop.map(d=>((d.teq) != null ? (d.teq) : (NaN))), colorscale:'Viridis', showscale:true, colorbar:{title:'Teq (K)'} },
-      ...(showLabels ? { text: labelsPop, textposition:'top center' } : {})
+      , text: (showLabels ? labelsPop : []), textposition: 'top center'
     }, hoverCommon));
   } else {
     traces.push(Object.assign({
       name: 'Population', type: baseType, mode: baseMode,
       x: pop.map(d=>d.x), y: pop.map(d=>d.y), hovertext: pop.map(d=>d.name),
       marker:{ size: popSizes, opacity: popOpacities, symbol: popSymbols, color:'#9CA3AF' },
-      ...(showLabels ? { text: labelsPop, textposition:'top center' } : {})
+      , text: (showLabels ? labelsPop : []), textposition: 'top center'
     }, hoverCommon));
   }
 
@@ -587,7 +587,7 @@ function buildTraces(){
       name: 'JWST – Planned', type: baseType, mode: baseMode,
       x: plan.map(d=>d.x), y: plan.map(d=>d.y), hovertext: plan.map(d=>d.name),
       marker:{ symbol:'diamond', size: (useTSM||useESM) ? planSizes : 12, opacity:.95, color:'#E69F00' },
-      ...(showLabels ? { text: labelsPlan, textposition:'top center' } : {})
+      , text: (showLabels ? labelsPlan : []), textposition: 'top center'
     }, hoverCommon));
   }
   if(showObs){
@@ -595,7 +595,7 @@ function buildTraces(){
       name: 'JWST – Observed', type: baseType, mode: baseMode,
       x: obs.map(d=>d.x), y: obs.map(d=>d.y), hovertext: obs.map(d=>d.name),
       marker:{ symbol:'diamond', size: (useTSM||useESM) ? obsSizes : 12, opacity:.95, color:'#9370DB' },
-      ...(showLabels ? { text: labelsObs, textposition:'top center' } : {})
+      , text: (showLabels ? labelsObs : []), textposition: 'top center'
     }, hoverCommon));
   }
   if(showHST){
@@ -603,7 +603,7 @@ function buildTraces(){
       name: 'HST – Atmospheric', type: baseType, mode: baseMode,
       x: hst.map(d=>d.x), y: hst.map(d=>d.y), hovertext: hst.map(d=>d.name),
       marker:{ symbol:'square', size: (useTSM||useESM) ? hstSizes : 10, opacity:.95, color:'#10B981' },
-      ...(showLabels ? { text: labelsHst, textposition:'top center' } : {})
+      , text: (showLabels ? labelsHst : []), textposition: 'top center'
     }, hoverCommon));
   }
   return traces;
@@ -624,11 +624,6 @@ function layoutForAxes(){
     xaxis:xaxis,
     yaxis:yaxis,
     showlegend:false
-  };
-},
-    xaxis:{title:xKey, type: document.getElementById('xLog').checked ? 'log' : 'linear', zeroline:false},
-    yaxis:{title:yKey, type: document.getElementById('yLog').checked ? 'log' : 'linear', zeroline:false},
-    showlegend: false
   };
 }
 
