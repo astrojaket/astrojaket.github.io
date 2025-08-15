@@ -22,7 +22,6 @@ permalink: /exoplanets
           <label class="exo-check"><input id="colorTemp" type="checkbox"/> Color by Teq (K)</label>
           <label class="exo-check"><input id="showLabels" type="checkbox"/> Show labels (all)</label>
           <label class="exo-check"><input id="onlyTransiting" type="checkbox"/> Only transiting</label>
-          <label class="exo-check"><input id="ckPredict" type="checkbox"> Use Chen &amp; Kipping (2017) mass when missing</label>
         </div>
       </div>
 
@@ -113,7 +112,6 @@ permalink: /exoplanets
     <aside class="exo-card">
       <h3>Legend</h3>
       <ul class="exo-legend">
-        <li><span class="dot" style="border:2px solid #9CA3AF; background:transparent;"></span> Population w/ CK17 mass (plus)</li>
         <li><span class="dot pop"></span> Population</li>
         <li><span class="dot jwstobs diamond"></span> JWST – Observed (diamond)</li>
         <li><span class="dot jwstplan diamond"></span> JWST – Planned (diamond)</li>
@@ -212,88 +210,6 @@ const PRESETS = {
 // ---------------------------
 // Utilities
 // ---------------------------
-// ---------------------------
-// CK17 mass-from-radius (Forecaster centerline)
-// ---------------------------
-const EARTH_TO_JUP_MASS = 1/317.83;
-const JUP_TO_EARTH_MASS = 317.83;
-const RJ_TO_RE = 11.209;
-
-function ckMassFromRadius_Re(radius_Re){
-  const R = +radius_Re;
-  if(!isFinite(R) || R<=0) return null;
-  // Degeneracy band where inverse is non-unique
-  if(R >= 11.1 && R <= 14.3) return null;
-  const logR = Math.log10(R);
-  let C, S;
-  if(R < 1.23){ C = 0.00346; S = 0.2790; }        // Terran
-  else if(R < 11.1){ C = -0.0925; S = 0.589; }    // Neptunian
-  else { C = -2.85; S = 0.881; }                  // Jovian (R >= 14.3)
-  const logM = (logR - C)/S;
-  const Mearth = Math.pow(10, logM);
-  return (isFinite(Mearth) && Mearth>0) ? Mearth : null;
-}
-function ckMassFromRadius_Rj(radius_Rj){
-  const Rj = +radius_Rj;
-  if(!isFinite(Rj) || Rj<=0) return null;
-  const Re = Rj * RJ_TO_RE;
-  const Mearth = ckMassFromRadius_Re(Re);
-  return (Mearth==null) ? null : Mearth * EARTH_TO_JUP_MASS;
-}
-
-// Unified getters that prefer measured mass; fall back to CK17 if enabled
-function getMassJ(p, ckEnabled){
-  let mj = (p.pl_bmassj!=null && isFinite(+p.pl_bmassj)) ? +p.pl_bmassj :
-           (p.pl_bmasse!=null && isFinite(+p.pl_bmasse)) ? (+p.pl_bmasse)*EARTH_TO_JUP_MASS : null;
-  let usedCK = false;
-  if(mj==null && ckEnabled){
-    if(p.pl_rade!=null && isFinite(+p.pl_rade)){
-      const mE = ckMassFromRadius_Re(+p.pl_rade);
-      if(mE!=null){ mj = mE*EARTH_TO_JUP_MASS; usedCK = true; }
-    }else if(p.pl_radj!=null && isFinite(+p.pl_radj)){
-      const mJ = ckMassFromRadius_Rj(+p.pl_radj);
-      if(mJ!=null){ mj = mJ; usedCK = true; }
-    }
-  }
-  return {value: (isFinite(mj)? mj : null), usedCK};
-}
-function getMassE(p, ckEnabled){
-  let me = (p.pl_bmasse!=null && isFinite(+p.pl_bmasse)) ? +p.pl_bmasse :
-           (p.pl_bmassj!=null && isFinite(+p.pl_bmassj)) ? (+p.pl_bmassj)*JUP_TO_EARTH_MASS : null;
-  let usedCK = false;
-  if(me==null && ckEnabled){
-    if(p.pl_rade!=null && isFinite(+p.pl_rade)){
-      const mE = ckMassFromRadius_Re(+p.pl_rade);
-      if(mE!=null){ me = mE; usedCK = true; }
-    }else if(p.pl_radj!=null && isFinite(+p.pl_radj)){
-      const mJ = ckMassFromRadius_Rj(+p.pl_radj);
-      if(mJ!=null){ me = mJ*JUP_TO_EARTH_MASS; usedCK = true; }
-    }
-  }
-  return {value: (isFinite(me)? me : null), usedCK};
-}
-
-function valueForKey(p, key, ckEnabled){
-  switch(key){
-    case 'Best Planet Mass (M_J)': return getMassJ(p, ckEnabled).value;
-    case 'Best Planet Mass (M_⊕)': return getMassE(p, ckEnabled).value;
-    default: return PARAMS[key](p);
-  }
-}
-function usedCKForKey(p, key, ckEnabled){
-  if(!ckEnabled) return false;
-  switch(key){
-    case 'Best Planet Mass (M_J)': return getMassJ(p, true).usedCK;
-    case 'Best Planet Mass (M_⊕)': return getMassE(p, true).usedCK;
-    default: return false;
-  }
-}
-
-// Helper: identify if axis is one of the mass axes
-function isMassAxis(key){
-  return key === 'Best Planet Mass (M_J)' || key === 'Best Planet Mass (M_⊕)';
-}
-
 const $ = sel => document.querySelector(sel);
 const $$ = sel => Array.from(document.querySelectorAll(sel));
 const num = v => (v==null || v==='' ? null : (isFinite(+v)? +v : null));
@@ -491,10 +407,10 @@ function filterRows(){
   });
 }
 
-
 function buildTraces(){
   const xKey = document.getElementById('xSelect').value;
   const yKey = document.getElementById('ySelect').value;
+  const xFn = PARAMS[xKey], yFn = PARAMS[yKey];
   const colorByTeq = document.getElementById('colorTemp').checked;
   const showObs = document.getElementById('highlightJWSTObs').checked;
   const showPlan = document.getElementById('highlightJWSTPlan').checked;
@@ -502,26 +418,13 @@ function buildTraces(){
   const showLabels = document.getElementById('showLabels').checked;
   const useTSM = document.getElementById('useTSM').checked;
   const useESM = document.getElementById('useESM').checked;
-  const ckEnabled = document.getElementById('ckPredict') ? document.getElementById('ckPredict').checked : false;
-
-  const massAxisUsed = isMassAxis(xKey) || isMassAxis(yKey);
 
   const pop = [], obs = [], plan = [], hst = [];
   const labelsPop=[], labelsObs=[], labelsPlan=[], labelsHst=[];
   const popSizes=[], obsSizes=[], planSizes=[], hstSizes=[];
-  const popSymbols=[], popOpacities=[];
 
   for(const p of state.rows){
-    // Default rule: if mass axis is used and CK is OFF, exclude M-R provenance (already mass-radius inferred)
-    if(!ckEnabled && massAxisUsed){
-      const prov = (p.pl_bmassprov || '').toLowerCase();
-      if(prov.includes('m-r relationship')) continue;
-    }
-
-    const x = valueForKey(p, xKey, ckEnabled);
-    const y = valueForKey(p, yKey, ckEnabled);
-    if(x==null || y==null) continue;
-
+    const x=xFn(p), y=yFn(p); if(x==null||y==null) continue;
     const variants = nameVariantsFromPlName(p.pl_name);
     const isObs = [...variants].some(v => state.jwstObserved.has(v));
     const isPlan = !isObs && [...variants].some(v => state.jwstPlanned.has(v));
@@ -536,76 +439,62 @@ function buildTraces(){
       if(metric!=null && isFinite(metric)) sizeVal = Math.max(6, Math.min(24, Math.sqrt(metric)));
     }
 
-    if(isObs){
-      obs.push({x,y,teq:p.pl_eqt, name:p.pl_name||''});
-      obsSizes.push(sizeVal);
-      if(showLabels) labelsObs.push(p.pl_name||'');
-    } else if(isPlan){
-      plan.push({x,y,teq:p.pl_eqt, name:p.pl_name||''});
-      planSizes.push(sizeVal);
-      if(showLabels) labelsPlan.push(p.pl_name||'');
-    } else if(isHST && showHST){
-      hst.push({x,y,teq:p.pl_eqt, name:p.pl_name||''});
-      hstSizes.push(sizeVal);
-      if(showLabels) labelsHst.push(p.pl_name||'');
-    } else {
-      pop.push({x,y,teq:p.pl_eqt, name:p.pl_name||''});
-      popSizes.push((useTSM||useESM)? sizeVal : 6);
-      const usedCK = usedCKForKey(p, xKey, ckEnabled) || usedCKForKey(p, yKey, ckEnabled);
-      // Use PLUS SIGN marker for CK-predicted any-axis point
-      popSymbols.push( usedCK ? 'cross' : 'circle' );
-      popOpacities.push( usedCK ? 0.85 : 0.85 );
-      if(showLabels) labelsPop.push(p.pl_name||'');
-    }
+    if(isObs){ obs.push({x,y,teq:p.pl_eqt}); obsSizes.push(sizeVal); if(showLabels) labelsObs.push(p.pl_name||''); }
+    else if(isPlan){ plan.push({x,y,teq:p.pl_eqt}); planSizes.push(sizeVal); if(showLabels) labelsPlan.push(p.pl_name||''); }
+    else if(isHST && showHST){ hst.push({x,y,teq:p.pl_eqt}); hstSizes.push(sizeVal); if(showLabels) labelsHst.push(p.pl_name||''); }
+    else { pop.push({x,y,teq:p.pl_eqt}); popSizes.push((useTSM||useESM)? sizeVal : 6); if(showLabels) labelsPop.push(p.pl_name||''); }
   }
 
   const baseType = showLabels ? 'scatter' : 'scattergl';
   const baseMode = showLabels ? 'markers+text' : 'markers';
 
   const traces = [];
-  const hoverCommon = {hovertemplate: '%{hovertext}<extra></extra>'};
-
   if(colorByTeq){
-    traces.push(Object.assign({
+    traces.push({
       name: 'Population (Teq)', type: baseType, mode: baseMode,
-      x: pop.map(d=>d.x), y: pop.map(d=>d.y), hovertext: pop.map(d=>d.name),
-      marker: { size: popSizes, opacity: popOpacities, symbol: popSymbols,
-                color: pop.map(d=>d.teq ?? NaN), colorscale:'Viridis', showscale:true, colorbar:{title:'Teq (K)'} },
-      ...(showLabels ? { text: labelsPop, textposition:'top center' } : {})
-    }, hoverCommon));
+      x: pop.map(d=>d.x), y: pop.map(d=>d.y),
+      marker: { size: popSizes, opacity:.75, color: pop.map(d=>d.teq ?? NaN), colorscale:'Viridis', showscale:true, colorbar:{title:'Teq (K)'} },
+      ...(showLabels ? { text: labelsPop, textposition:'top center' } : {}),
+      hovertemplate: '%{x}, %{y}<extra></extra>'
+    });
   } else {
-    traces.push(Object.assign({
+    traces.push({
       name: 'Population', type: baseType, mode: baseMode,
-      x: pop.map(d=>d.x), y: pop.map(d=>d.y), hovertext: pop.map(d=>d.name),
-      marker:{ size: popSizes, opacity: popOpacities, symbol: popSymbols, color:'#9CA3AF' },
-      ...(showLabels ? { text: labelsPop, textposition:'top center' } : {})
-    }, hoverCommon));
+      x: pop.map(d=>d.x), y: pop.map(d=>d.y),
+      marker:{ size: popSizes, opacity:.45, color:'#9CA3AF' },
+      ...(showLabels ? { text: labelsPop, textposition:'top center' } : {}),
+      hovertemplate: '%{x}, %{y}<extra></extra>'
+    });
   }
 
   if(showPlan){
-    traces.push(Object.assign({
+    traces.push({
       name: 'JWST – Planned', type: baseType, mode: baseMode,
-      x: plan.map(d=>d.x), y: plan.map(d=>d.y), hovertext: plan.map(d=>d.name),
+      x: plan.map(d=>d.x), y: plan.map(d=>d.y),
       marker:{ symbol:'diamond', size: (useTSM||useESM) ? planSizes : 12, opacity:.95, color:'#E69F00' },
-      ...(showLabels ? { text: labelsPlan, textposition:'top center' } : {})
-    }, hoverCommon));
+      ...(showLabels ? { text: labelsPlan, textposition:'top center' } : {}),
+      hovertemplate: '%{x}, %{y}<extra></extra>'
+    });
   }
   if(showObs){
-    traces.push(Object.assign({
+    traces.push({
       name: 'JWST – Observed', type: baseType, mode: baseMode,
-      x: obs.map(d=>d.x), y: obs.map(d=>d.y), hovertext: obs.map(d=>d.name),
+      x: obs.map(d=>d.x), y: obs.map(d=>d.y),
       marker:{ symbol:'diamond', size: (useTSM||useESM) ? obsSizes : 12, opacity:.95, color:'#9370DB' },
-      ...(showLabels ? { text: labelsObs, textposition:'top center' } : {})
-    }, hoverCommon));
+      ...(showLabels ? { text: labelsObs, textposition:'top center' } : {}),
+      hovertemplate: '%{x}, %{y}<extra></extra>'
+    });
   }
   if(showHST){
-    traces.push(Object.assign({
+    traces.push({
       name: 'HST – Atmospheric', type: baseType, mode: baseMode,
-      x: hst.map(d=>d.x), y: hst.map(d=>d.y), hovertext: hst.map(d=>d.name),
+      x: hst.map(d=>d.x), y: hst.map(d=>d.y),
       marker:{ symbol:'square', size: (useTSM||useESM) ? hstSizes : 10, opacity:.95, color:'#10B981' },
-      ...(showLabels ? { text: labelsHst, textposition:'top center' } : {})
-    }, hoverCommon));
+      ...(showLabels ? { text: labelsHst, textposition:'top center' } : {}),
+      hovertemplate: '%{x}, %{y}<extra></extra>'
+    });
   }
+
   return traces;
 }
 
@@ -613,8 +502,34 @@ function buildTraces(){
 function layoutForAxes(){
   const xKey = document.getElementById('xSelect').value;
   const yKey = document.getElementById('ySelect').value;
+  const xLog = document.getElementById('xLog').checked;
+  const yLog = document.getElementById('yLog').checked;
+
+  const xaxis = {
+    title: xKey,
+    type: xLog ? 'log' : 'linear',
+    zeroline: false,
+    exponentformat: 'E',
+    showexponent: 'all'
+  };
+  if (!xLog) { xaxis.tickformat = '.3e'; }
+
+  const yaxis = {
+    title: yKey,
+    type: yLog ? 'log' : 'linear',
+    zeroline: false,
+    exponentformat: 'E',
+    showexponent: 'all'
+  };
+  if (!yLog) { yaxis.tickformat = '.3e'; }
+
   return {
     margin:{l:60,r:10,t:18,b:50},
+    xaxis, yaxis,
+    showlegend: false
+  };
+}
+,
     xaxis:{title:xKey, type: document.getElementById('xLog').checked ? 'log' : 'linear', zeroline:false},
     yaxis:{title:yKey, type: document.getElementById('yLog').checked ? 'log' : 'linear', zeroline:false},
     showlegend: false
@@ -630,7 +545,7 @@ function refresh(){
 }
 
 function hookUI(){
-  ['xSelect','ySelect','xLog','yLog','colorTemp','showLabels','onlyTransiting','highlightJWSTObs','highlightJWSTPlan','highlightHST','useTSM','useESM','ckPredict']
+  ['xSelect','ySelect','xLog','yLog','colorTemp','showLabels','onlyTransiting','highlightJWSTObs','highlightJWSTPlan','highlightHST','useTSM','useESM']
     .forEach(id => document.getElementById(id).addEventListener('change', () => { filterRows(); refresh(); }));
   document.getElementById('applyFilters').addEventListener('click', applyFiltersAndRefresh);
   document.getElementById('clearFilters').addEventListener('click', () => clearFilters());
