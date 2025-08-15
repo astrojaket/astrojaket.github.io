@@ -647,7 +647,7 @@ function hookUI(){
       $$('.exo-filters input').forEach(i=> i.value='');
       for(const [k,[mn,mx]] of Object.entries(def)){
         const el1=document.getElementById('f-min-'+k), el2=document.getElementById('f-max-'+k);
-        if(el1) el1.value=(((mn) != null ? ((mn) : (''))); if(el2) el2.value=(((mx) != null ? ((mx) : ('')));
+        if(el1) el1.value=(mn != null ? mn : ''); if(el2) el2.value=(mx != null ? mx : '');
       }
     });
   });
