@@ -420,6 +420,7 @@ function buildTraces(){
   const useESM = document.getElementById('useESM').checked;
 
   const pop = [], obs = [], plan = [], hst = [];
+  const popNames=[], obsNames=[], planNames=[], hstNames=[];
   const labelsPop=[], labelsObs=[], labelsPlan=[], labelsHst=[];
   const popSizes=[], obsSizes=[], planSizes=[], hstSizes=[];
 
@@ -439,10 +440,10 @@ function buildTraces(){
       if(metric!=null && isFinite(metric)) sizeVal = Math.max(6, Math.min(24, Math.sqrt(metric)));
     }
 
-    if(isObs){ obs.push({x,y,teq:p.pl_eqt}); obsSizes.push(sizeVal); if(showLabels) labelsObs.push(p.pl_name||''); }
-    else if(isPlan){ plan.push({x,y,teq:p.pl_eqt}); planSizes.push(sizeVal); if(showLabels) labelsPlan.push(p.pl_name||''); }
-    else if(isHST && showHST){ hst.push({x,y,teq:p.pl_eqt}); hstSizes.push(sizeVal); if(showLabels) labelsHst.push(p.pl_name||''); }
-    else { pop.push({x,y,teq:p.pl_eqt}); popSizes.push((useTSM||useESM)? sizeVal : 6); if(showLabels) labelsPop.push(p.pl_name||''); }
+    if(isObs){ obs.push({x,y,teq:p.pl_eqt}); obsSizes.push(sizeVal); obsNames.push(p.pl_name||''); if(showLabels) labelsObs.push(p.pl_name||''); }
+    else if(isPlan){ plan.push({x,y,teq:p.pl_eqt}); planSizes.push(sizeVal); planNames.push(p.pl_name||''); if(showLabels) labelsPlan.push(p.pl_name||''); }
+    else if(isHST && showHST){ hst.push({x,y,teq:p.pl_eqt}); hstSizes.push(sizeVal); hstNames.push(p.pl_name||''); if(showLabels) labelsHst.push(p.pl_name||''); }
+    else { pop.push({x,y,teq:p.pl_eqt}); popSizes.push((useTSM||useESM)? sizeVal : 6); popNames.push(p.pl_name||''); if(showLabels) labelsPop.push(p.pl_name||''); }
   }
 
   const baseType = showLabels ? 'scatter' : 'scattergl';
@@ -454,16 +455,18 @@ function buildTraces(){
       name: 'Population (Teq)', type: baseType, mode: baseMode,
       x: pop.map(d=>d.x), y: pop.map(d=>d.y),
       marker: { size: popSizes, opacity:.75, color: pop.map(d=>d.teq ?? NaN), colorscale:'Viridis', showscale:true, colorbar:{title:'Teq (K)'} },
+      hovertext: popNames,
       ...(showLabels ? { text: labelsPop, textposition:'top center' } : {}),
-      hovertemplate: '%{x}, %{y}<extra></extra>'
+      hovertemplate: '%{hovertext}<extra></extra>'
     });
   } else {
     traces.push({
       name: 'Population', type: baseType, mode: baseMode,
       x: pop.map(d=>d.x), y: pop.map(d=>d.y),
       marker:{ size: popSizes, opacity:.45, color:'#9CA3AF' },
+      hovertext: popNames,
       ...(showLabels ? { text: labelsPop, textposition:'top center' } : {}),
-      hovertemplate: '%{x}, %{y}<extra></extra>'
+      hovertemplate: '%{hovertext}<extra></extra>'
     });
   }
 
@@ -472,8 +475,9 @@ function buildTraces(){
       name: 'JWST – Planned', type: baseType, mode: baseMode,
       x: plan.map(d=>d.x), y: plan.map(d=>d.y),
       marker:{ symbol:'diamond', size: (useTSM||useESM) ? planSizes : 12, opacity:.95, color:'#E69F00' },
+      hovertext: planNames,
       ...(showLabels ? { text: labelsPlan, textposition:'top center' } : {}),
-      hovertemplate: '%{x}, %{y}<extra></extra>'
+      hovertemplate: '%{hovertext}<extra></extra>'
     });
   }
   if(showObs){
@@ -481,8 +485,9 @@ function buildTraces(){
       name: 'JWST – Observed', type: baseType, mode: baseMode,
       x: obs.map(d=>d.x), y: obs.map(d=>d.y),
       marker:{ symbol:'diamond', size: (useTSM||useESM) ? obsSizes : 12, opacity:.95, color:'#9370DB' },
+      hovertext: obsNames,
       ...(showLabels ? { text: labelsObs, textposition:'top center' } : {}),
-      hovertemplate: '%{x}, %{y}<extra></extra>'
+      hovertemplate: '%{hovertext}<extra></extra>'
     });
   }
   if(showHST){
@@ -490,8 +495,9 @@ function buildTraces(){
       name: 'HST – Atmospheric', type: baseType, mode: baseMode,
       x: hst.map(d=>d.x), y: hst.map(d=>d.y),
       marker:{ symbol:'square', size: (useTSM||useESM) ? hstSizes : 10, opacity:.95, color:'#10B981' },
+      hovertext: hstNames,
       ...(showLabels ? { text: labelsHst, textposition:'top center' } : {}),
-      hovertemplate: '%{x}, %{y}<extra></extra>'
+      hovertemplate: '%{hovertext}<extra></extra>'
     });
   }
 
@@ -501,10 +507,12 @@ function buildTraces(){
 function layoutForAxes(){
   const xKey = document.getElementById('xSelect').value;
   const yKey = document.getElementById('ySelect').value;
+  const xIsLog = document.getElementById('xLog').checked;
+  const yIsLog = document.getElementById('yLog').checked;
   return {
     margin:{l:60,r:10,t:18,b:50},
-    xaxis:{title:xKey, type: document.getElementById('xLog').checked ? 'log' : 'linear', zeroline:false},
-    yaxis:{title:yKey, type: document.getElementById('yLog').checked ? 'log' : 'linear', zeroline:false},
+    xaxis:{title:xKey, type: xIsLog ? 'log' : 'linear', zeroline:false, exponentformat:'E', showexponent:'all', tickformat: xIsLog ? undefined : '.3e'},
+    yaxis:{title:yKey, type: yIsLog ? 'log' : 'linear', zeroline:false, exponentformat:'E', showexponent:'all', tickformat: yIsLog ? undefined : '.3e'},
     showlegend: false
   };
 }
