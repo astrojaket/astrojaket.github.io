@@ -22,6 +22,7 @@ permalink: /exoplanets
           <label class="exo-check"><input id="colorTemp" type="checkbox"/> Color by Teq (K)</label>
           <label class="exo-check"><input id="showLabels" type="checkbox"/> Show labels (all)</label>
           <label class="exo-check"><input id="onlyTransiting" type="checkbox"/> Only transiting</label>
+          <label class="exo-check"><input id="ckPredict" type="checkbox"/> Use Chen &amp; Kipping (2017) mass when missing</label>
         </div>
       </div>
 
@@ -102,7 +103,7 @@ permalink: /exoplanets
         <a href="https://www.stsci.edu/~WFC3/trexolists/trexolists.html" target="_blank" rel="noopener">TrExoLiSTS – HST</a>.<br/>
         TSM (transmission) & ESM (emission) per Kempton+2018. When enabled, marker size ∝ √metric (clamped).<br/>
         Threshold guide: TSM &gt; 10 (R&lt;1.5R⊕), TSM &gt; 90 (1.5–10R⊕), ESM &gt; 7.5 (terrestrial).<br/>
-        If TSM/ESM sizing is ON, JWST/HST points follow the metric size (no extra ×2).
+        If TSM/ESM sizing is ON, JWST/HST points follow the metric size (no extra ×2).<br/>Mass estimates via Chen &amp; Kipping (2017) Forecaster centerline are used only when enabled and when measured mass is missing; no estimate is provided in the degenerate radius band 11.1–14.3 R⊕.
       </div>
     </aside>
   </div>
@@ -112,6 +113,7 @@ permalink: /exoplanets
     <aside class="exo-card">
       <h3>Legend</h3>
       <ul class="exo-legend">
+        <li><span class="dot" style="border:2px solid #9CA3AF; background:transparent;"></span> Population w/ CK17 mass (open)</li>
         <li><span class="dot pop"></span> Population</li>
         <li><span class="dot jwstobs diamond"></span> JWST – Observed (diamond)</li>
         <li><span class="dot jwstplan diamond"></span> JWST – Planned (diamond)</li>
@@ -210,6 +212,94 @@ const PRESETS = {
 // ---------------------------
 // Utilities
 // ---------------------------
+// ---------------------------
+// CK17 mass-from-radius (Forecaster centerline)
+// ---------------------------
+const EARTH_TO_JUP_MASS = 1/317.83;
+const JUP_TO_EARTH_MASS = 317.83;
+const RJ_TO_RE = 11.209;
+
+function ckMassFromRadius_Re(radius_Re){
+  const R = +radius_Re;
+  if(!isFinite(R) || R<=0) return null;
+  // Degeneracy band where inverse is non-unique
+  if(R >= 11.1 && R <= 14.3) return null;
+  const logR = Math.log10(R);
+  let C, S;
+  if(R < 1.23){ C = 0.00346; S = 0.2790; }        // Terran
+  else if(R < 11.1){ C = -0.0925; S = 0.589; }    // Neptunian
+  else { C = -2.85; S = 0.881; }                  // Jovian (R >= 14.3)
+  const logM = (logR - C)/S;
+  const Mearth = Math.pow(10, logM);
+  return (isFinite(Mearth) && Mearth>0) ? Mearth : null;
+}
+function ckMassFromRadius_Rj(radius_Rj){
+  const Rj = +radius_Rj;
+  if(!isFinite(Rj) || Rj<=0) return null;
+  const Re = Rj * RJ_TO_RE;
+  const Mearth = ckMassFromRadius_Re(Re);
+  return (Mearth==null) ? null : Mearth * EARTH_TO_JUP_MASS;
+}
+
+// Unified getters that prefer measured mass; fall back to CK17 if enabled
+function getMassJ(p, ckEnabled){
+  // measured first (MJ or M⊕→MJ)
+  let mj = (p.pl_bmassj!=null && isFinite(+p.pl_bmassj)) ? +p.pl_bmassj :
+           (p.pl_bmasse!=null && isFinite(+p.pl_bmasse)) ? (+p.pl_bmasse)*EARTH_TO_JUP_MASS : null;
+  let usedCK = false;
+  if(mj==null && ckEnabled){
+    // prefer radius in R⊕ if available
+    if(p.pl_rade!=null && isFinite(+p.pl_rade)){
+      const mE = ckMassFromRadius_Re(+p.pl_rade);
+      if(mE!=null){ mj = mE*EARTH_TO_JUP_MASS; usedCK = true; }
+    }else if(p.pl_radj!=null && isFinite(+p.pl_radj)){
+      const mJ = ckMassFromRadius_Rj(+p.pl_radj);
+      if(mJ!=null){ mj = mJ; usedCK = true; }
+    }
+  }
+  return {value: (isFinite(mj)? mj : null), usedCK};
+}
+function getMassE(p, ckEnabled){
+  // measured first (M⊕ or MJ→M⊕)
+  let me = (p.pl_bmasse!=null && isFinite(+p.pl_bmasse)) ? +p.pl_bmasse :
+           (p.pl_bmassj!=null && isFinite(+p.pl_bmassj)) ? (+p.pl_bmassj)*JUP_TO_EARTH_MASS : null;
+  let usedCK = false;
+  if(me==null && ckEnabled){
+    if(p.pl_rade!=null && isFinite(+p.pl_rade)){
+      const mE = ckMassFromRadius_Re(+p.pl_rade);
+      if(mE!=null){ me = mE; usedCK = true; }
+    }else if(p.pl_radj!=null && isFinite(+p.pl_radj)){
+      const mJ = ckMassFromRadius_Rj(+p.pl_radj);
+      if(mJ!=null){ me = mJ*JUP_TO_EARTH_MASS; usedCK = true; }
+    }
+  }
+  return {value: (isFinite(me)? me : null), usedCK};
+}
+
+// Wrapper to supply axis values with CK fallback
+function valueForKey(p, key, ckEnabled){
+  switch(key){
+    case 'Best Planet Mass (M_J)': {
+      const {value} = getMassJ(p, ckEnabled);
+      return value;
+    }
+    case 'Best Planet Mass (M_⊕)': {
+      const {value} = getMassE(p, ckEnabled);
+      return value;
+    }
+    default: return PARAMS[key](p);
+  }
+}
+// Check if CK was used for the given axis
+function usedCKForKey(p, key, ckEnabled){
+  if(!ckEnabled) return false;
+  switch(key){
+    case 'Best Planet Mass (M_J)': return getMassJ(p, true).usedCK;
+    case 'Best Planet Mass (M_⊕)': return getMassE(p, true).usedCK;
+    default: return false;
+  }
+}
+
 const $ = sel => document.querySelector(sel);
 const $$ = sel => Array.from(document.querySelectorAll(sel));
 const num = v => (v==null || v==='' ? null : (isFinite(+v)? +v : null));
@@ -407,10 +497,10 @@ function filterRows(){
   });
 }
 
+
 function buildTraces(){
   const xKey = document.getElementById('xSelect').value;
   const yKey = document.getElementById('ySelect').value;
-  const xFn = PARAMS[xKey], yFn = PARAMS[yKey];
   const colorByTeq = document.getElementById('colorTemp').checked;
   const showObs = document.getElementById('highlightJWSTObs').checked;
   const showPlan = document.getElementById('highlightJWSTPlan').checked;
@@ -418,13 +508,18 @@ function buildTraces(){
   const showLabels = document.getElementById('showLabels').checked;
   const useTSM = document.getElementById('useTSM').checked;
   const useESM = document.getElementById('useESM').checked;
+  const ckEnabled = document.getElementById('ckPredict').checked;
 
   const pop = [], obs = [], plan = [], hst = [];
   const labelsPop=[], labelsObs=[], labelsPlan=[], labelsHst=[];
   const popSizes=[], obsSizes=[], planSizes=[], hstSizes=[];
+  const popSymbols=[], popOpacities=[];
 
   for(const p of state.rows){
-    const x=xFn(p), y=yFn(p); if(x==null||y==null) continue;
+    const x = valueForKey(p, xKey, ckEnabled);
+    const y = valueForKey(p, yKey, ckEnabled);
+    if(x==null || y==null) continue;
+
     const variants = nameVariantsFromPlName(p.pl_name);
     const isObs = [...variants].some(v => state.jwstObserved.has(v));
     const isPlan = !isObs && [...variants].some(v => state.jwstPlanned.has(v));
@@ -439,10 +534,26 @@ function buildTraces(){
       if(metric!=null && isFinite(metric)) sizeVal = Math.max(6, Math.min(24, Math.sqrt(metric)));
     }
 
-    if(isObs){ obs.push({x,y,teq:p.pl_eqt}); obsSizes.push(sizeVal); if(showLabels) labelsObs.push(p.pl_name||''); }
-    else if(isPlan){ plan.push({x,y,teq:p.pl_eqt}); planSizes.push(sizeVal); if(showLabels) labelsPlan.push(p.pl_name||''); }
-    else if(isHST && showHST){ hst.push({x,y,teq:p.pl_eqt}); hstSizes.push(sizeVal); if(showLabels) labelsHst.push(p.pl_name||''); }
-    else { pop.push({x,y,teq:p.pl_eqt}); popSizes.push((useTSM||useESM)? sizeVal : 6); if(showLabels) labelsPop.push(p.pl_name||''); }
+    if(isObs){
+      obs.push({x,y,teq:p.pl_eqt});
+      obsSizes.push(sizeVal);
+      if(showLabels) labelsObs.push(p.pl_name||'');
+    } else if(isPlan){
+      plan.push({x,y,teq:p.pl_eqt});
+      planSizes.push(sizeVal);
+      if(showLabels) labelsPlan.push(p.pl_name||'');
+    } else if(isHST && showHST){
+      hst.push({x,y,teq:p.pl_eqt});
+      hstSizes.push(sizeVal);
+      if(showLabels) labelsHst.push(p.pl_name||'');
+    } else {
+      pop.push({x,y,teq:p.pl_eqt});
+      popSizes.push((useTSM||useESM)? sizeVal : 6);
+      const usedCK = usedCKForKey(p, xKey, ckEnabled) || usedCKForKey(p, yKey, ckEnabled);
+      popSymbols.push( usedCK ? 'circle-open' : 'circle' );
+      popOpacities.push( usedCK ? 0.65 : 0.8 );
+      if(showLabels) labelsPop.push(p.pl_name||'');
+    }
   }
 
   const baseType = showLabels ? 'scatter' : 'scattergl';
@@ -453,7 +564,8 @@ function buildTraces(){
     traces.push({
       name: 'Population (Teq)', type: baseType, mode: baseMode,
       x: pop.map(d=>d.x), y: pop.map(d=>d.y),
-      marker: { size: popSizes, opacity:.75, color: pop.map(d=>d.teq ?? NaN), colorscale:'Viridis', showscale:true, colorbar:{title:'Teq (K)'} },
+      marker: { size: popSizes, opacity: popOpacities, symbol: popSymbols,
+                color: pop.map(d=>d.teq ?? NaN), colorscale:'Viridis', showscale:true, colorbar:{title:'Teq (K)'} },
       ...(showLabels ? { text: labelsPop, textposition:'top center' } : {}),
       hovertemplate: '%{x}, %{y}<extra></extra>'
     });
@@ -461,7 +573,7 @@ function buildTraces(){
     traces.push({
       name: 'Population', type: baseType, mode: baseMode,
       x: pop.map(d=>d.x), y: pop.map(d=>d.y),
-      marker:{ size: popSizes, opacity:.45, color:'#9CA3AF' },
+      marker:{ size: popSizes, opacity: popOpacities, symbol: popSymbols, color:'#9CA3AF' },
       ...(showLabels ? { text: labelsPop, textposition:'top center' } : {}),
       hovertemplate: '%{x}, %{y}<extra></extra>'
     });
@@ -494,9 +606,9 @@ function buildTraces(){
       hovertemplate: '%{x}, %{y}<extra></extra>'
     });
   }
-
   return traces;
 }
+
 
 function layoutForAxes(){
   const xKey = document.getElementById('xSelect').value;
@@ -518,7 +630,7 @@ function refresh(){
 }
 
 function hookUI(){
-  ['xSelect','ySelect','xLog','yLog','colorTemp','showLabels','onlyTransiting','highlightJWSTObs','highlightJWSTPlan','highlightHST','useTSM','useESM']
+  ['xSelect','ySelect','xLog','yLog','colorTemp','showLabels','onlyTransiting','highlightJWSTObs','highlightJWSTPlan','highlightHST','useTSM','useESM','ckPredict']
     .forEach(id => document.getElementById(id).addEventListener('change', () => { filterRows(); refresh(); }));
   document.getElementById('applyFilters').addEventListener('click', applyFiltersAndRefresh);
   document.getElementById('clearFilters').addEventListener('click', () => clearFilters());
