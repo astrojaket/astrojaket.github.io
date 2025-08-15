@@ -22,6 +22,7 @@ permalink: /exoplanets
           <label class="exo-check"><input id="colorTemp" type="checkbox"/> Color by Teq (K)</label>
           <label class="exo-check"><input id="showLabels" type="checkbox"/> Show labels (all)</label>
           <label class="exo-check"><input id="onlyTransiting" type="checkbox"/> Only transiting</label>
+          <label class="exo-check"><input id="ckPredict" type="checkbox"> Use Chen &amp; Kipping (2017) mass when missing</label>
         </div>
       </div>
 
@@ -282,8 +283,8 @@ async function loadJWST(){
     const obs = new Set(), plan = new Set();
     const PLANNED = new Set(['Scheduled','Implementation','Flight Ready','Inactive','On Hold','On Hold (Inactive)']);
     for(const r of rows){
-      const host = r.hostname_nn ?? r['Star   name'] ?? r['Star name'] ?? r['Star'];
-      const letter = r.letter_nn ?? r['Planet   letter'] ?? r['Planet letter'] ?? r['Planet'];
+      const host = r.hostname_nn != null ? r['Star   name'] != null ? r['Star name'] != null ? r['Star'];
+      const letter = r.letter_nn != null ? r['Planet   letter'] != null ? r['Planet letter'] != null ? r['Planet'];
       const status = (r.Status || '').trim();
       if(!host || !letter) continue;
       const keys = keyVariants(host, letter);
@@ -453,7 +454,7 @@ function buildTraces(){
     traces.push({
       name: 'Population (Teq)', type: baseType, mode: baseMode,
       x: pop.map(d=>d.x), y: pop.map(d=>d.y),
-      marker: { size: popSizes, opacity:.75, color: pop.map(d=>d.teq ?? NaN), colorscale:'Viridis', showscale:true, colorbar:{title:'Teq (K)'} },
+      marker: { size: popSizes, opacity:.75, color: pop.map(d=>d.teq != null ? NaN), colorscale:'Viridis', showscale:true, colorbar:{title:'Teq (K)'} },
       ...(showLabels ? { text: labelsPop, textposition:'top center' } : {}),
       hovertemplate: '%{x}, %{y}<extra></extra>'
     });
@@ -498,23 +499,27 @@ function buildTraces(){
   return traces;
 }
 
-
 function layoutForAxes(){
-  const xKey = document.getElementById('xSelect').value;
-  const yKey = document.getElementById('ySelect').value;
-  const xIsLog = document.getElementById('xLog').checked;
-  const yIsLog = document.getElementById('yLog').checked;
-  const xaxis = { title: xKey, type: xIsLog ? 'log' : 'linear', zeroline:false, exponentformat:'E', showexponent:'all' };
-  const yaxis = { title: yKey, type: yIsLog ? 'log' : 'linear', zeroline:false, exponentformat:'E', showexponent:'all' };
-  if(!xIsLog) xaxis.tickformat = '.3e';
-  if(!yIsLog) yaxis.tickformat = '.3e';
+  var xKey = document.getElementById('xSelect').value;
+  var yKey = document.getElementById('ySelect').value;
+  var xIsLog = document.getElementById('xLog').checked;
+  var yIsLog = document.getElementById('yLog').checked;
+  var xaxis = { title: xKey, type: xIsLog ? 'log' : 'linear', zeroline:false, exponentformat:'E', showexponent:'all' };
+  var yaxis = { title: yKey, type: yIsLog ? 'log' : 'linear', zeroline:false, exponentformat:'E', showexponent:'all' };
+  if (!xIsLog) xaxis.tickformat = '.3e';
+  if (!yIsLog) yaxis.tickformat = '.3e';
   return {
     margin:{l:60,r:10,t:18,b:50},
-    xaxis, yaxis,
+    xaxis:xaxis,
+    yaxis:yaxis,
+    showlegend:false
+  };
+},
+    xaxis:{title:xKey, type: document.getElementById('xLog').checked ? 'log' : 'linear', zeroline:false},
+    yaxis:{title:yKey, type: document.getElementById('yLog').checked ? 'log' : 'linear', zeroline:false},
     showlegend: false
   };
 }
-    
 
 function refresh(){
   const traces = buildTraces();
@@ -525,7 +530,7 @@ function refresh(){
 }
 
 function hookUI(){
-  ['xSelect','ySelect','xLog','yLog','colorTemp','showLabels','onlyTransiting','highlightJWSTObs','highlightJWSTPlan','highlightHST','useTSM','useESM']
+  ['xSelect','ySelect','xLog','yLog','colorTemp','showLabels','onlyTransiting','highlightJWSTObs','highlightJWSTPlan','highlightHST','useTSM','useESM','ckPredict']
     .forEach(id => document.getElementById(id).addEventListener('change', () => { filterRows(); refresh(); }));
   document.getElementById('applyFilters').addEventListener('click', applyFiltersAndRefresh);
   document.getElementById('clearFilters').addEventListener('click', () => clearFilters());
@@ -536,7 +541,7 @@ function hookUI(){
       $$('.exo-filters input').forEach(i=> i.value='');
       for(const [k,[mn,mx]] of Object.entries(def)){
         const el1=document.getElementById('f-min-'+k), el2=document.getElementById('f-max-'+k);
-        if(el1) el1.value=(mn??''); if(el2) el2.value=(mx??'');
+        if(el1) el1.value=(mn!= null ?''); if(el2) el2.value=(mx!= null ?'');
       }
     });
   });
