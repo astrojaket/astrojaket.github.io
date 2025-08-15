@@ -502,39 +502,19 @@ function buildTraces(){
 function layoutForAxes(){
   const xKey = document.getElementById('xSelect').value;
   const yKey = document.getElementById('ySelect').value;
-  const xLog = document.getElementById('xLog').checked;
-  const yLog = document.getElementById('yLog').checked;
-
-  const xaxis = {
-    title: xKey,
-    type: xLog ? 'log' : 'linear',
-    zeroline: false,
-    exponentformat: 'E',
-    showexponent: 'all'
-  };
-  if (!xLog) { xaxis.tickformat = '.3e'; }
-
-  const yaxis = {
-    title: yKey,
-    type: yLog ? 'log' : 'linear',
-    zeroline: false,
-    exponentformat: 'E',
-    showexponent: 'all'
-  };
-  if (!yLog) { yaxis.tickformat = '.3e'; }
-
+  const xIsLog = document.getElementById('xLog').checked;
+  const yIsLog = document.getElementById('yLog').checked;
+  const xaxis = { title: xKey, type: xIsLog ? 'log' : 'linear', zeroline:false, exponentformat:'E', showexponent:'all' };
+  const yaxis = { title: yKey, type: yIsLog ? 'log' : 'linear', zeroline:false, exponentformat:'E', showexponent:'all' };
+  if(!xIsLog) xaxis.tickformat = '.3e';
+  if(!yIsLog) yaxis.tickformat = '.3e';
   return {
     margin:{l:60,r:10,t:18,b:50},
     xaxis, yaxis,
     showlegend: false
   };
 }
-,
-    xaxis:{title:xKey, type: document.getElementById('xLog').checked ? 'log' : 'linear', zeroline:false},
-    yaxis:{title:yKey, type: document.getElementById('yLog').checked ? 'log' : 'linear', zeroline:false},
-    showlegend: false
-  };
-}
+    
 
 function refresh(){
   const traces = buildTraces();
