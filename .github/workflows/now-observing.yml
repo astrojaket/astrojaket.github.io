@@ -1,0 +1,31 @@
+# .github/workflows/now-observing.yml
+name: Update Now Observing (JWST exoplanets)
+
+on:
+  schedule:
+    - cron: "17 * * * *"   # hourly at :17
+  workflow_dispatch: {}
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Fetch JWST exoplanets (last 24h, tiny slices)
+        run: |
+          python -u tools/fetch_mast_24h.py \
+            --slice-hours 0.5 \
+            --pagesize 60 \
+            --timeout 300 \
+            --retries 8 \
+            --instruments "NIRCam,NIRSpec,NIRISS,MIRI"
+      - name: Commit JSON
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add assets/data/mast_24h.json
+          git commit -m "chore: refresh mast_24h.json (JWST exoplanets)" || echo "No changes"
+          git push
