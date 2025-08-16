@@ -6,23 +6,27 @@ permalink: /now-observing/
 <link rel="preconnect" href="https://mast.stsci.edu">
 <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
 <style>
+  :root { --mp: MediumPurple; --bg:#120c22; --card:#1b1330; --border:#3b2d66; --ink:#eee; --muted:#c9c9d9; }
   .section { margin: 1.2rem 0; }
   .row { display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-start; }
-  .card { flex: 1 1 380px; background: #1b1330; border: 1px solid #3b2d66; border-radius: 16px; padding: 14px; color: #eee; }
-  h1, h2, h3 { color: MediumPurple; margin: .2rem 0 .6rem; }
-  .pill { display:inline-block; padding:.2rem .5rem; border-radius:999px; font-size:.8rem; border:1px solid #4b3b80; background:#2a2048; color:#d9cdfd; }
-  .loading { opacity:.75; font-style: italic; }
+  .card { flex: 1 1 420px; background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 14px; color: var(--ink); }
+  h1, h2, h3 { color: var(--mp); margin: .2rem 0 .6rem; }
+  .pill { display:inline-block; padding:.2rem .5rem; border-radius:999px; font-size:.8rem; border:1px solid var(--border); background:#2a2048; color:#d9cdfd; }
+  .loading { opacity:.8; font-style: italic; }
   table { width:100%; border-collapse: collapse; }
-  th, td { padding: .45rem .5rem; border-bottom: 1px solid #3b2d66; }
+  th, td { padding: .45rem .5rem; border-bottom: 1px solid var(--border); }
   th { text-align:left; color:#d9cdfd; }
-  .small { font-size: .9rem; color:#c9c9d9; }
+  .small { font-size: .9rem; color: var(--muted); }
   .stamp { color:#bbb; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
   .btn { background:#3b2d66; color:#fff; border:1px solid #5a45a8; padding:.35rem .6rem; border-radius:8px; cursor:pointer; }
   .btn:disabled { opacity:.5; cursor:not-allowed; }
   .legend { font-size:.95rem; line-height:1.35; }
+  .err { color:#ffb4b4; }
 </style>
-<h1>“Now Observing” — JWST · HST · Ground</h1>
-<p class="small">Shows observations overlapping the current time (±3 hours) using the MAST API for JWST & HST. Ground-based feeds can be added below.</p>
+
+<h1>Now Observing — JWST & HST</h1>
+<p class="small">Live snapshot of observations overlapping the current time (±3 hours), via the MAST Mashup API.</p>
+
 <div class="row">
   <div class="card" style="max-width: 860px;">
     <h2>Live Timeline</h2>
@@ -36,12 +40,13 @@ permalink: /now-observing/
       <button id="refreshBtn" class="btn">Refresh now</button>
     </div>
     <div class="legend">
-      <div><span class="pill">JWST</span> &nbsp; <span class="small">From MAST Observations (CAOM)</span></div>
-      <div><span class="pill">HST</span> &nbsp; <span class="small">From MAST Observations (CAOM)</span></div>
-      <div class="small" style="margin-top:.5rem;">Axis shows UTC time within the ±3h window; each bar spans an observation’s <code>t_min → t_max</code>.</div>
+      <div><span class="pill">JWST</span> &nbsp; <span class="small">MAST (CAOM)</span></div>
+      <div><span class="pill">HST</span> &nbsp; <span class="small">MAST (CAOM)</span></div>
+      <div class="small" style="margin-top:.5rem;">Each bar spans an observation’s <code>t_min → t_max</code> in UTC within the ±3h window.</div>
     </div>
   </div>
 </div>
+
 <div class="row">
   <div class="card">
     <h2>Currently Observing — JWST</h2>
@@ -64,46 +69,38 @@ permalink: /now-observing/
     </table>
   </div>
 </div>
-<div class="section card">
-  <h2>Ground-based (beta)</h2>
-  <p class="small">Many observatories publish schedules in HTML/PDF without open CORS APIs. For a static site, add a JSON feed (example below) to <code>/assets/data/ground_now.json</code> and we’ll render it here.</p>
-  <pre class="small" style="white-space: pre-wrap; border:1px solid #3b2d66; border-radius:8px; padding:.6rem; background:#120c22;">
-[
-  {"facility":"ESO VLT UT1","start_utc":"2025-08-16T19:00:00Z","end_utc":"2025-08-16T23:59:00Z","target":"NGC 1068","instrument":"MUSE","program":"0104.B-XXXX"},
-  {"facility":"Gemini North","start_utc":"2025-08-16T06:15:00Z","end_utc":"2025-08-16T12:30:00Z","target":"WASP-43","instrument":"GMOS-N","program":"GN-2025B-Q-101"}
-]</pre>
-  <div id="groundStatus" class="loading">Looking for <code>/assets/data/ground_now.json</code>…</div>
-  <table id="groundTbl" style="display:none;">
-    <thead><tr><th>Facility</th><th>Start</th><th>End</th><th>Target</th><th>Instrument</th><th>Program</th></tr></thead>
-    <tbody></tbody>
-  </table>
-</div>
+
 <div class="section small">
-  <h3>Notes & Sources</h3>
+  <h3>Notes</h3>
   <ul>
-    <li>Data via the <strong>MAST Mashup API</strong> (<code>Mast.Caom.Filtered</code>) with filters on <code>obs_collection</code> and MJD time bounds <code>t_min</code>/<code>t_max</code>. See docs: MAST API Tutorial and CAOM fields.</li>
-    <li>“Currently observing” is approximated as observations where <code>t_min ≤ now ≤ t_max</code>. This reflects the observation block timing at the archive level, not sub-exposure status.</li>
-    <li>Ground-based schedules vary; if you can provide an open JSON or ICS, we will render it automatically. Otherwise a small GitHub Action can scrape and write <code>ground_now.json</code>.</li>
+    <li>Data: <code>Mast.Caom.Filtered</code> with filters on <code>obs_collection</code> and MJD bounds <code>t_min</code>, <code>t_max</code>.</li>
+    <li>“Currently” ≈ observations where <code>t_min ≤ now ≤ t_max</code> (archive block timing).</li>
   </ul>
   <div class="small">Last updated: <span id="stamp" class="stamp"></span></div>
 </div>
+
 <script>
 (function(){
-  const API = 'https://mast.stsci.edu/api/v0/invoke';
-  const HRS = 3;
+  const API = 'https://mast.stsci.edu/api/v0/invoke'; // CORS-enabled
+  const HRS = 3; // +/- window hours
+
   function toMJD(d){ return (d.getTime()/86400000) + 40587.0; }
   function toISO(d){ return d.toISOString().replace('.000','').replace('Z','Z'); }
   function fromMJD(mjd){ return new Date((mjd - 40587.0) * 86400000); }
+
   function setWindowText(center){
     const a = new Date(center.getTime() - HRS*3600*1000);
     const b = new Date(center.getTime() + HRS*3600*1000);
     document.getElementById('winText').textContent = toISO(a) + ' … ' + toISO(b);
     document.getElementById('stamp').textContent = toISO(new Date());
   }
+
   async function mastFiltered(collection, mjdNow, plusHours){
+    // anything with t_min <= now and t_max >= now (allow a small look-ahead to catch program edges)
     const max1 = mjdNow;
     const min2 = mjdNow;
     const max2 = mjdNow + (plusHours/24.0);
+
     const request = {
       "service":"Mast.Caom.Filtered",
       "format":"json",
@@ -118,14 +115,19 @@ permalink: /now-observing/
       "pagesize": 2000,
       "page": 1
     };
+
     const body = "request=" + encodeURIComponent(JSON.stringify(request));
-    const resp = await fetch(API, { method: "POST",
-      headers: {"Content-Type":"application/x-www-form-urlencoded;charset=UTF-8", "Accept":"application/json"}, body });
+    const resp = await fetch(API, {
+      method: "POST",
+      headers: {"Content-Type":"application/x-www-form-urlencoded;charset=UTF-8", "Accept":"application/json"},
+      body
+    });
     if(!resp.ok) throw new Error(collection + " fetch failed " + resp.status);
     const data = await resp.json();
     if(data.status !== "COMPLETE") throw new Error(collection + " status " + data.status);
     return data.data || [];
   }
+
   function fillTable(tblId, statusId, rows){
     const tbl = document.getElementById(tblId);
     const status = document.getElementById(statusId);
@@ -134,13 +136,14 @@ permalink: /now-observing/
     rows.sort((a,b)=>a.t_min - b.t_min).forEach(r=>{
       const tr = document.createElement('tr');
       const t0 = fromMJD(r.t_min), t1 = fromMJD(r.t_max);
-      tr.innerHTML = `<td>${toISO(t0)}</td><td>${toISO(t1)}</td><td>${r.target_name||''}</td><td>${r.instrument_name||''}</td><td>${r.proposal_id||''}</td>`;
+      tr.innerHTML = '<td>'+toISO(t0)+'</td><td>'+toISO(t1)+'</td><td>'+(r.target_name||'')+'</td><td>'+(r.instrument_name||'')+'</td><td>'+(r.proposal_id||'')+'</td>';
       tb.appendChild(tr);
     });
     status.style.display='none';
     tbl.style.display = rows.length ? 'table' : 'none';
     if(!rows.length){ status.textContent = 'No observations in this window.'; status.style.display='block'; }
   }
+
   function drawTimeline(jwst, hst, center){
     function toBar(arr,label,color){
       return (arr||[]).map(function(r){
@@ -156,6 +159,7 @@ permalink: /now-observing/
       {displaylogo:false, responsive:true});
     document.getElementById('summary').textContent = (jwst.length + " JWST · " + hst.length + " HST observations overlapping now");
   }
+
   async function loadAll(){
     const now = new Date();
     setWindowText(now);
@@ -171,30 +175,8 @@ permalink: /now-observing/
       document.getElementById('jwstStatus').textContent = 'Error: ' + err.message;
       document.getElementById('hstStatus').textContent = 'Error: ' + err.message;
     }
-    try{
-      const r = await fetch('/assets/data/ground_now.json', {cache:'no-store'});
-      if(r.ok){
-        const rows = await r.json();
-        const tb = document.querySelector('#groundTbl tbody');
-        tb.innerHTML='';
-        (rows||[]).forEach(function(g){
-          const tr = document.createElement('tr');
-          tr.innerHTML = `<td>${g.facility||''}</td><td>${g.start_utc||''}</td><td>${g.end_utc||''}</td><td>${g.target||''}</td><td>${g.instrument||''}</td><td>${g.program||''}</td>`;
-          tb.appendChild(tr);
-        });
-        document.getElementById('groundStatus').style.display='none';
-        document.getElementById('groundTbl').style.display = (rows && rows.length) ? 'table' : 'none';
-        if(!rows || !rows.length){
-          document.getElementById('groundStatus').textContent = 'No ground JSON found or list is empty.';
-          document.getElementById('groundStatus').style.display='block';
-        }
-      } else {
-        document.getElementById('groundStatus').textContent = 'No ground JSON found (optional).';
-      }
-    }catch(e){
-      document.getElementById('groundStatus').textContent = 'Ground feed error: ' + e.message;
-    }
   }
+
   document.getElementById('refreshBtn').addEventListener('click', loadAll);
   loadAll();
 })();
