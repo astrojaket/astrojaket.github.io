@@ -1,6 +1,6 @@
 ---
 layout: page
-title: Now Observing
+title: Now Observing (Last 24 Hours)
 permalink: /now-observing/
 ---
 <link rel="preconnect" href="https://mast.stsci.edu">
@@ -24,12 +24,12 @@ permalink: /now-observing/
   .err { color:#ffb4b4; }
 </style>
 
-<h1>Now Observing — JWST & HST</h1>
-<p class="small">Live snapshot of observations overlapping the current time (±3 hours), via the MAST Mashup API.</p>
+<h1>Now Observing — JWST & HST (Last 24 Hours)</h1>
+<p class="small">Shows observations whose time ranges intersect the last 24 hours, via the MAST Mashup API.</p>
 
 <div class="row">
   <div class="card" style="max-width: 860px;">
-    <h2>Live Timeline</h2>
+    <h2>Timeline (UTC)</h2>
     <div id="timeline" style="height: 320px;"></div>
     <div id="summary" class="small"></div>
   </div>
@@ -37,19 +37,19 @@ permalink: /now-observing/
     <h2>Controls</h2>
     <div class="small">Window: <span id="winText"></span></div>
     <div style="margin:.4rem 0;">
-      <button id="refreshBtn" class="btn">Refresh now</button>
+      <button id="refreshBtn" class="btn">Refresh</button>
     </div>
     <div class="legend">
       <div><span class="pill">JWST</span> &nbsp; <span class="small">MAST (CAOM)</span></div>
       <div><span class="pill">HST</span> &nbsp; <span class="small">MAST (CAOM)</span></div>
-      <div class="small" style="margin-top:.5rem;">Each bar spans an observation’s <code>t_min → t_max</code> in UTC within the ±3h window.</div>
+      <div class="small" style="margin-top:.5rem;">Bars span each observation’s <code>t_min → t_max</code> where it intersects the 24h window.</div>
     </div>
   </div>
 </div>
 
 <div class="row">
   <div class="card">
-    <h2>Currently Observing — JWST</h2>
+    <h2>Observations — JWST</h2>
     <div id="jwstStatus" class="loading">Loading…</div>
     <table id="jwstTbl" style="display:none;">
       <thead><tr>
@@ -59,7 +59,7 @@ permalink: /now-observing/
     </table>
   </div>
   <div class="card">
-    <h2>Currently Observing — HST</h2>
+    <h2>Observations — HST</h2>
     <div id="hstStatus" class="loading">Loading…</div>
     <table id="hstTbl" style="display:none;">
       <thead><tr>
@@ -73,34 +73,28 @@ permalink: /now-observing/
 <div class="section small">
   <h3>Notes</h3>
   <ul>
-    <li>Data: <code>Mast.Caom.Filtered</code> with filters on <code>obs_collection</code> and MJD bounds <code>t_min</code>, <code>t_max</code>.</li>
-    <li>“Currently” ≈ observations where <code>t_min ≤ now ≤ t_max</code> (archive block timing).</li>
+    <li>Query window: <code>now - 24h</code> to <code>now</code>.</li>
+    <li>Filter logic: include rows where <code>t_min ≤ window_end</code> and <code>t_max ≥ window_start</code>.</li>
   </ul>
   <div class="small">Last updated: <span id="stamp" class="stamp"></span></div>
 </div>
 
 <script>
 (function(){
-  const API = 'https://mast.stsci.edu/api/v0/invoke'; // CORS-enabled
-  const HRS = 3; // +/- window hours
+  const API = 'https://mast.stsci.edu/api/v0/invoke';
+  const HOURS = 24; // last 24 hours
 
   function toMJD(d){ return (d.getTime()/86400000) + 40587.0; }
   function toISO(d){ return d.toISOString().replace('.000','').replace('Z','Z'); }
   function fromMJD(mjd){ return new Date((mjd - 40587.0) * 86400000); }
 
-  function setWindowText(center){
-    const a = new Date(center.getTime() - HRS*3600*1000);
-    const b = new Date(center.getTime() + HRS*3600*1000);
-    document.getElementById('winText').textContent = toISO(a) + ' … ' + toISO(b);
+  function setWindowText(start, end){
+    document.getElementById('winText').textContent = toISO(start) + ' … ' + toISO(end);
     document.getElementById('stamp').textContent = toISO(new Date());
   }
 
-  async function mastFiltered(collection, mjdNow, plusHours){
-    // anything with t_min <= now and t_max >= now (allow a small look-ahead to catch program edges)
-    const max1 = mjdNow;
-    const min2 = mjdNow;
-    const max2 = mjdNow + (plusHours/24.0);
-
+  async function mastWindow(collection, mjdStart, mjdEnd){
+    // include if t_min <= mjdEnd AND t_max >= mjdStart
     const request = {
       "service":"Mast.Caom.Filtered",
       "format":"json",
@@ -108,20 +102,17 @@ permalink: /now-observing/
         "columns":"obs_collection,obsid,obs_id,obs_title,proposal_id,proposal_pi,instrument_name,target_name,t_min,t_max",
         "filters":[
           {"paramName":"obs_collection","values":[collection]},
-          {"paramName":"t_min","values":[{"max":max1}]},
-          {"paramName":"t_max","values":[{"min":min2,"max":max2}]}
+          {"paramName":"t_min","values":[{"max":mjdEnd}]},
+          {"paramName":"t_max","values":[{"min":mjdStart}]}
         ]
       },
       "pagesize": 2000,
       "page": 1
     };
-
     const body = "request=" + encodeURIComponent(JSON.stringify(request));
-    const resp = await fetch(API, {
-      method: "POST",
-      headers: {"Content-Type":"application/x-www-form-urlencoded;charset=UTF-8", "Accept":"application/json"},
-      body
-    });
+    const resp = await fetch(API, { method:"POST",
+      headers:{ "Content-Type":"application/x-www-form-urlencoded;charset=UTF-8", "Accept":"application/json" },
+      body });
     if(!resp.ok) throw new Error(collection + " fetch failed " + resp.status);
     const data = await resp.json();
     if(data.status !== "COMPLETE") throw new Error(collection + " status " + data.status);
@@ -141,10 +132,10 @@ permalink: /now-observing/
     });
     status.style.display='none';
     tbl.style.display = rows.length ? 'table' : 'none';
-    if(!rows.length){ status.textContent = 'No observations in this window.'; status.style.display='block'; }
+    if(!rows.length){ status.textContent = 'No observations in the last 24 hours.'; status.style.display='block'; }
   }
 
-  function drawTimeline(jwst, hst, center){
+  function drawTimeline(jwst, hst, start, end){
     function toBar(arr,label,color){
       return (arr||[]).map(function(r){
         return { x: [fromMJD(r.t_min), fromMJD(r.t_max)], y: [label,label], mode: 'lines',
@@ -153,23 +144,27 @@ permalink: /now-observing/
       });
     }
     var traces = [].concat(toBar(jwst,'JWST','#9370DB')).concat(toBar(hst,'HST','#10B981'));
-    var a = new Date(center.getTime() - HRS*3600*1000);
-    var b = new Date(center.getTime() + HRS*3600*1000);
-    Plotly.newPlot('timeline', traces, { margin:{l:60,r:10,t:10,b:40}, xaxis:{title:'UTC', type:'date', range:[a,b]}, yaxis:{type:'category'}, showlegend:false },
-      {displaylogo:false, responsive:true});
-    document.getElementById('summary').textContent = (jwst.length + " JWST · " + hst.length + " HST observations overlapping now");
+    Plotly.newPlot('timeline', traces, {
+      margin:{l:60,r:10,t:10,b:40},
+      xaxis:{title:'UTC', type:'date', range:[start, end]},
+      yaxis:{type:'category'},
+      showlegend:false
+    }, {displaylogo:false, responsive:true});
+    document.getElementById('summary').textContent =
+      (jwst.length + " JWST · " + hst.length + " HST observations in the last 24 hours");
   }
 
   async function loadAll(){
-    const now = new Date();
-    setWindowText(now);
-    const mjdNow = toMJD(now);
+    const end = new Date();
+    const start = new Date(end.getTime() - HOURS*3600*1000);
+    setWindowText(start, end);
+    const mjdStart = toMJD(start), mjdEnd = toMJD(end);
     try{
-      const both = await Promise.all([ mastFiltered('JWST', mjdNow, 3), mastFiltered('HST', mjdNow, 3) ]);
+      const both = await Promise.all([ mastWindow('JWST', mjdStart, mjdEnd), mastWindow('HST', mjdStart, mjdEnd) ]);
       const jwst = both[0] || [], hst = both[1] || [];
       fillTable('jwstTbl','jwstStatus', jwst);
       fillTable('hstTbl','hstStatus', hst);
-      drawTimeline(jwst, hst, now);
+      drawTimeline(jwst, hst, start, end);
     }catch(err){
       console.error(err);
       document.getElementById('jwstStatus').textContent = 'Error: ' + err.message;
