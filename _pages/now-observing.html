@@ -7,36 +7,18 @@ permalink: /now-observing/
 <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
 
 <style>
-  /* Light / Exoplanets-like panels */
   :root{
     --brand: MediumPurple;
     --ink: #111827;
     --muted: #4b5563;
     --panel: #ffffff;
     --border:#e5e7eb;
-    --accent:#6b21a8;
   }
   h1, h2, h3 { color: var(--brand); }
   .wrap { display:flex; flex-wrap:wrap; gap:1rem; align-items:flex-start; }
-  .card {
-    flex:1 1 420px;
-    background: var(--panel);
-    border:1px solid var(--border);
-    border-radius: 14px;
-    padding: 14px 16px;
-    color: var(--ink);
-    box-shadow: 0 1px 2px rgba(0,0,0,.04);
-  }
+  .card { flex:1 1 420px; background: var(--panel); border:1px solid var(--border); border-radius: 14px; padding: 14px 16px; color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,.04); }
   .small { color: var(--muted); font-size: .92rem; }
-  .btn {
-    background: var(--brand);
-    color: white;
-    border: none;
-    padding: .45rem .7rem;
-    border-radius: 8px;
-    cursor: pointer;
-  }
-  .btn:disabled { opacity:.6; cursor:not-allowed; }
+  .btn { background: var(--brand); color: white; border: none; padding: .45rem .7rem; border-radius: 8px; cursor: pointer; }
   table { width:100%; border-collapse: collapse; }
   th, td { padding:.5rem .55rem; border-bottom: 1px solid var(--border); }
   th { text-align:left; color: var(--ink); }
@@ -47,7 +29,7 @@ permalink: /now-observing/
 </style>
 
 <h1>Now Observing — JWST & HST (Last 24 Hours)</h1>
-<p class="small">Observations intersecting a rolling 24‑hour window, via the MAST Mashup API.</p>
+<p class="small">Observations that intersect the last 24 hours via the MAST Mashup API.</p>
 
 <div class="wrap">
   <div class="card" style="max-width:880px">
@@ -99,7 +81,6 @@ permalink: /now-observing/
 
 <script>
 (function(){
-  // Robust MAST call with POST → GET fallback (helps with some blockers/CDNs)
   const API = 'https://mast.stsci.edu/api/v0/invoke';
   const HOURS = 24;
 
@@ -107,25 +88,19 @@ permalink: /now-observing/
   function toISO(d){ return d.toISOString().replace('.000','').replace('Z','Z'); }
   function fromMJD(mjd){ return new Date((mjd - 40587.0) * 86400000); }
 
-  async function mastQuery(request){
+  async function mastPost(request){
     const body = 'request=' + encodeURIComponent(JSON.stringify(request));
-    // Try POST first
-    try{
-      const resp = await fetch(API, {
-        method: 'POST',
-        headers: {'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8','Accept':'application/json'},
-        body
-      });
-      if(resp.ok){
-        return await resp.json();
-      }
-      // Fall through to GET if non-OK
-    }catch(e){
-      // Network failure — try GET
-    }
-    const resp2 = await fetch(API + '?' + body, { method: 'GET' });
-    if(!resp2.ok) throw new Error('MAST load failed (' + resp2.status + ')');
-    return await resp2.json();
+    const resp = await fetch(API, {
+      method: 'POST',
+      mode: 'cors',
+      cache: 'no-store',
+      referrerPolicy: 'no-referrer',
+      credentials: 'omit',
+      headers: { 'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8', 'Accept':'application/json' },
+      body
+    });
+    if(!resp.ok) throw new Error('MAST load failed (' + resp.status + ')');
+    return await resp.json();
   }
 
   async function mastWindow(collection, mjdStart, mjdEnd){
@@ -136,14 +111,14 @@ permalink: /now-observing/
         columns: 'obs_collection,obsid,obs_id,obs_title,proposal_id,proposal_pi,instrument_name,target_name,t_min,t_max',
         filters: [
           { paramName:'obs_collection', values:[collection] },
-          { paramName:'t_min', values:[{ max: mjdEnd }] },   // t_min ≤ end
-          { paramName:'t_max', values:[{ min: mjdStart }] }  // t_max ≥ start
+          { paramName:'t_min', values:[{ max: mjdEnd }] },
+          { paramName:'t_max', values:[{ min: mjdStart }] }
         ]
       },
       pagesize: 2000,
       page: 1
     };
-    const data = await mastQuery(request);
+    const data = await mastPost(request);
     if(data.status && data.status !== 'COMPLETE') throw new Error(collection + ' status ' + data.status);
     return data.data || [];
   }
@@ -201,9 +176,8 @@ permalink: /now-observing/
       drawTimeline(jwst, hst, start, end);
     }catch(err){
       console.error(err);
-      // Friendly surface error
-      document.getElementById('jwstStatus').textContent = 'Error: ' + err.message;
-      document.getElementById('hstStatus').textContent = 'Error: ' + err.message;
+      document.getElementById('jwstStatus').textContent = 'Error: ' + err.message + ' — If you use content blockers, allow mast.stsci.edu.';
+      document.getElementById('hstStatus').textContent = 'Error: ' + err.message + ' — If you use content blockers, allow mast.stsci.edu.';
     }
   }
 
