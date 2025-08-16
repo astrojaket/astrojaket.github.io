@@ -6,8 +6,8 @@ on:
   workflow_dispatch: {}
 
 permissions:
-  contents: write      # <-- lets GITHUB_TOKEN push commits
-  pull-requests: write # <-- only used if we need to open a PR
+  contents: write
+  pull-requests: write
 
 jobs:
   fetch:
@@ -30,7 +30,7 @@ jobs:
           echo "Repo: $GITHUB_REPOSITORY"
           echo "Default branch: $GITHUB_REF_NAME"
 
-      - name: Fetch JWST exoplanets (tiny slices)
+      - name: Fetch JWST exoplanets (last 24h, tiny slices)
         run: |
           python -u tools/fetch_mast_24h.py \
             --slice-hours 0.5 \
