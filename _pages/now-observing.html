@@ -5,118 +5,152 @@ permalink: /now-observing/
 ---
 <link rel="preconnect" href="https://mast.stsci.edu">
 <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+
 <style>
-  :root { --mp: MediumPurple; --bg:#120c22; --card:#1b1330; --border:#3b2d66; --ink:#eee; --muted:#c9c9d9; }
-  .section { margin: 1.2rem 0; }
-  .row { display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-start; }
-  .card { flex: 1 1 420px; background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 14px; color: var(--ink); }
-  h1, h2, h3 { color: var(--mp); margin: .2rem 0 .6rem; }
-  .pill { display:inline-block; padding:.2rem .5rem; border-radius:999px; font-size:.8rem; border:1px solid var(--border); background:#2a2048; color:#d9cdfd; }
-  .loading { opacity:.8; font-style: italic; }
+  /* Light / Exoplanets-like panels */
+  :root{
+    --brand: MediumPurple;
+    --ink: #111827;
+    --muted: #4b5563;
+    --panel: #ffffff;
+    --border:#e5e7eb;
+    --accent:#6b21a8;
+  }
+  h1, h2, h3 { color: var(--brand); }
+  .wrap { display:flex; flex-wrap:wrap; gap:1rem; align-items:flex-start; }
+  .card {
+    flex:1 1 420px;
+    background: var(--panel);
+    border:1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px 16px;
+    color: var(--ink);
+    box-shadow: 0 1px 2px rgba(0,0,0,.04);
+  }
+  .small { color: var(--muted); font-size: .92rem; }
+  .btn {
+    background: var(--brand);
+    color: white;
+    border: none;
+    padding: .45rem .7rem;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  .btn:disabled { opacity:.6; cursor:not-allowed; }
   table { width:100%; border-collapse: collapse; }
-  th, td { padding: .45rem .5rem; border-bottom: 1px solid var(--border); }
-  th { text-align:left; color:#d9cdfd; }
-  .small { font-size: .9rem; color: var(--muted); }
-  .stamp { color:#bbb; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
-  .btn { background:#3b2d66; color:#fff; border:1px solid #5a45a8; padding:.35rem .6rem; border-radius:8px; cursor:pointer; }
-  .btn:disabled { opacity:.5; cursor:not-allowed; }
-  .legend { font-size:.95rem; line-height:1.35; }
-  .err { color:#ffb4b4; }
+  th, td { padding:.5rem .55rem; border-bottom: 1px solid var(--border); }
+  th { text-align:left; color: var(--ink); }
+  .pill { display:inline-block; padding:.2rem .5rem; border:1px solid var(--border); border-radius:999px; background:#fafafa; }
+  .legend { line-height:1.35; }
+  .loading { opacity:.8; font-style: italic; }
+  .err { color:#b91c1c; }
 </style>
 
 <h1>Now Observing — JWST & HST (Last 24 Hours)</h1>
-<p class="small">Shows observations whose time ranges intersect the last 24 hours, via the MAST Mashup API.</p>
+<p class="small">Observations intersecting a rolling 24‑hour window, via the MAST Mashup API.</p>
 
-<div class="row">
-  <div class="card" style="max-width: 860px;">
+<div class="wrap">
+  <div class="card" style="max-width:880px">
     <h2>Timeline (UTC)</h2>
-    <div id="timeline" style="height: 320px;"></div>
+    <div id="timeline" style="height: 340px;"></div>
     <div id="summary" class="small"></div>
   </div>
-  <div class="card" style="max-width: 520px;">
+  <div class="card" style="max-width:520px">
     <h2>Controls</h2>
     <div class="small">Window: <span id="winText"></span></div>
-    <div style="margin:.4rem 0;">
+    <div style="margin:.5rem 0 0.2rem">
       <button id="refreshBtn" class="btn">Refresh</button>
     </div>
-    <div class="legend">
-      <div><span class="pill">JWST</span> &nbsp; <span class="small">MAST (CAOM)</span></div>
-      <div><span class="pill">HST</span> &nbsp; <span class="small">MAST (CAOM)</span></div>
-      <div class="small" style="margin-top:.5rem;">Bars span each observation’s <code>t_min → t_max</code> where it intersects the 24h window.</div>
+    <div class="legend small">
+      <div><span class="pill">JWST</span> &nbsp; MAST (CAOM)</div>
+      <div><span class="pill">HST</span> &nbsp; MAST (CAOM)</div>
+      <div style="margin-top:.4rem">Bars span each observation’s <code>t_min → t_max</code> within the 24h window.</div>
     </div>
   </div>
 </div>
 
-<div class="row">
+<div class="wrap" style="margin-top:1rem">
   <div class="card">
     <h2>Observations — JWST</h2>
     <div id="jwstStatus" class="loading">Loading…</div>
-    <table id="jwstTbl" style="display:none;">
-      <thead><tr>
-        <th>Start (UTC)</th><th>End</th><th>Target</th><th>Instrument</th><th>Program</th>
-      </tr></thead>
+    <table id="jwstTbl" style="display:none">
+      <thead><tr><th>Start (UTC)</th><th>End</th><th>Target</th><th>Instrument</th><th>Program</th></tr></thead>
       <tbody></tbody>
     </table>
   </div>
   <div class="card">
     <h2>Observations — HST</h2>
     <div id="hstStatus" class="loading">Loading…</div>
-    <table id="hstTbl" style="display:none;">
-      <thead><tr>
-        <th>Start (UTC)</th><th>End</th><th>Target</th><th>Instrument</th><th>Program</th>
-      </tr></thead>
+    <table id="hstTbl" style="display:none">
+      <thead><tr><th>Start (UTC)</th><th>End</th><th>Target</th><th>Instrument</th><th>Program</th></tr></thead>
       <tbody></tbody>
     </table>
   </div>
 </div>
 
-<div class="section small">
+<div class="small" style="margin-top:1rem">
   <h3>Notes</h3>
   <ul>
-    <li>Query window: <code>now - 24h</code> to <code>now</code>.</li>
-    <li>Filter logic: include rows where <code>t_min ≤ window_end</code> and <code>t_max ≥ window_start</code>.</li>
+    <li>Window = <code>now − 24h</code> → <code>now</code>.</li>
+    <li>Filter: include rows where <code>t_min ≤ window_end</code> and <code>t_max ≥ window_start</code>.</li>
   </ul>
-  <div class="small">Last updated: <span id="stamp" class="stamp"></span></div>
+  <div>Last updated: <span id="stamp"></span></div>
 </div>
 
 <script>
 (function(){
+  // Robust MAST call with POST → GET fallback (helps with some blockers/CDNs)
   const API = 'https://mast.stsci.edu/api/v0/invoke';
-  const HOURS = 24; // last 24 hours
+  const HOURS = 24;
 
   function toMJD(d){ return (d.getTime()/86400000) + 40587.0; }
   function toISO(d){ return d.toISOString().replace('.000','').replace('Z','Z'); }
   function fromMJD(mjd){ return new Date((mjd - 40587.0) * 86400000); }
 
-  function setWindowText(start, end){
-    document.getElementById('winText').textContent = toISO(start) + ' … ' + toISO(end);
-    document.getElementById('stamp').textContent = toISO(new Date());
+  async function mastQuery(request){
+    const body = 'request=' + encodeURIComponent(JSON.stringify(request));
+    // Try POST first
+    try{
+      const resp = await fetch(API, {
+        method: 'POST',
+        headers: {'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8','Accept':'application/json'},
+        body
+      });
+      if(resp.ok){
+        return await resp.json();
+      }
+      // Fall through to GET if non-OK
+    }catch(e){
+      // Network failure — try GET
+    }
+    const resp2 = await fetch(API + '?' + body, { method: 'GET' });
+    if(!resp2.ok) throw new Error('MAST load failed (' + resp2.status + ')');
+    return await resp2.json();
   }
 
   async function mastWindow(collection, mjdStart, mjdEnd){
-    // include if t_min <= mjdEnd AND t_max >= mjdStart
     const request = {
-      "service":"Mast.Caom.Filtered",
-      "format":"json",
-      "params":{
-        "columns":"obs_collection,obsid,obs_id,obs_title,proposal_id,proposal_pi,instrument_name,target_name,t_min,t_max",
-        "filters":[
-          {"paramName":"obs_collection","values":[collection]},
-          {"paramName":"t_min","values":[{"max":mjdEnd}]},
-          {"paramName":"t_max","values":[{"min":mjdStart}]}
+      service: 'Mast.Caom.Filtered',
+      format: 'json',
+      params: {
+        columns: 'obs_collection,obsid,obs_id,obs_title,proposal_id,proposal_pi,instrument_name,target_name,t_min,t_max',
+        filters: [
+          { paramName:'obs_collection', values:[collection] },
+          { paramName:'t_min', values:[{ max: mjdEnd }] },   // t_min ≤ end
+          { paramName:'t_max', values:[{ min: mjdStart }] }  // t_max ≥ start
         ]
       },
-      "pagesize": 2000,
-      "page": 1
+      pagesize: 2000,
+      page: 1
     };
-    const body = "request=" + encodeURIComponent(JSON.stringify(request));
-    const resp = await fetch(API, { method:"POST",
-      headers:{ "Content-Type":"application/x-www-form-urlencoded;charset=UTF-8", "Accept":"application/json" },
-      body });
-    if(!resp.ok) throw new Error(collection + " fetch failed " + resp.status);
-    const data = await resp.json();
-    if(data.status !== "COMPLETE") throw new Error(collection + " status " + data.status);
+    const data = await mastQuery(request);
+    if(data.status && data.status !== 'COMPLETE') throw new Error(collection + ' status ' + data.status);
     return data.data || [];
+  }
+
+  function setWindowText(start, end){
+    document.getElementById('winText').textContent = toISO(start) + ' … ' + toISO(end);
+    document.getElementById('stamp').textContent = toISO(new Date());
   }
 
   function fillTable(tblId, statusId, rows){
@@ -124,10 +158,10 @@ permalink: /now-observing/
     const status = document.getElementById(statusId);
     const tb = tbl.querySelector('tbody');
     tb.innerHTML = '';
-    rows.sort((a,b)=>a.t_min - b.t_min).forEach(r=>{
+    rows.sort(function(a,b){ return a.t_min - b.t_min; }).forEach(function(r){
       const tr = document.createElement('tr');
       const t0 = fromMJD(r.t_min), t1 = fromMJD(r.t_max);
-      tr.innerHTML = '<td>'+toISO(t0)+'</td><td>'+toISO(t1)+'</td><td>'+(r.target_name||'')+'</td><td>'+(r.instrument_name||'')+'</td><td>'+(r.proposal_id||'')+'</td>';
+      tr.innerHTML = '<td>'+toISO(t0)+'</td><td>'+toISO(t1)+'</td><td>'+ (r.target_name||'') +'</td><td>'+ (r.instrument_name||'') +'</td><td>'+ (r.proposal_id||'') +'</td>';
       tb.appendChild(tr);
     });
     status.style.display='none';
@@ -143,7 +177,7 @@ permalink: /now-observing/
           text: (r.target_name||'') + ' — ' + (r.instrument_name||'') + ' — ' + (r.proposal_id||'') };
       });
     }
-    var traces = [].concat(toBar(jwst,'JWST','#9370DB')).concat(toBar(hst,'HST','#10B981'));
+    var traces = [].concat(toBar(jwst,'JWST','#7c3aed')).concat(toBar(hst,'HST','#059669'));
     Plotly.newPlot('timeline', traces, {
       margin:{l:60,r:10,t:10,b:40},
       xaxis:{title:'UTC', type:'date', range:[start, end]},
@@ -151,7 +185,7 @@ permalink: /now-observing/
       showlegend:false
     }, {displaylogo:false, responsive:true});
     document.getElementById('summary').textContent =
-      (jwst.length + " JWST · " + hst.length + " HST observations in the last 24 hours");
+      (jwst.length + ' JWST · ' + hst.length + ' HST observations in the last 24 hours');
   }
 
   async function loadAll(){
@@ -167,6 +201,7 @@ permalink: /now-observing/
       drawTimeline(jwst, hst, start, end);
     }catch(err){
       console.error(err);
+      // Friendly surface error
       document.getElementById('jwstStatus').textContent = 'Error: ' + err.message;
       document.getElementById('hstStatus').textContent = 'Error: ' + err.message;
     }
