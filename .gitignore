@@ -2,3 +2,7 @@
 assets/data/mast_24h.json
 assets/data/mast_7d.json
 .github/workflows/now-observing.yml
+
+# macOS cruft
+.DS_Store
+assets/.DS_Store
