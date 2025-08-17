@@ -1,8 +1,8 @@
-name: Update Now Observing (JWST exoplanets)
+name: Update Now Observing (JWST exoplanets, 7 days)
 
 on:
   schedule:
-    - cron: "17 * * * *"   # hourly at :17
+    - cron: "17 3 * * *"    # daily at 03:17 UTC
   workflow_dispatch: {}
 
 permissions:
@@ -23,45 +23,39 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Debug env (optional)
-        run: |
-          python -V
-          date -u
-          echo "Repo: $GITHUB_REPOSITORY"
-          echo "Default branch: $GITHUB_REF_NAME"
-
-      - name: Fetch JWST exoplanets (last 24h, tiny slices)
+      - name: Fetch JWST exoplanets (last 7 days)
         run: |
           python -u tools/fetch_mast_24h.py \
-            --slice-hours 0.5 \
-            --pagesize 60 \
+            --days 7 \
+            --slice-hours 6 \
+            --pagesize 80 \
             --timeout 300 \
             --retries 8 \
-            --instruments "NIRCam,NIRSpec,NIRISS,MIRI"
+            --instruments "NIRCam,NIRSpec,NIRISS,MIRI" \
+            --out assets/data/mast_7d.json
 
       - name: Commit changes (if any)
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add assets/data/mast_24h.json
+          git add assets/data/mast_7d.json
           if git diff --cached --quiet; then
             echo "No changes to commit."
             exit 0
           fi
-          git commit -m "chore: refresh mast_24h.json (JWST exoplanets)"
+          git commit -m "chore: refresh mast_7d.json (JWST exoplanets)"
 
       - name: Push directly (try)
         id: push
         continue-on-error: true
-        run: |
-          git push
+        run: git push
 
       - name: Open PR instead (if push blocked)
         if: steps.push.outcome == 'failure'
         uses: peter-evans/create-pull-request@v6
         with:
-          commit-message: "chore: refresh mast_24h.json (JWST exoplanets)"
-          title: "Update JWST now-observing cache"
-          body: "Automated update from workflow. Converts last 24h JWST CAOM for exoplanet targets."
+          commit-message: "chore: refresh mast_7d.json (JWST exoplanets)"
+          title: "Update JWST now-observing cache (last 7 days)"
+          body: "Automated update: last 7 days JWST exoplanet observations."
           branch: "bot/update-now-observing"
           delete-branch: true
