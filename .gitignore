@@ -1,3 +1,4 @@
 # Ignore generated JWST Now-Observing cache
 assets/data/mast_24h.json
+assets/data/mast_7d.json
 .github/workflows/now-observing.yml
