@@ -1,15 +1,22 @@
 ---
 layout: page
-title: Now Observing — JWST (Last 24 Hours)
+title: Now Observing — JWST (Last 7 Days)
 permalink: /now-observing/
 ---
 <link rel="preconnect" href="https://mast.stsci.edu">
 <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+
 <style>
-  :root{ --brand: MediumPurple; --ink:#111827; --muted:#4b5563; --panel:#ffffff; --border:#e5e7eb; }
+  :root{
+    --brand: MediumPurple;
+    --ink: #111827;
+    --muted:#4b5563;
+    --panel:#ffffff;
+    --border:#e5e7eb;
+  }
   h1, h2, h3 { color: var(--brand); }
   .wrap { display:flex; flex-wrap:wrap; gap:1rem; align-items:flex-start; }
-  .card { flex:1 1 420px; background: var(--panel); border:1px solid var(--border); border-radius:14px; padding:14px 16px; color:var(--ink); box-shadow:0 1px 2px rgba(0,0,0,.04); }
+  .card { flex:1 1 420px; background: var(--panel); border:1px solid var(--border); border-radius: 14px; padding: 14px 16px; color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,.04); }
   .small { color: var(--muted); font-size:.92rem; }
   .btn { background: var(--brand); color: white; border: none; padding: .45rem .7rem; border-radius: 8px; cursor: pointer; }
   table { width:100%; border-collapse: collapse; }
@@ -19,14 +26,19 @@ permalink: /now-observing/
   .legend { line-height:1.35; }
   .loading { opacity:.8; font-style: italic; }
 </style>
-<h1>Now Observing — <span class="pill">JWST</span> (Last 24 Hours)</h1>
-<p class="small">This page reads a local cache <code>assets/data/mast_24h.json</code> (JWST exoplanet targets only), refreshed by a small script.</p>
+
+<h1>Now Observing — <span class="pill">JWST</span> (Last 7 Days)</h1>
+<p class="small">
+  This page reads a local cache <code>assets/data/mast_7d.json</code> (JWST exoplanet targets only), refreshed daily by a workflow.
+</p>
+
 <div class="wrap">
   <div class="card" style="max-width:880px">
     <h2>Timeline (UTC)</h2>
-    <div id="timeline" style="height: 340px;"></div>
+    <div id="timeline" style="height: 360px;"></div>
     <div id="summary" class="small"></div>
   </div>
+
   <div class="card" style="max-width:520px">
     <h2>Controls</h2>
     <div class="small">Window: <span id="winText"></span></div>
@@ -35,78 +47,132 @@ permalink: /now-observing/
     </div>
     <div class="legend small" style="margin-top:.4rem">
       Targets filtered using <em>TrExoLiSTS JWST</em> (local CSV).
+      <div style="margin-top:.4rem">Bars span each observation’s <code>t_min → t_max</code> within the window.</div>
     </div>
   </div>
 </div>
+
 <div class="wrap" style="margin-top:1rem">
   <div class="card">
     <h2>Observations — JWST</h2>
     <div id="jwstStatus" class="loading">Loading local JSON…</div>
     <table id="jwstTbl" style="display:none">
-      <thead><tr><th>Start (UTC)</th><th>End</th><th>Target</th><th>Instrument</th><th>Program</th></tr></thead>
+      <thead>
+        <tr>
+          <th>Start (UTC)</th>
+          <th>End</th>
+          <th>Target</th>
+          <th>Instrument</th>
+          <th>Program</th>
+        </tr>
+      </thead>
       <tbody></tbody>
     </table>
   </div>
 </div>
+
 <div class="small" style="margin-top:1rem">
-  <h3>Notes</h3>
+  <h3>Notes & Sources</h3>
   <ul>
-    <li>Window = <code>now − 24h</code> → <code>now</code>.</li>
-    <li>Filter: include rows where <code>t_min ≤ window_end</code> and <code>t_max ≥ window_start</code>.</li>
-    <li>Exoplanet-only: whitelist of targets from <code>assets/data/jwst_trexolists_extended.csv</code>.</li>
+    <li>Window defaults to the last 7 days: <code>now − 7d</code> → <code>now</code>.</li>
+    <li>Filter includes rows where <code>t_min ≤ window_end</code> and <code>t_max ≥ window_start</code>.</li>
+    <li>Exoplanet-only via whitelist from <code>assets/data/jwst_trexolists_extended.csv</code> (TrExoLiSTS JWST).</li>
+    <li>Observation metadata from the MAST CAOM service, cached to avoid browser CORS.</li>
   </ul>
   <div>Last updated from MAST: <span id="stamp">—</span></div>
 </div>
+
 <script>
 (function(){
-  const HOURS = 24;
+  // Helpers
   function toISO(d){ return d.toISOString().replace('.000','').replace('Z','Z'); }
   function fromMJD(mjd){ return new Date((mjd - 40587.0) * 86400000); }
-  function setWindowText(start, end){ document.getElementById('winText').textContent = toISO(start) + ' … ' + toISO(end); }
+
+  function setWindowText(start, end){
+    document.getElementById('winText').textContent = toISO(start) + ' … ' + toISO(end);
+  }
+
   function fillTable(tblId, statusId, rows){
     const tbl = document.getElementById(tblId);
     const status = document.getElementById(statusId);
     const tb = tbl.querySelector('tbody');
     tb.innerHTML = '';
-    rows.sort(function(a,b){ return a.t_min - b.t_min; }).forEach(function(r){
+    rows.slice().sort(function(a,b){ return a.t_min - b.t_min; }).forEach(function(r){
       const tr = document.createElement('tr');
       const t0 = fromMJD(r.t_min), t1 = fromMJD(r.t_max);
-      tr.innerHTML = '<td>'+toISO(t0)+'</td><td>'+toISO(t1)+'</td><td>'+ (r.target_name||'') +'</td><td>'+ (r.instrument_name||'') +'</td><td>'+ (r.proposal_id||'') +'</td>';
+      tr.innerHTML =
+        '<td>'+toISO(t0)+'</td>'+
+        '<td>'+toISO(t1)+'</td>'+
+        '<td>'+ (r.target_name||'') +'</td>'+
+        '<td>'+ (r.instrument_name||'') +'</td>'+
+        '<td>'+ (r.proposal_id||'') +'</td>';
       tb.appendChild(tr);
     });
     status.style.display='none';
     tbl.style.display = rows.length ? 'table' : 'none';
-    if(!rows.length){ status.textContent = 'No JWST exoplanet observations in the last 24 hours.'; status.style.display='block'; }
+    if(!rows.length){
+      status.textContent = 'No JWST exoplanet observations found in the last 7 days.';
+      status.style.display='block';
+    }
   }
+
   function drawTimeline(jwst, start, end){
     function toBar(arr,label,color){
       return (arr||[]).map(function(r){
-        return { x: [new Date((r.t_min - 40587.0) * 86400000), new Date((r.t_max - 40587.0) * 86400000)], y: [label,label], mode: 'lines',
-          line: {width: 10, color: color}, hoverinfo: 'text',
-          text: (r.target_name||'') + ' — ' + (r.instrument_name||'') + ' — ' + (r.proposal_id||'') };
+        return {
+          x: [fromMJD(r.t_min), fromMJD(r.t_max)],
+          y: [label, label],
+          mode: 'lines',
+          line: {width: 10, color: color},
+          hoverinfo: 'text',
+          text: (r.target_name||'') + ' — ' + (r.instrument_name||'') + ' — ' + (r.proposal_id||'')
+        };
       });
     }
     var traces = [].concat(toBar(jwst,'JWST','#7c3aed'));
-    Plotly.newPlot('timeline', traces, { margin:{l:60,r:10,t:10,b:40}, xaxis:{title:'UTC', type:'date', range:[start, end]}, yaxis:{type:'category'}, showlegend:false }, {displaylogo:false, responsive:true});
-    document.getElementById('summary').textContent = (jwst.length + ' JWST exoplanet observations in the last 24 hours');
+    Plotly.newPlot('timeline', traces, {
+      margin:{l:60,r:10,t:10,b:40},
+      xaxis:{title:'UTC', type:'date', range:[start, end]},
+      yaxis:{type:'category'},
+      showlegend:false
+    }, {displaylogo:false, responsive:true});
+    document.getElementById('summary').textContent =
+      (jwst.length + ' JWST exoplanet observations in the last 7 days');
   }
+
   async function loadLocal(){
-    const end = new Date();
-    const start = new Date(end.getTime() - HOURS*3600*1000);
-    setWindowText(start, end);
+    // Default to last 7 days; if JSON provides window_utc, prefer that for axes
+    const now = new Date();
+    const defStart = new Date(now.getTime() - 7*24*3600*1000);
+    let winStart = defStart, winEnd = now;
+
     try{
-      const r = await fetch('/assets/data/mast_24h.json', {cache:'no-store'});
+      const r = await fetch('/assets/data/mast_7d.json', {cache:'no-store'});
       if(!r.ok) throw new Error('Local JSON not found');
       const payload = await r.json();
+
+      if (payload.window_utc && payload.window_utc.length === 2){
+        const w0 = new Date(payload.window_utc[0]);
+        const w1 = new Date(payload.window_utc[1]);
+        if(!isNaN(w0) && !isNaN(w1)){ winStart = w0; winEnd = w1; }
+      }
+      setWindowText(winStart, winEnd);
+
       const jwst = payload.jwst || [];
       fillTable('jwstTbl','jwstStatus', jwst);
-      drawTimeline(jwst, start, end);
-      if(payload.generated_utc){ document.getElementById('stamp').textContent = payload.generated_utc + ' (UTC)'; }
+      drawTimeline(jwst, winStart, winEnd);
+
+      if(payload.generated_utc){
+        document.getElementById('stamp').textContent = payload.generated_utc + ' (UTC)';
+      }
     }catch(err){
-      document.getElementById('jwstStatus').textContent = 'Could not load local JSON. Run the fetch script to generate it.';
+      setWindowText(winStart, winEnd);
+      document.getElementById('jwstStatus').textContent =
+        'Could not load /assets/data/mast_7d.json. Run the daily fetch or seed the file once.';
       console.error(err);
     }
   }
+
   document.getElementById('refreshBtn').addEventListener('click', loadLocal);
   loadLocal();
 })();
