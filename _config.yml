@@ -2,6 +2,9 @@ title: "Jake Taylor"
 description: ""
 url: "https://astrojaket.github.io"
 
+include:
+  - assets/data/mast_7d.json
+
 # Theme and Plugins
 theme: minima
 plugins:
