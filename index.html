@@ -3,104 +3,94 @@ layout: default
 title: Home
 ---
 
-<section class="hero">
-  <div class="card hero-copy">
-    <span class="kicker">Astrophysics • University of Oxford</span>
-    <h1>Jake Taylor</h1>
-    <p class="lead">
-      Glasstone Fellow in Astrophysics working on exoplanet atmospheres with the James Webb Space Telescope,
-      combining observations, retrievals, and atmospheric physics to understand distant worlds.
-    </p>
-    <div class="button-row">
-      <a class="button primary" href="{{ '/research/' | relative_url }}">Research</a>
-      <a class="button secondary" href="{{ '/publications/' | relative_url }}">Publications</a>
-      <a class="button secondary" href="{{ '/posts/' | relative_url }}">Posts</a>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{ page.title }}</title>
+  <link rel="stylesheet" href="/assets/css/style.css" />
+  <style>
+    body {
+      font-family: Avenir, sans-serif;
+      font-size: 20px;
+      margin: 0;
+      padding: 0;
+    }
+
+    .banner-small {
+      background-color: #e6e1f5;
+      height: 200px;
+      border-radius: 12px;
+      margin-bottom: 30px;
+    }
+
+    .about-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 50px;
+      flex-wrap: wrap;
+    }
+
+    .about-text {
+      flex: 1;
+      max-width: 600px;
+      margin: 20px;
+      text-align: left;
+    }
+
+    .about-photo {
+      margin: 20px;
+    }
+
+    .profile-photo {
+      width: 100%;
+      max-width: 300px;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .about-text a {
+      color: #5a4d92;
+      text-decoration: none;
+    }
+
+    .about-text a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 768px) {
+      .about-container {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .about-photo {
+        order: 0;
+        margin-bottom: 20px;
+      }
+
+      .profile-photo {
+        max-width: 200px;
+      }
+
+      .about-text {
+        max-width: 100%;
+      }
+    }
+  </style>
+</head>
+<body class="light-purple-theme">
+  <!-- About Section -->
+  <section class="about-container">
+    <div class="about-photo">
+      <img src="/assets/images/profile.jpg" alt="Dr Jake Taylor" class="profile-photo" />
     </div>
-  </div>
-
-  <div class="hero-aside">
-    <div class="card portrait-card">
-      <img src="{{ '/assets/images/profile.jpg' | relative_url }}" alt="Dr Jake Taylor" class="profile-photo" />
+    <div class="about-text">
+      <p>I'm Dr Jake Taylor and I am a Glasstone Fellow in Astrophysics at the University of Oxford. I am also a Supernumerary Fellow at Exeter College. My research focuses on studying the atmospheres of exoplanets, go to my <a href="/research" target="_self">research section</a> of the website for more details. <a href="https://www.physics.ox.ac.uk/our-people/jaketaylor" target="_blank">Click here</a> to go to my Oxford Physics page. I also like to make TikToks about various things related to Astrophysics and Oxford, go to my <a href="/posts" target="_self">posts section</a> to watch them!</p>
     </div>
-    <div class="hero-facts">
-      <div class="fact">
-        <span class="label">Role</span>
-        <span class="value">Glasstone Fellow in Astrophysics</span>
-      </div>
-      <div class="fact">
-        <span class="label">Research</span>
-        <span class="value">Exoplanet atmospheres</span>
-      </div>
-      <div class="fact">
-        <span class="label">Institution</span>
-        <span class="value">University of Oxford</span>
-      </div>
-      <div class="fact">
-        <span class="label">Also</span>
-        <span class="value">Supernumerary Fellow, Exeter College</span>
-      </div>
-    </div>
-  </div>
-</section>
+  </section>
 
-<section class="section">
-  <div class="section-head">
-    <div>
-      <span class="kicker">What I do</span>
-      <h2>Research, communication, and public outreach</h2>
-    </div>
-    <p>
-      A concise overview of the main areas on the site, with the same visual language carried through every page.
-    </p>
-  </div>
-
-  <div class="grid grid-3">
-    <article class="info-card">
-      <h3>Exoplanet atmospheres</h3>
-      <p>
-        I study atmospheres of giant and terrestrial exoplanets using JWST and complementary observations to infer
-        composition, clouds, and temperature structure.
-      </p>
-      <div class="meta"><a href="{{ '/research/' | relative_url }}">Read more</a></div>
-    </article>
-
-    <article class="info-card">
-      <h3>Publications</h3>
-      <p>
-        A curated list of first-author work and selected co-authored papers, with direct links to ADS and DOI records.
-      </p>
-      <div class="meta"><a href="{{ '/publications/' | relative_url }}">View publications</a></div>
-    </article>
-
-    <article class="info-card">
-      <h3>Posts and updates</h3>
-      <p>
-        Short-form updates, talks, and links to social channels for science communication and day-to-day work.
-      </p>
-      <div class="meta"><a href="{{ '/posts/' | relative_url }}">See posts</a></div>
-    </article>
-  </div>
-</section>
-
-<section class="section">
-  <div class="section-head">
-    <div>
-      <span class="kicker">Oxford links</span>
-      <h2>Helpful places to go next</h2>
-    </div>
-  </div>
-
-  <div class="grid grid-2">
-    <article class="tool-card">
-      <h3>Oxford Physics profile</h3>
-      <p>My department page with a short professional bio and institutional details.</p>
-      <div class="meta"><a href="https://www.physics.ox.ac.uk/our-people/jaketaylor" target="_blank" rel="noreferrer">Open profile</a></div>
-    </article>
-
-    <article class="tool-card">
-      <h3>Quick access pages</h3>
-      <p>Use the clean top navigation to move between research, publications, observing, visibility, and support.</p>
-      <div class="meta">Each page uses the same design system for a consistent, professional look.</div>
-    </article>
-  </div>
-</section>
+</body>
+</html>

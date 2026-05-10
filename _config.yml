@@ -1,11 +1,12 @@
 title: "Jake Taylor"
-description: "Astrophysics research, publications, and updates."
+description: ""
 url: "https://astrojaket.github.io"
-baseurl: ""
+
 include:
   - assets/data/mast_7d.json
 
-# Theme and plugins
+# Theme and Plugins
+theme: minima
 plugins:
   - jekyll-seo-tag
   - jekyll-feed
@@ -19,7 +20,6 @@ collections:
 
 # Markdown Support
 markdown: kramdown
-highlighter: rouge
 
 # Defaults for Layout
 defaults:
@@ -29,7 +29,7 @@ defaults:
       layout: "default"
 
 # SEO Settings
-author: "Jake Taylor"
+author: ""
 language: "en"
 social:
   name: "Jake Taylor"
@@ -39,9 +39,20 @@ social:
 
 # Sitemap Settings
 sitemap:
-  exclude:
-    - "404.html"
+  exclude: ['404.html']
 
-# Sass
+# Custom Styling
 sass:
   style: compressed
+
+# Global Styles
+global_styles: |
+  body {
+    font-family: Avenir, sans-serif;
+    background-color: #e6e1f5;
+    margin: 0;
+    padding: 0;
+  }
+  footer {
+    display: none;
+  }

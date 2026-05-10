@@ -1,70 +1,74 @@
 ---
 layout: default
 title: Research
-permalink: /research/
 ---
 
-<article class="card prose">
-  <span class="kicker">Research</span>
-  <h1>Exoplanet atmospheres and atmospheric inference</h1>
-  <p>
-    My work focuses on using JWST and complementary datasets to understand the composition, structure, and clouds of
-    exoplanet atmospheres. I am particularly interested in how atmospheric signals change across planet size,
-    temperature, and observing geometry.
-  </p>
+<div class="research-topic-box">
+    <div class="research-topic">
+        <h3>Gas Giant Exoplanets</h3>
+        <p>Exoplanets that have atmospheres that are rich in hydrogen make exquisite laboratories to understand the formation of planets. Their low mean molecular weight atmosphere produces large signals that the Hubble Space Telescope, and now the James Webb Space Telescope, can readily measure. There is a large diversity of Gas Giants, spanning the mass, radius, and temperature space. One such object, called Hot Jupiters, are Jupiter-like planets, however on a close=in orbit around their star, which results in extremely hot temperatures. These objects can teach us about the extreme physical and chemical processes that can happen in a planetary atmosphere. My research has led me to study hot Jupiters in both transmission and emission, revealing their temperature structure, amount of different molecules in the atmpsphere, and even measure what the clouds in these atmospheres are made of. I led one of the first atmospheric analysis of a hot Jupiter using observations from the James Webb Space Telescope, you can read the article <a href="https://ui.adsabs.harvard.edu/abs/2023MNRAS.524..817T/abstract" target="_blank">here</a>. My research continues to study these hot gaseous planets to uncover what their atmospheres are made of.</p>
+    </div>
+</div>
 
-  <div class="grid grid-3" style="margin-top: 1.2rem;">
-    <section class="info-card">
-      <h3>Gas giants</h3>
-      <p>
-        Hot Jupiters and warm gas giants are strong laboratory targets because their large atmospheric signals reveal
-        chemistry, temperature structure, and cloud properties with comparatively high precision.
-      </p>
-    </section>
 
-    <section class="info-card">
-      <h3>Terrestrial planets</h3>
-      <p>
-        Smaller planets around nearby stars are central to the search for atmospheric diversity and, ultimately,
-        habitability. I work on methods that separate planetary signals from stellar contamination.
-      </p>
-    </section>
+<div class="research-topic-box">
+    <div class="research-topic">
+        <h3>Terrestrial Exoplanets</h3>
+        <p>A key question that humanity are trying to answer is: are we alone in the universe? This is a question we are trying to answer by studying the atmospheres of terrestrial planets in nearby star systems. With the launch of the James Webb Space Telescope, we are closer to answering this question than ever before. I have been studying the terrestrial planets around the star TRAPPIST-1, which has been deemed one of the most favourable systems to harbour life, given there are 7 Earth-sized planets around the star. One key challenge we are facing, however, is accurately modelling the information from the star, as the signal from the star can impact how we study the atmosphere. Recently, along with a team of researchers based at the University of Montreal, we studied the transmission spectrum of TRAPPIST-1c, the second planet in the system, you can read the article <a href="https://ui.adsabs.harvard.edu/abs/2025ApJ...979L...5R" target="_blank">here</a>. I am continuing to study terrestrial planets and figure out the ways we can unabiguosly detect atmospheric signals.</p>
+    </div>
+</div>
 
-    <section class="info-card">
-      <h3>Model comparison</h3>
-      <p>
-        I use retrieval frameworks and forward models to test which atmospheric assumptions are actually supported by
-        the data, including cloud models and instrument-specific effects.
-      </p>
-    </section>
-  </div>
+<div class="research-topic-box">
+    <div class="research-topic">
+        <h3>Machine Learning</h3>
+        <p>I spent a year as a Schmidt AI in Science Fellow, learning cutting edge machine learning methods that can be applied to studying the atmospheres of exoplanets. Work from this is still on going, and will hopefully be published soon.</p>
+    </div>
+</div>
 
-  <h2>Selected themes</h2>
-  <div class="grid grid-2">
-    <section class="tool-card">
-      <h3>JWST-era atmospheric studies</h3>
-      <p>
-        I led one of the first atmospheric analyses of a hot Jupiter using JWST observations and continue to work on
-        spectra that probe temperature gradients, clouds, and molecular abundances.
-      </p>
-      <p class="meta">
-        Read the paper on <a href="https://ui.adsabs.harvard.edu/" target="_blank" rel="noreferrer">ADS</a>.
-      </p>
-    </section>
+<style>
+    body {
+        font-family: Avenir, sans-serif;
+        font-size: 14px;
+        margin: 0;
+        padding: 0;
+    }
 
-    <section class="tool-card">
-      <h3>TRAPPIST-1 and rocky worlds</h3>
-      <p>
-        A major focus of the field is determining how stellar contamination and observational systematics affect the
-        interpretation of terrestrial-planet spectra. I work on these problems with a team based in Montréal and
-        elsewhere.
-      </p>
-    </section>
-  </div>
+    h1, h2 {
+        text-align: center;
+    }
 
-  <h2>Machine learning</h2>
-  <p>
-    I spent a year as a Schmidt AI in Science Fellow exploring machine learning methods that can be applied to exoplanet
-    atmosphere analysis. That work remains an important part of my broader research toolkit.
-  </p>
-</article>
+    .research-topic-box {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 40px;
+    }
+
+    .research-topic {
+        background-color: #f7f7f7;
+        border-radius: 12px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        width: 80%;
+        max-width: 800px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 20px;
+    }
+
+    .research-topic h3 {
+        font-size: 18px;
+        color: #5a4e87; /* Purple color for headings */
+        margin-bottom: 10px;
+    }
+
+    .research-topic p {
+        text-align: justify;
+        color: #333;
+    }
+
+    .research-topic-box:hover {
+        transform: scale(1.02);
+        transition: transform 0.3s ease-in-out;
+    }
+</style>

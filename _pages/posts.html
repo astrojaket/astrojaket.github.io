@@ -1,31 +1,77 @@
 ---
 layout: default
 title: Posts
-permalink: /posts/
 ---
 
-<article class="card prose">
-  <span class="kicker">Posts</span>
-  <h1>Short updates and social channels</h1>
-  <p>
-    This is the lightweight home for quick updates, short videos, and links to social platforms.
-  </p>
-
-  <div class="grid grid-2" style="margin-top: 1.1rem;">
-    <section class="info-card">
-      <h3>Bluesky</h3>
-      <p>Occasional notes, links, and informal updates.</p>
-      <div class="meta"><a href="https://bsky.app/profile/astrojake" target="_blank" rel="noreferrer">@astrojake</a></div>
-    </section>
-
-    <section class="info-card">
-      <h3>TikTok</h3>
-      <p>Short science videos and Oxford-related content.</p>
-      <div class="meta"><a href="https://www.tiktok.com/@astrojaket" target="_blank" rel="noreferrer">@astrojaket</a></div>
-    </section>
+<div class="posts-container">
+  <!-- Bluesky Section -->
+  <div class="bluesky-section">
+    <h2>Bluesky Posts</h2>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/bsky-embed/dist/bsky-embed.es.js" async></script>
+    <bsky-embed
+      username="astrojake.bsky.social"
+      mode="white"
+      limit="5"
+    ></bsky-embed>
   </div>
 
-  <div class="notice" style="margin-top: 1rem;">
-    <strong>Tip:</strong> Add featured embeds later if you want this page to become a richer live feed.
+<!-- TikTok Section -->
+  <div class="tiktok-section">
+    <h2>TikTok Videos</h2>
+
+    <!-- TikTok Creator Embed -->
+    <blockquote class="tiktok-embed"
+                cite="https://www.tiktok.com/@astrojaket"
+                data-unique-id="astrojaket"
+                data-embed-type="creator"
+                style="max-width: 780px; min-width: 288px;">
+      <section>
+        <a target="_blank" href="https://www.tiktok.com/@astrojaket?refer=creator_embed">
+          @astrojaket
+        </a>
+      </section>
+    </blockquote>
+
+    <!-- TikTok Embed Script -->
+    <script async src="https://www.tiktok.com/embed.js"></script>
   </div>
-</article>
+</div>
+
+<!-- CSS for Responsive Layout -->
+<style>
+  .posts-container {
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-start;
+    margin-top: 20px;
+    flex-wrap: wrap;
+  }
+
+  .bluesky-section, .tiktok-section {
+    width: 45%;
+    background-color: #f9f9ff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    margin-bottom: 20px;
+  }
+
+  h2 {
+    color: #6b5b95;
+  }
+
+  p {
+    color: #333;
+  }
+
+  @media (max-width: 768px) {
+    .posts-container {
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .bluesky-section, .tiktok-section {
+      width: 90%;
+    }
+  }
+</style>
