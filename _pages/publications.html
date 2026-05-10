@@ -57,10 +57,19 @@ permalink: /publications/
     padding: 1rem 1.1rem;
     margin-bottom: 1rem;
     box-shadow: 0 6px 18px rgba(47, 42, 61, 0.08);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
   }
 
-  .pub-title {
-    color: #B069DB;
+  .pub-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(47, 42, 61, 0.12);
+  }
+
+  .pub-title,
+  .pub-title:visited,
+  .pub-title:hover,
+  .pub-title:active {
+    color: #B069DB !important;
     font-weight: 700;
     text-decoration: none;
   }
@@ -95,22 +104,22 @@ permalink: /publications/
   }
 </style>
 
-{% assign first_author = "" | split: "" %}
-{% assign coauthor = "" | split: "" %}
-
-{% if site.data.publications %}
-  {% if site.data.publications.first_author %}
-    {% assign first_author = site.data.publications.first_author %}
-  {% endif %}
-  {% if site.data.publications.coauthor %}
-    {% assign coauthor = site.data.publications.coauthor %}
-  {% endif %}
-{% endif %}
-
+{% assign first_author = site.data.publications.first_author %}
+{% assign coauthor = site.data.publications.coauthor %}
 {% assign first_count = first_author | size %}
 {% assign coauthor_count = coauthor | size %}
 
 <div class="pub-wrap">
+  <div class="pub-intro">
+    <h1>Publications</h1>
+    <p>
+      First-author papers on the left, co-authored papers on the right.
+      The newest papers should appear at the top of each column.
+    </p>
+    <div class="pub-debug">
+      Loaded {{ first_count }} first-author papers and {{ coauthor_count }} co-authored papers from <code>_data/publications.yml</code>.
+    </div>
+  </div>
 
   {% if first_count == 0 and coauthor_count == 0 %}
     <div class="pub-empty">

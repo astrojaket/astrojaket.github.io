@@ -1,4 +1,3 @@
-# tools/fetch_publications.py
 import os
 import re
 from pathlib import Path
@@ -7,31 +6,61 @@ import requests
 import yaml
 
 ORCID = "0000-0003-4844-9838"
-AUTHOR_SURNAME = "Taylor"  # change only if your SciX author strings use a different surname
 OUTFILE = Path("_data/publications.yml")
-
 TOKEN = os.environ.get("ADS_API_TOKEN")
+
 if not TOKEN:
     raise RuntimeError("ADS_API_TOKEN is missing from the environment.")
 
-url = "https://api.adsabs.harvard.edu/v1/search/query"
-params = {
+URL = "https://api.adsabs.harvard.edu/v1/search/query"
+PARAMS = {
     "q": f"orcid:{ORCID}",
     "fl": "title,author,bibcode,year,date",
     "sort": "date desc",
     "rows": 500,
 }
-headers = {"Authorization": f"Bearer {TOKEN}"}
+HEADERS = {"Authorization": f"Bearer {TOKEN}"}
 
-resp = requests.get(url, params=params, headers=headers, timeout=60)
-resp.raise_for_status()
-payload = resp.json()
+SELF_PATTERNS = [
+    r"\bJ\.?\s*Taylor\b",
+    r"\bJake\s+Taylor\b",
+    r"\bTaylor,\s*J\.?\b",
+    r"\bTaylor,\s*Jake\b",
+]
 
+
+def author_is_self(author_name: str) -> bool:
+    name = re.sub(r"\s+", " ", author_name.strip())
+
+    # Exclude unrelated Bell papers up front.
+    if re.search(r"\bBell\b", name, flags=re.IGNORECASE):
+        return False
+
+    return any(re.search(pattern, name, flags=re.IGNORECASE) for pattern in SELF_PATTERNS)
+
+
+def author_summary(authors: list[str]) -> str:
+    shown = authors[:4]
+    summary = ", ".join(shown)
+    if len(authors) > 4:
+        summary += " et al."
+    return summary
+
+
+def paper_sort_key(paper: dict) -> tuple:
+    date = paper.get("date") or ""
+    year = paper.get("year") or ""
+    title = paper.get("title") or ""
+    return (str(date), str(year), str(title))
+
+
+response = requests.get(URL, params=PARAMS, headers=HEADERS, timeout=60)
+response.raise_for_status()
+payload = response.json()
 docs = payload.get("response", {}).get("docs", [])
 
 first_author = []
 coauthor = []
-
 seen = set()
 
 for doc in docs:
@@ -46,18 +75,24 @@ for doc in docs:
 
     title = (doc.get("title") or ["Untitled"])[0]
     year = doc.get("year") or ""
-    link = f"https://ui.adsabs.harvard.edu/abs/{bibcode}/abstract" if bibcode else "https://ui.adsabs.harvard.edu/"
+    date = doc.get("date") or ""
+    link = (
+        f"https://ui.adsabs.harvard.edu/abs/{bibcode}/abstract"
+        if bibcode
+        else "https://ui.adsabs.harvard.edu/"
+    )
 
     paper = {
         "title": title,
-        "authors": ", ".join(authors),
+        "authors": f"{author_summary(authors)} ({year})" if year else author_summary(authors),
         "year": year,
+        "date": date,
         "link": link,
     }
 
     author_index = None
     for idx, author_name in enumerate(authors[:4]):
-        if re.search(rf"\b{re.escape(AUTHOR_SURNAME)}\b", author_name, flags=re.IGNORECASE):
+        if author_is_self(author_name):
             author_index = idx
             break
 
@@ -69,12 +104,8 @@ for doc in docs:
     elif author_index in (1, 2, 3):
         coauthor.append(paper)
 
-# newest-first
-def sort_key(p):
-    return str(p.get("year", "")), p.get("title", "")
-
-first_author = sorted(first_author, key=sort_key, reverse=True)
-coauthor = sorted(coauthor, key=sort_key, reverse=True)
+first_author = sorted(first_author, key=paper_sort_key, reverse=True)
+coauthor = sorted(coauthor, key=paper_sort_key, reverse=True)
 
 OUTFILE.parent.mkdir(parents=True, exist_ok=True)
 with OUTFILE.open("w", encoding="utf-8") as f:
