@@ -1,3 +1,4 @@
+
 ---
 layout: default
 title: Publications
@@ -5,220 +6,72 @@ permalink: /publications/
 ---
 
 <style>
-  .page-shell {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 1.5rem 1rem 3rem;
+.pub-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2rem;
+  align-items: start;
+}
+
+.pub-column h2 {
+  color: #5a4d92;
+  margin-bottom: 1rem;
+}
+
+.pub-card {
+  background: rgba(255,255,255,0.82);
+  border: 1px solid rgba(90,77,146,0.12);
+  border-radius: 14px;
+  padding: 1rem 1.1rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 6px 18px rgba(47,42,61,0.08);
+}
+
+.pub-title {
+  color: #5a4d92;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.pub-title:hover {
+  text-decoration: underline;
+}
+
+.pub-authors {
+  margin-top: 0.4rem;
+  color: #4a455a;
+  font-size: 0.95rem;
+}
+
+@media (max-width: 800px) {
+  .pub-grid {
+    grid-template-columns: 1fr;
   }
-
-  .page-hero {
-    margin: 1rem auto 2rem;
-    padding: 1.5rem 1.75rem;
-    border-radius: 18px;
-    background: rgba(255, 255, 255, 0.82);
-    border: 1px solid rgba(90, 77, 146, 0.12);
-    box-shadow: 0 10px 28px rgba(47, 42, 61, 0.08);
-    backdrop-filter: blur(10px);
-  }
-
-  .page-title {
-    margin: 0 0 0.4rem;
-    color: #4d437d;
-    font-size: 2.1rem;
-    line-height: 1.15;
-    letter-spacing: -0.02em;
-  }
-
-  .page-subtitle {
-    margin: 0;
-    color: #5f5a74;
-    font-size: 1rem;
-    line-height: 1.6;
-  }
-
-  .pub-section {
-    margin-top: 2rem;
-  }
-
-  .pub-section h2 {
-    margin: 0 0 1rem;
-    color: #5a4d92;
-    font-size: 1.2rem;
-    letter-spacing: 0.01em;
-  }
-
-  .pub-list {
-    display: grid;
-    gap: 0.9rem;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  }
-
-  .publication-box {
-    background: rgba(255, 255, 255, 0.84);
-    border: 1px solid rgba(90, 77, 146, 0.12);
-    border-radius: 16px;
-    padding: 1rem 1.1rem;
-    box-shadow: 0 6px 18px rgba(47, 42, 61, 0.08);
-    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-  }
-
-  .publication-box:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 24px rgba(47, 42, 61, 0.12);
-    border-color: rgba(90, 77, 146, 0.22);
-  }
-
-  .publication-box p {
-    margin: 0.45rem 0 0;
-    color: #4b465b;
-    line-height: 1.55;
-  }
-
-  .publication-link {
-    color: #5a4d92;
-    text-decoration: none;
-    font-weight: 700;
-    line-height: 1.45;
-  }
-
-  .publication-link:hover {
-    text-decoration: underline;
-  }
-
-  .meta-label {
-    display: inline-block;
-    margin-top: 0.8rem;
-    font-size: 0.82rem;
-    letter-spacing: 0.02em;
-    text-transform: uppercase;
-    color: #7a6ba9;
-    font-weight: 700;
-  }
-
-  .authors {
-    margin-top: 0.45rem !important;
-    font-size: 0.96rem;
-  }
-
-  @media (max-width: 700px) {
-    .page-shell {
-      padding: 1rem 0.8rem 2.25rem;
-    }
-
-    .page-hero {
-      padding: 1.25rem 1.2rem;
-      border-radius: 16px;
-    }
-
-    .page-title {
-      font-size: 1.75rem;
-    }
-  }
+}
 </style>
 
-<div class="page-shell">
-  <div class="page-hero">
-    <h1 class="page-title">Publications</h1>
-    <p class="page-subtitle">Selected papers and co-authored work, presented in the same soft purple visual language as the rest of the site.</p>
-  </div>
-
-  <section class="pub-section">
+<div class="pub-grid">
+  <section class="pub-column">
     <h2>First Author Papers</h2>
-    <div class="pub-list">
-      <div class="publication-box">
-        <a class="publication-link" href="https://ui.adsabs.harvard.edu/abs/2023MNRAS.526.3326T/abstract">JWST NIRISS Transmission Spectroscopy of the Super-Earth GJ 357b, a Favourable Target for Atmospheric Retention</a>
-        <p class="authors">Authors: Jake Taylor, Michael Radica., et al</p>
-        <p><strong>DOI:</strong> <a class="publication-link" href="https://doi.org/10.1093/mnras/stad2287">10.1093/mnras/stad2287</a></p>
-      </div>
 
-      <div class="publication-box">
-        <a class="publication-link" href="https://ui.adsabs.harvard.edu/abs/2023MNRAS.526.3326T/abstract">Are There Spectral Features in the MIRI/LRS Transmission Spectrum of K2-18b?</a>
-        <p class="authors">Authors: Jake Taylor</p>
-        <p><strong>DOI:</strong> <a class="publication-link" href="https://doi.org/10.1093/mnras/stad2287">10.1093/mnras/stad2287</a></p>
-      </div>
-
-      <div class="publication-box">
-        <a class="publication-link" href="https://ui.adsabs.harvard.edu/abs/2021MNRAS.506.1677T/abstract">Another look at the dayside spectra of WASP-43b and HD 209458b: Are there scattering clouds?</a>
-        <p class="authors">Authors: Jake Taylor, Vivien Parmentier</p>
-        <p><strong>DOI:</strong> <a class="publication-link" href="https://doi.org/10.1093/mnras/stad2287">10.1093/mnras/stad2287</a></p>
-      </div>
-
-      <div class="publication-box">
-        <a class="publication-link" href="https://ui.adsabs.harvard.edu/abs/2022MNRAS.512.1415T/abstract">Awesome SOSS: atmospheric characterization of WASP-96 b using the JWST early release observations</a>
-        <p class="authors">Authors: Jake Taylor, Michael Radica, Luis Welbanks, Ryan J. MacDonald, Jasmina Blecic, Maria Zamyatina, Alexander Roth, Jacob L. Bean, Vivien Parmentier, Louis-Philippe Coulombe, Adina D. Feinstein, Néstor Espinoza, Björn Benneke, David Lafrenière, René Doyon, Eva-Maria Ahrer</p>
-        <p><strong>DOI:</strong> <a class="publication-link" href="https://doi.org/10.1093/mnras/stad1547">10.1093/mnras/stad1547</a></p>
-      </div>
-
-      <div class="publication-box">
-        <a class="publication-link" href="https://ui.adsabs.harvard.edu/abs/2022MNRAS.512.1415T/abstract">Impact of variable photospheric radius on exoplanet atmospheric retrievals</a>
-        <p class="authors">Authors: Jake Taylor</p>
-        <p><strong>DOI:</strong> <a class="publication-link" href="https://doi.org/10.1093/mnrasl/slac028">10.1093/mnrasl/slac028</a></p>
-      </div>
-
-      <div class="publication-box">
-        <a class="publication-link" href="https://ui.adsabs.harvard.edu/abs/2021MNRAS.506.1677T/abstract">How does thermal scattering shape the infrared spectra of cloudy exoplanets? A theoretical framework and consequences for atmospheric retrievals in the JWST era</a>
-        <p class="authors">Authors: Jake Taylor, Vivien Parmentier, Michael R. Line, Elspeth K.H. Lee, Patrick G.J. Irwin, Suzanne Aigrain</p>
-        <p><strong>DOI:</strong> <a class="publication-link" href="https://doi.org/10.1093/mnras/stab1854">10.1093/mnras/stab1854</a></p>
-      </div>
-
-      <div class="publication-box">
-        <a class="publication-link" href="https://ui.adsabs.harvard.edu/abs/2020MNRAS.496.4689T/abstract">Understanding and mitigating biases when studying inhomogeneous emission spectra with JWST</a>
-        <p class="authors">Authors: Jake Taylor, Vivien Parmentier, Patrick G.J. Irwin, Suzanne Aigrain, Elspeth K.H. Lee, Joshua Krissansen-Totton</p>
-        <p><strong>DOI:</strong> <a class="publication-link" href="https://doi.org/10.1093/mnras/staa552">10.1093/mnras/staa552</a></p>
-      </div>
-    </div>
+    {% for paper in site.data.publications.first_author %}
+    <article class="pub-card">
+      <a href="{{ paper.link }}" class="pub-title" target="_blank">{{ paper.title }}</a>
+      <p class="pub-authors">{{ paper.authors }}</p>
+      <p>{{ paper.year }}</p>
+    </article>
+    {% endfor %}
   </section>
 
-  <section class="pub-section">
-    <h2>Second and Third Author Papers</h2>
-    <div class="pub-list">
-      <div class="publication-box">
-        <a class="publication-link" href="https://ui.adsabs.harvard.edu/abs/2023MNRAS.526.3326T/abstract">Constraining the Scattered Light properties of LTT 9779 b Using HST/WFC3 UVIS</a>
-        <p class="authors">Authors: Michael Radica, Jake Taylor, Hannah R Wakeford, David Lafrenière, Romain Allart, Nicolas B Cowan, James S. Jenkins, Vivien Parmentier</p>
-        <p><strong>DOI:</strong> <a class="publication-link" href="https://doi.org/10.1093/mnras/staf402">10.1093/mnras/staf402</a></p>
-      </div>
+  <section class="pub-column">
+    <h2>Second–Fourth Author Papers</h2>
 
-      <div class="publication-box">
-        <a class="publication-link" href="https://ui.adsabs.harvard.edu/abs/2024ApJ...972L..25R/abstract">Promise and Peril: Stellar Contamination and Strict Limits on the Atmosphere Composition of TRAPPIST-1 c from JWST NIRISS Transmission Spectra</a>
-        <p class="authors">Authors: Michael Radica, Caroline Piaulet-Ghorayeb, Jake Taylor, Louis-Philippe Coulombe, Björn Benneke, Loic Albert, Étienne Artigau, Nicolas B. Cowan, René Doyon, David Lafrenière, Alexandrine L'Heureux, Olivia Lim</p>
-        <p><strong>DOI:</strong> <a class="publication-link" href="https://doi.org/10.3847/2041-8213/ada381">10.3847/2041-8213/ada381</a></p>
-      </div>
-
-      <div class="publication-box">
-        <a class="publication-link" href="https://ui.adsabs.harvard.edu/abs/2024MNRAS.527.7361F/abstract">JWST/NIRISS and HST: Exploring the improved ability to characterize exoplanet atmospheres in the JWST era</a>
-        <p class="authors">Authors: Chloe Fisher, Jake Taylor, Vivien Parmentier, Daniel Kitzmann, Jayne L. Birkby, Michael Radica, Joanna Barstow, Jingxuan Yang, Giuseppe Morello</p>
-        <p><strong>DOI:</strong> <a class="publication-link" href="https://doi.org/10.1093/mnras/stae2240">10.1093/mnras/stae2240</a></p>
-      </div>
-
-      <div class="publication-box">
-        <a class="publication-link" href="https://ui.adsabs.harvard.edu/abs/2024ApJ...972L..25R/abstract">Muted Features in the JWST NIRISS Transmission Spectrum of Hot Neptune LTT 9779b</a>
-        <p class="authors">Authors: Michael Radica, Louis-Philippe Coulombe, Jake Taylor, Loic Albert, Romain Allart, Björn Benneke, Nicolas B. Cowan, Lisa Dang, David Lafrenière, Daniel Thorngren, Étienne Artigau, René Doyon, Laura Flagg, Doug Johnstone, Stefan Pelletier, Pierre-Alexis Roy</p>
-        <p><strong>DOI:</strong> <a class="publication-link" href="https://doi.org/10.3847/2041-8213/ad20e4">10.3847/2041-8213/ad20e4</a></p>
-      </div>
-
-      <div class="publication-box">
-        <a class="publication-link" href="https://ui.adsabs.harvard.edu/abs/2024PASP..136a4203R/abstract">APPLESOSS: A Producer of ProfiLEs for SOSS. Application to the NIRISS SOSS Mode</a>
-        <p class="authors">Authors: Michael Radica, Loïc Albert, Jake Taylor, David Lafrenière, Louis-Philippe Coulombe, Antoine Darveau-Bernier, René Doyon, Neil Cook, Nicolas Cowan, Néstor Espinoza, Doug Johnstone, Lisa Kaltenegger, Caroline Piaulet, Arpita Roy, Geert Jan Talens</p>
-        <p><strong>DOI:</strong> <a class="publication-link" href="https://doi.org/10.1088/1538-3873/ac9430">10.1088/1538-3873/ac9430</a></p>
-      </div>
-
-      <div class="publication-box">
-        <a class="publication-link" href="https://ui.adsabs.harvard.edu/abs/2024ApJ...925L..15M/abstract">Water Ice Cloud Variability and Multi-epoch Transmission Spectra of TRAPPIST-1e</a>
-        <p class="authors">Authors: E. M. May, Jake Taylor, T. D. Komacek, M. R. Line, V. Parmentier</p>
-        <p><strong>DOI:</strong> <a class="publication-link" href="https://doi.org/10.3847/2041-8213/abeeff">10.3847/2041-8213/abeeff</a></p>
-      </div>
-
-      <div class="publication-box">
-        <a class="publication-link" href="https://ui.adsabs.harvard.edu/abs/2020MNRAS.496.4689T/abstract">2.5D retrieval of atmospheric properties from exoplanet phase curves: application to WASP-43b observations</a>
-        <p class="authors">Authors: Patrick G. J. Irwin, Vivien Parmentier, Jake Taylor, Jo Barstow, Suzanne Aigrain, Elspeth K. H. Lee, Ryan Garland</p>
-        <p><strong>DOI:</strong> <a class="publication-link" href="https://doi.org/10.1093/mnras/staa238">10.1093/mnras/staa238</a></p>
-      </div>
-
-      <div class="publication-box">
-        <a class="publication-link" href="https://ui.adsabs.harvard.edu/abs/2019MNRAS.491.1445L/abstract">Exoplanetary Monte Carlo radiative transfer with correlated-k - I. Benchmarking transit and emission observables</a>
-        <p class="authors">Authors: Elspeth Lee, Jake Taylor, Simon L. Grimm, Jean-Loup Baudino, Ryan Garland, Patrick G. J. Irwin, Kenneth Wood</p>
-        <p><strong>DOI:</strong> <a class="publication-link" href="https://doi.org/10.1093/mnras/stz1418">10.1093/mnras/stz1418</a></p>
-      </div>
-    </div>
+    {% for paper in site.data.publications.coauthor %}
+    <article class="pub-card">
+      <a href="{{ paper.link }}" class="pub-title" target="_blank">{{ paper.title }}</a>
+      <p class="pub-authors">{{ paper.authors }}</p>
+      <p>{{ paper.year }}</p>
+    </article>
+    {% endfor %}
   </section>
 </div>
