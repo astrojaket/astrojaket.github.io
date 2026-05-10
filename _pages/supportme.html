@@ -1,76 +1,28 @@
 ---
 layout: default
 title: Support Me
+permalink: /supportme/
 ---
 
-<div class="support-container">
-  <!-- Monzo Section -->
-  <div class="monzo-section">
-    <h2>Support Me with Monzo</h2>
-    <p>If you'd like to support me, you can send a donation through Monzo.</p>
-    <a href="https://monzo.me/jaketaylor2?h=jOupTl" target="_blank">
-      <button class="donate-button">Donate with Monzo</button>
-    </a>
+<article class="card prose">
+  <span class="kicker">Support</span>
+  <h1>Support my work</h1>
+  <p>
+    Thank you for any support. Small donations help with outreach, side projects, and the time it takes to share work
+    publicly.
+  </p>
+
+  <div class="grid grid-2" style="margin-top: 1.1rem;">
+    <section class="tool-card">
+      <h3>Monzo</h3>
+      <p>Send a donation directly through Monzo.</p>
+      <div class="meta"><a class="button primary" href="https://monzo.me" target="_blank" rel="noreferrer">Donate with Monzo</a></div>
+    </section>
+
+    <section class="tool-card">
+      <h3>Buy me a coffee</h3>
+      <p>A simple one-off option for a coffee and a few minutes of coding time.</p>
+      <div class="meta"><span class="button secondary">Add your preferred coffee link here</span></div>
+    </section>
   </div>
-
-  <!-- Buy Me a Coffee Section -->
-  <div class="bmc-section">
-    <h2>Buy Me a Coffee</h2>
-    <p>Your support is greatly appreciated! You can buy me a coffee through the link below.</p>
-    <script src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-name="BMC-Widget" data-cfasync="false" data-id="astrojake" data-description="Support me on Buy me a coffee!" data-message="Thank you for your support!" data-color="#6b5b95" data-position="Right" data-x_margin="18" data-y_margin="18"></script>
-  </div>
-</div>
-
-<!-- CSS for Responsive Layout -->
-<style>
-  .support-container {
-    display: flex;
-    justify-content: space-around;
-    align-items: flex-start;
-    margin-top: 20px;
-    flex-wrap: wrap;
-  }
-
-  .monzo-section, .bmc-section {
-    width: 45%;
-    background-color: #f9f9ff;
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-    margin-bottom: 20px;
-  }
-
-  h2 {
-    color: #6b5b95;
-  }
-
-  p {
-    color: #333;
-  }
-
-  .donate-button {
-    background-color: #6b5b95;
-    color: #fff;
-    border: none;
-    padding: 12px 24px;
-    font-size: 16px;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-  }
-
-  .donate-button:hover {
-    background-color: #574a78;
-  }
-
-  @media (max-width: 768px) {
-    .support-container {
-      flex-direction: column;
-      align-items: center;
-    }
-
-    .monzo-section, .bmc-section {
-      width: 90%;
-    }
-  }
-</style>
+</article>
