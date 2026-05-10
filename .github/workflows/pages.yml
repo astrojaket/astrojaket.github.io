@@ -4,6 +4,8 @@ on:
   push:
     branches: [ main ]
   workflow_dispatch: {}
+  schedule:
+    - cron: "0 6 * * 1"
 
 permissions:
   contents: read
@@ -17,18 +19,32 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      ADS_API_TOKEN: ${{ secrets.ADS_API_TOKEN }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Jekyll build (uses GitHub’s maintained action)
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests pyyaml
+
+      - name: Fetch publications from SciX
+        run: python tools/fetch_publications.py
+
       - name: Build site with Jekyll
         uses: actions/jekyll-build-pages@v1
         with:
           source: .
           destination: ./_site
 
-      # Upload the generated site for deployment
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
@@ -40,6 +56,7 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
