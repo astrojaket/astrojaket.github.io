@@ -1,12 +1,2 @@
-
-first_author:
-  - title: "Example First Author Paper"
-    authors: "J. Taylor et al."
-    year: 2026
-    link: "https://ui.adsabs.harvard.edu/"
-
-coauthor:
-  - title: "Example Coauthor Paper"
-    authors: "A. Author, J. Taylor et al."
-    year: 2025
-    link: "https://ui.adsabs.harvard.edu/"
+first_author: []
+coauthor: []
