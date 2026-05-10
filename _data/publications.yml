@@ -1,2 +1,21 @@
-first_author: []
-coauthor: []
+first_author:
+  - title: "JWST Transmission Spectroscopy of a Warm Neptune"
+    authors: "J. Taylor, A. Smith, B. Carter"
+    year: 2026
+    link: "https://ui.adsabs.harvard.edu/"
+
+  - title: "Cloud Structures in Exoplanet Atmospheres"
+    authors: "J. Taylor, L. Brown, M. Evans"
+    year: 2025
+    link: "https://ui.adsabs.harvard.edu/"
+
+coauthor:
+  - title: "Atmospheric Retrievals for Sub-Neptune Worlds"
+    authors: "A. Johnson, J. Taylor, R. White"
+    year: 2026
+    link: "https://ui.adsabs.harvard.edu/"
+
+  - title: "High Precision NIRSpec Observations of GJ 436b"
+    authors: "K. Adams, P. Singh, J. Taylor, T. Green"
+    year: 2025
+    link: "https://ui.adsabs.harvard.edu/"
