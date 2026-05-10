@@ -1,0 +1,162 @@
+first_author:
+- title: JWST NIRISS transmission spectroscopy of the super-Earth GJ 357b, a favourable
+    target for atmospheric retention
+  authors: Taylor, Jake, Radica, Michael, Chatterjee, Richard D., Hammond, Mark, Meier,
+    Tobias, Aigrain, Suzanne, MacDonald, Ryan J., Albert, Loic, Benneke, Björn, Coulombe,
+    Louis-Philippe, Cowan, Nicolas B., Dang, Lisa, Doyon, René, Flagg, Laura, Johnstone,
+    Doug, Kaltenegger, Lisa, Lafrenière, David, Pelletier, Stefan, Piaulet-Ghorayeb,
+    Caroline, Rowe, Jason F., Roy, Pierre-Alexis
+  year: '2025'
+  link: https://ui.adsabs.harvard.edu/abs/2025MNRAS.540.3677T/abstract
+- title: Are There Spectral Features in the MIRI/LRS Transmission Spectrum of K2-18b?
+  authors: Taylor, Jake
+  year: '2025'
+  link: https://ui.adsabs.harvard.edu/abs/2025RNAAS...9..118T/abstract
+- title: Nightside clouds and disequilibrium chemistry on the hot Jupiter WASP-43b
+  authors: Bell, Taylor J., Crouzet, Nicolas, Cubillos, Patricio E., Kreidberg, Laura,
+    Piette, Anjali A. A., Roman, Michael T., Barstow, Joanna K., Blecic, Jasmina,
+    Carone, Ludmila, Coulombe, Louis-Philippe, Ducrot, Elsa, Hammond, Mark, Mendonça,
+    João M., Moses, Julianne I., Parmentier, Vivien, Stevenson, Kevin B., Teinturier,
+    Lucas, Zhang, Michael, Batalha, Natalie M., Bean, Jacob L., Benneke, Björn, Charnay,
+    Benjamin, Chubb, Katy L., Demory, Brice-Olivier, Gao, Peter, Lee, Elspeth K. H.,
+    López-Morales, Mercedes, Morello, Giuseppe, Rauscher, Emily, Sing, David K., Tan,
+    Xianyu, Venot, Olivia, Wakeford, Hannah R., Aggarwal, Keshav, Ahrer, Eva-Maria,
+    Alam, Munazza K., Baeyens, Robin, Barrado, David, Caceres, Claudio, Carter, Aarynn
+    L., Casewell, Sarah L., Challener, Ryan C., Crossfield, Ian J. M., Decin, Leen,
+    Désert, Jean-Michel, Dobbs-Dixon, Ian, Dyrek, Achrène, Espinoza, Néstor, Feinstein,
+    Adina D., Gibson, Neale P., Harrington, Joseph, Helling, Christiane, Hu, Renyu,
+    Iro, Nicolas, Kempton, Eliza M.-R., Kendrew, Sarah, Komacek, Thaddeus D., Krick,
+    Jessica, Lagage, Pierre-Olivier, Leconte, Jérémy, Lendl, Monika, Lewis, Neil T.,
+    Lothringer, Joshua D., Malsky, Isaac, Mancini, Luigi, Mansfield, Megan, Mayne,
+    Nathan J., Evans-Soma, Thomas M., Molaverdikhani, Karan, Nikolov, Nikolay K.,
+    Nixon, Matthew C., Palle, Enric, Petit dit de la Roche, Dominique J. M., Piaulet,
+    Caroline, Powell, Diana, Rackham, Benjamin V., Schneider, Aaron D., Steinrueck,
+    Maria E., Taylor, Jake, Welbanks, Luis, Yurchenko, Sergei N., Zhang, Xi, Zieba,
+    Sebastian
+  year: '2024'
+  link: https://ui.adsabs.harvard.edu/abs/2024NatAs...8..879B/abstract
+- title: 'Awesome SOSS: atmospheric characterization of WASP-96 b using the JWST early
+    release observations'
+  authors: Taylor, Jake, Radica, Michael, Welbanks, Luis, MacDonald, Ryan J., Blecic,
+    Jasmina, Zamyatina, Maria, Roth, Alexander, Bean, Jacob L., Parmentier, Vivien,
+    Coulombe, Louis-Philippe, Feinstein, Adina D., Espinoza, Néstor, Benneke, Björn,
+    Lafrenière, David, Doyon, René, Ahrer, Eva-Maria
+  year: '2023'
+  link: https://ui.adsabs.harvard.edu/abs/2023MNRAS.524..817T/abstract
+- title: 'Another look at the dayside spectra of WASP-43b and HD 209458b: Are there
+    scattering clouds?'
+  authors: Taylor, Jake, Parmentier, Vivien
+  year: '2023'
+  link: https://ui.adsabs.harvard.edu/abs/2023MNRAS.526.2133T/abstract
+- title: Impact of variable photospheric radius on exoplanet atmospheric retrievals
+  authors: Taylor, Jake
+  year: '2022'
+  link: https://ui.adsabs.harvard.edu/abs/2022MNRAS.513L..20T/abstract
+- title: How does thermal scattering shape the infrared spectra of cloudy exoplanets?
+    A theoretical framework and consequences for atmospheric retrievals in the JWST
+    era
+  authors: Taylor, Jake, Parmentier, Vivien, Line, Michael R., Lee, Elspeth K. H.,
+    Irwin, Patrick G. J., Aigrain, Suzanne
+  year: '2021'
+  link: https://ui.adsabs.harvard.edu/abs/2021MNRAS.506.1309T/abstract
+- title: Understanding and mitigating biases when studying inhomogeneous emission
+    spectra with JWST
+  authors: Taylor, Jake, Parmentier, Vivien, Irwin, Patrick G. J., Aigrain, Suzanne,
+    Lee, Elspeth K. H., Krissansen-Totton, Joshua
+  year: '2020'
+  link: https://ui.adsabs.harvard.edu/abs/2020MNRAS.493.4342T/abstract
+- title: The Impact of Scattering Clouds when Studying Exoplanet Emission Spectra
+    with JWST
+  authors: Taylor, Jake, Parmentier, Vivien, Line, Michael, Lee, Graham, Irwin, Patrick,
+    Aigrain, Suzanne
+  year: '2020'
+  link: https://ui.adsabs.harvard.edu/abs/2020EPSC...14...69T/abstract
+coauthor:
+- title: Supersolar Metallicity and Tentative Evidence for Photochemistry on WASP-96
+    b from JWST and Ground-based VLT Transmission Spectroscopy
+  authors: Radica, Michael, Taylor, Jake, Rotman, Yoav, Blecic, Jasmina, Welbanks,
+    Luis, Ahrer, Eva-Maria, Christie, Duncan, Coulombe, Louis-Philippe, Lowry, Gillis,
+    Murphy, Matthew M., Feinstein, Adina D., Lafrenière, David, MacDonald, Ryan J.,
+    Mayne, Nathan J., Tsai, Shang-Min, Zamyatina, Maria
+  year: '2026'
+  link: https://ui.adsabs.harvard.edu/abs/2026AJ....171..314R/abstract
+- title: 'Promise and Peril: Stellar Contamination and Strict Limits on the Atmosphere
+    Composition of TRAPPIST-1 c from JWST NIRISS Transmission Spectra'
+  authors: Radica, Michael, Piaulet-Ghorayeb, Caroline, Taylor, Jake, Coulombe, Louis-Philippe,
+    Benneke, Björn, Albert, Loic, Artigau, Étienne, Cowan, Nicolas B., Doyon, René,
+    Lafrenière, David, L'Heureux, Alexandrine, Lim, Olivia
+  year: '2025'
+  link: https://ui.adsabs.harvard.edu/abs/2025ApJ...979L...5R/abstract
+- title: Constraining the scattered light properties of LTT 9779 b using HST/WFC3
+    UVIS
+  authors: Radica, Michael, Taylor, Jake, Wakeford, Hannah R., Lafrenière, David,
+    Allart, Romain, Cowan, Nicolas B., Jenkins, James S., Parmentier, Vivien
+  year: '2025'
+  link: https://ui.adsabs.harvard.edu/abs/2025MNRAS.538.1853R/abstract
+- title: Muted Features in the JWST NIRISS Transmission Spectrum of Hot Neptune LTT
+    9779b
+  authors: Radica, Michael, Coulombe, Louis-Philippe, Taylor, Jake, Albert, Loic,
+    Allart, Romain, Benneke, Björn, Cowan, Nicolas B., Dang, Lisa, Lafrenière, David,
+    Thorngren, Daniel, Artigau, Étienne, Doyon, René, Flagg, Laura, Johnstone, Doug,
+    Pelletier, Stefan, Roy, Pierre-Alexis
+  year: '2024'
+  link: https://ui.adsabs.harvard.edu/abs/2024ApJ...962L..20R/abstract
+- title: 'JWST/NIRISS and HST: Exploring the improved ability to characterize exoplanet
+    atmospheres in the JWST era'
+  authors: Fisher, Chloe, Taylor, Jake, Parmentier, Vivien, Kitzmann, Daniel, Birkby,
+    Jayne L., Radica, Michael, Barstow, Joanna, Yang, Jingxuan, Morello, Giuseppe
+  year: '2024'
+  link: https://ui.adsabs.harvard.edu/abs/2024MNRAS.535...27F/abstract
+- title: 'Putting it all Together: Dynamics and Chemistry Probed Through Transmission
+    Spectroscopy of a Cloud-Free Exoplanet'
+  authors: Radica, Michael, Taylor, Jake, Ahrer, Eva-Maria, Blecic, Jasmina, Christie,
+    Duncan, Coulombe, Louis-Philippe, Espinoza, Nestor, Feinstein, Adina, Goyal, Jayesh,
+    Lafreniere, David, MacDonald, Ryan, Tsai, Shang-Min, Welbanks, Luis, Zamyatina,
+    Maria
+  year: '2023'
+  link: https://ui.adsabs.harvard.edu/abs/2023jwst.prop.4082R/abstract
+- title: 'Awesome SOSS: transmission spectroscopy of WASP-96b with NIRISS/SOSS'
+  authors: Radica, Michael, Welbanks, Luis, Espinoza, Néstor, Taylor, Jake, Coulombe,
+    Louis-Philippe, Feinstein, Adina D., Goyal, Jayesh, Scarsdale, Nicholas, Albert,
+    Loïc, Baghel, Priyanka, Bean, Jacob L., Blecic, Jasmina, Lafrenière, David, MacDonald,
+    Ryan J., Zamyatina, Maria, Allart1, Romain, Artigau, Étienne, Batalha, Natasha
+    E., Cook, Neil James, Cowan, Nicolas B., Dang, Lisa, Doyon, René, Fournier-Tondreau,
+    Marylou, Johnstone, Doug, Line, Michael R., Moran, Sarah E., Mukherjee, Sagnick,
+    Pelletier, Stefan, Roy, Pierre-Alexis, Talens, Geert Jan, Filippazzo, Joseph,
+    Pontoppidan, Klaus, Volk, Kevin
+  year: '2023'
+  link: https://ui.adsabs.harvard.edu/abs/2023MNRAS.524..835R/abstract
+- title: 'APPLESOSS: A Producer of ProfiLEs for SOSS. Application to the NIRISS SOSS
+    Mode'
+  authors: Radica, Michael, Albert, Loïc, Taylor, Jake, Lafrenière, David, Coulombe,
+    Louis-Philippe, Darveau-Bernier, Antoine, Doyon, René, Cook, Neil, Cowan, Nicolas,
+    Espinoza, Néstor, Johnstone, Doug, Kaltenegger, Lisa, Piaulet, Caroline, Roy,
+    Arpita, Talens, Geert Jan
+  year: '2022'
+  link: https://ui.adsabs.harvard.edu/abs/2022PASP..134j4502R/abstract
+- title: Water Ice Cloud Variability and Multi-epoch Transmission Spectra of TRAPPIST-1e
+  authors: May, E. M., Taylor, J., Komacek, T. D., Line, M. R., Parmentier, V.
+  year: '2021'
+  link: https://ui.adsabs.harvard.edu/abs/2021ApJ...911L..30M/abstract
+- title: Inferring Shallow Surfaces on Sub-Neptune Exoplanets with JWST
+  authors: Tsai, Shang-Min, Innes, Hamish, Lichtenberg, Tim, Taylor, Jake, Malik,
+    Matej, Chubb, Katy, Pierrehumbert, Raymond
+  year: '2021'
+  link: https://ui.adsabs.harvard.edu/abs/2021ApJ...922L..27T/abstract
+- title: '2.5D retrieval of atmospheric properties from exoplanet phase curves: application
+    to WASP-43b observations'
+  authors: Irwin, Patrick G. J., Parmentier, Vivien, Taylor, Jake, Barstow, Jo, Aigrain,
+    Suzanne, Lee, Elspeth K. H., Garland, Ryan
+  year: '2020'
+  link: https://ui.adsabs.harvard.edu/abs/2020MNRAS.493..106I/abstract
+- title: 'Towards the analysis of JWST exoplanet spectra: the effective temperature
+    in the context of direct imaging'
+  authors: Baudino, Jean-Loup, Taylor, J., Irwin, P. G. J., Garland, R.
+  year: '2019'
+  link: https://ui.adsabs.harvard.edu/abs/2019MNRAS.490.2086B/abstract
+- title: Exoplanetary Monte Carlo radiative transfer with correlated-k - I. Benchmarking
+    transit and emission observables
+  authors: Lee, Elspeth, Taylor, Jake, Grimm, Simon L., Baudino, Jean-Loup, Garland,
+    Ryan, Irwin, Patrick G. J., Wood, Kenneth
+  year: '2019'
+  link: https://ui.adsabs.harvard.edu/abs/2019MNRAS.487.2082L/abstract
