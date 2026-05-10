@@ -110,16 +110,6 @@ permalink: /publications/
 {% assign coauthor_count = coauthor | size %}
 
 <div class="pub-wrap">
-  <div class="pub-intro">
-    <h1>Publications</h1>
-    <p>
-      First-author papers on the left, co-authored papers on the right.
-      The newest papers should appear at the top of each column.
-    </p>
-    <div class="pub-debug">
-      Loaded {{ first_count }} first-author papers and {{ coauthor_count }} co-authored papers from <code>_data/publications.yml</code>.
-    </div>
-  </div>
 
   {% if first_count == 0 and coauthor_count == 0 %}
     <div class="pub-empty">
