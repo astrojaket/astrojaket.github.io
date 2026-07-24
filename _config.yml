@@ -1,58 +1,49 @@
-title: "Jake Taylor"
-description: ""
-url: "https://astrojaket.github.io"
+title: "Dr Jake Taylor"
+description: "Astrophysicist at the University of Oxford studying the atmospheres of exoplanets with JWST, atmospheric retrievals and machine learning."
+url: "https://www.astrojake.com"
+baseurl: ""
 
 include:
   - assets/data/mast_7d.json
 
-# Theme and Plugins
 theme: minima
 plugins:
   - jekyll-seo-tag
   - jekyll-feed
   - jekyll-sitemap
 
-# Collections
 collections:
   pages:
     output: true
     permalink: /:path/
 
-# Markdown Support
 markdown: kramdown
+permalink: pretty
 
-# Defaults for Layout
 defaults:
   - scope:
       path: "_pages"
     values:
       layout: "default"
 
-# SEO Settings
-author: ""
-language: "en"
+author:
+  name: "Dr Jake Taylor"
+  url: "https://www.astrojake.com/about/"
+
+locale: "en_GB"
+language: "en-GB"
+
 social:
-  name: "Jake Taylor"
+  name: "Dr Jake Taylor"
   links:
-    - "https://bsky.app/profile/astrojake"
+    - "https://www.physics.ox.ac.uk/our-people/jaketaylor"
+    - "https://github.com/astrojaket"
+    - "https://bsky.app/profile/astrojake.bsky.social"
     - "https://www.tiktok.com/@astrojaket"
 
-# Sitemap Settings
 sitemap:
-  exclude: ['404.html']
+  exclude:
+    - "404.html"
 
-# Custom Styling
 sass:
   style: compressed
-
-# Global Styles
-global_styles: |
-  body {
-    font-family: Avenir, sans-serif;
-    background-color: #e6e1f5;
-    margin: 0;
-    padding: 0;
-  }
-  footer {
-    display: none;
-  }
