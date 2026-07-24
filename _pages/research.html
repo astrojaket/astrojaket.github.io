@@ -1,74 +1,82 @@
 ---
 layout: default
-title: Research
+title: Research | Dr Jake Taylor
+description: Research by Dr Jake Taylor on exoplanet atmospheres, hot Jupiters, rocky planets, atmospheric retrievals and machine learning.
+permalink: /research/
 ---
 
-<div class="research-topic-box">
-    <div class="research-topic">
-        <h3>Gas Giant Exoplanets</h3>
-        <p>Exoplanets that have atmospheres that are rich in hydrogen make exquisite laboratories to understand the formation of planets. Their low mean molecular weight atmosphere produces large signals that the Hubble Space Telescope, and now the James Webb Space Telescope, can readily measure. There is a large diversity of Gas Giants, spanning the mass, radius, and temperature space. One such object, called Hot Jupiters, are Jupiter-like planets, however on a close=in orbit around their star, which results in extremely hot temperatures. These objects can teach us about the extreme physical and chemical processes that can happen in a planetary atmosphere. My research has led me to study hot Jupiters in both transmission and emission, revealing their temperature structure, amount of different molecules in the atmpsphere, and even measure what the clouds in these atmospheres are made of. I led one of the first atmospheric analysis of a hot Jupiter using observations from the James Webb Space Telescope, you can read the article <a href="https://ui.adsabs.harvard.edu/abs/2023MNRAS.524..817T/abstract" target="_blank">here</a>. My research continues to study these hot gaseous planets to uncover what their atmospheres are made of.</p>
-    </div>
-</div>
+<header class="page-hero">
+  <div class="page-hero-inner">
+    <span class="eyebrow">Research</span>
+    <h1>Reading planetary atmospheres in <span class="text-gradient">starlight.</span></h1>
+    <p>
+      I study the physics and chemistry of exoplanet atmospheres—particularly how we can turn
+      telescope observations into reliable knowledge about distant worlds.
+    </p>
+  </div>
+</header>
 
+<section class="section">
+  <div class="section-shell topic-stack">
+    <article class="topic-panel" id="giant-planets">
+      <div>
+        <span class="topic-kicker">01 · Giant planets</span>
+        <h2>Hot, gaseous worlds</h2>
+      </div>
+      <div>
+        <p>
+          Hydrogen-rich exoplanets are exceptional laboratories for planetary physics. Their
+          extended atmospheres produce strong signals that can be measured with the Hubble Space
+          Telescope and the James Webb Space Telescope.
+        </p>
+        <p>
+          I study hot Jupiters in both transmission and emission, using their spectra to constrain
+          atmospheric temperatures, molecular abundances and the composition and behaviour of
+          clouds. I led one of the first atmospheric analyses of a hot Jupiter using JWST
+          observations.
+        </p>
+        <a class="text-link" href="https://ui.adsabs.harvard.edu/abs/2023MNRAS.524..817T/abstract" target="_blank" rel="noopener">Read the JWST WASP-96b paper</a>
+      </div>
+    </article>
 
-<div class="research-topic-box">
-    <div class="research-topic">
-        <h3>Terrestrial Exoplanets</h3>
-        <p>A key question that humanity are trying to answer is: are we alone in the universe? This is a question we are trying to answer by studying the atmospheres of terrestrial planets in nearby star systems. With the launch of the James Webb Space Telescope, we are closer to answering this question than ever before. I have been studying the terrestrial planets around the star TRAPPIST-1, which has been deemed one of the most favourable systems to harbour life, given there are 7 Earth-sized planets around the star. One key challenge we are facing, however, is accurately modelling the information from the star, as the signal from the star can impact how we study the atmosphere. Recently, along with a team of researchers based at the University of Montreal, we studied the transmission spectrum of TRAPPIST-1c, the second planet in the system, you can read the article <a href="https://ui.adsabs.harvard.edu/abs/2025ApJ...979L...5R" target="_blank">here</a>. I am continuing to study terrestrial planets and figure out the ways we can unabiguosly detect atmospheric signals.</p>
-    </div>
-</div>
+    <article class="topic-panel" id="terrestrial-planets">
+      <div>
+        <span class="topic-kicker">02 · Terrestrial planets</span>
+        <h2>Searching for smaller atmospheres</h2>
+      </div>
+      <div>
+        <p>
+          Studying nearby terrestrial planets brings us closer to answering one of astronomy’s
+          defining questions: are we alone? The challenge is that the host star can leave a much
+          stronger imprint on the data than the planet itself.
+        </p>
+        <p>
+          I work on the TRAPPIST-1 system and other small worlds, developing ways to distinguish
+          stellar contamination from planetary signals and determine whether these planets retain
+          detectable atmospheres.
+        </p>
+        <a class="text-link" href="https://ui.adsabs.harvard.edu/abs/2025ApJ...979L...5R" target="_blank" rel="noopener">Read the TRAPPIST-1c paper</a>
+      </div>
+    </article>
 
-<div class="research-topic-box">
-    <div class="research-topic">
-        <h3>Machine Learning</h3>
-        <p>I spent a year as a Schmidt AI in Science Fellow, learning cutting edge machine learning methods that can be applied to studying the atmospheres of exoplanets. Work from this is still on going, and will hopefully be published soon.</p>
-    </div>
-</div>
-
-<style>
-    body {
-        font-family: Avenir, sans-serif;
-        font-size: 14px;
-        margin: 0;
-        padding: 0;
-    }
-
-    h1, h2 {
-        text-align: center;
-    }
-
-    .research-topic-box {
-        display: flex;
-        justify-content: center;
-        margin-bottom: 40px;
-    }
-
-    .research-topic {
-        background-color: #f7f7f7;
-        border-radius: 12px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        padding: 20px;
-        width: 80%;
-        max-width: 800px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        margin: 20px;
-    }
-
-    .research-topic h3 {
-        font-size: 18px;
-        color: #5a4e87; /* Purple color for headings */
-        margin-bottom: 10px;
-    }
-
-    .research-topic p {
-        text-align: justify;
-        color: #333;
-    }
-
-    .research-topic-box:hover {
-        transform: scale(1.02);
-        transition: transform 0.3s ease-in-out;
-    }
-</style>
+    <article class="topic-panel" id="methods">
+      <div>
+        <span class="topic-kicker">03 · Methods</span>
+        <h2>Retrievals and machine learning</h2>
+      </div>
+      <div>
+        <p>
+          Atmospheric retrievals connect observed spectra to physical properties, but different
+          modelling assumptions can produce different answers. I develop and compare retrieval
+          methods to understand those differences and make our conclusions more robust.
+        </p>
+        <p>
+          As a former Schmidt AI in Science Fellow, I also investigate how modern machine-learning
+          techniques can accelerate atmospheric models, identify unexpected structure in spectra
+          and help us explore complex chemistry.
+        </p>
+        <a class="text-link" href="{{ '/robert/' | relative_url }}">See the ROBERT project</a>
+      </div>
+    </article>
+  </div>
+</section>
