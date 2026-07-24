@@ -829,6 +829,78 @@ select {
   font-size: 2rem;
 }
 
+.contact-panel {
+  display: grid;
+  padding: clamp(38px, 7vw, 76px);
+  align-items: center;
+  gap: clamp(40px, 8vw, 90px);
+  border-radius: var(--radius-lg);
+  color: white;
+  background: linear-gradient(135deg, #102a43, #243b67 60%, #56458d);
+  box-shadow: var(--shadow);
+  grid-template-columns: minmax(0, 1.05fr) minmax(320px, 0.95fr);
+}
+
+.contact-panel h2 {
+  margin-bottom: 22px;
+  color: white;
+}
+
+.contact-panel .eyebrow {
+  color: #d8edf2;
+}
+
+.contact-panel .eyebrow::before {
+  background: #9ed3df;
+}
+
+.contact-copy p {
+  max-width: 650px;
+  margin-bottom: 30px;
+  color: #d9e2ec;
+  font-size: 1.08rem;
+}
+
+.contact-panel .button-primary {
+  border-color: white;
+  color: var(--blue);
+  background: white;
+}
+
+.contact-panel .button-primary:hover {
+  color: var(--blue);
+  background: #eef5f8;
+}
+
+.contact-email {
+  display: block;
+  width: fit-content;
+  margin-top: 18px;
+  color: #d9e2ec;
+  font-size: 0.92rem;
+}
+
+.contact-email:hover {
+  color: white;
+}
+
+.contact-services {
+  display: flex;
+  align-content: center;
+  flex-wrap: wrap;
+  gap: 11px;
+}
+
+.contact-services span {
+  padding: 10px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 999px;
+  color: #eef5f8;
+  background: rgba(255, 255, 255, 0.07);
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
 .site-footer {
   padding: 70px 0 26px;
   color: #d9e2ec;
@@ -928,6 +1000,10 @@ select {
   }
 
   .feature-split {
+    grid-template-columns: 1fr;
+  }
+
+  .contact-panel {
     grid-template-columns: 1fr;
   }
 
