@@ -1,124 +1,67 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>{{ page.title }}</title>
-  <link rel="stylesheet" href="/assets/css/style.css" />
-</head>
-<body>
-  <!-- Improved Navigation Bar with Mobile Support -->
-  <header class="header">
-    <div class="logo">Dr Jake Taylor</div>
-    
-    <!-- Hamburger Menu -->
-    <button class="hamburger" aria-label="Toggle navigation">&#9776;</button>
+<!doctype html>
+<html lang="{{ site.language | default: 'en-GB' }}">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#102a43">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
+    {% seo %}
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
 
-    <nav class="navbar">
-      <ul>
-        <li><a href="/">Home</a></li>
-        <!--<li><a href="/supportme">Support Me</a></li>-->
-        <!--<li><a href="/research">Research</a></li>-->
-        <li><a href="/publications">Publications</a></li>
-        <li><a href="/posts">Posts</a></li>
-        <!--<li><a href="/exoplanets">Exoplanets</a></li>-->
-      </ul>
-    </nav>
-  </header>
+    <header class="site-header">
+      <div class="nav-shell">
+        <a class="site-brand" href="{{ '/' | relative_url }}" aria-label="Dr Jake Taylor, home">
+          <span class="brand-orbit" aria-hidden="true"></span>
+          <span>Dr Jake Taylor</span>
+        </a>
 
-  <main>
-    {{ content }}
-  </main>
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
+          <span class="sr-only">Open navigation</span>
+          <span></span><span></span><span></span>
+        </button>
 
-  <!-- Buy Me a Coffee Popup Widget -->
-  <script data-name="BMC-Widget" data-cfasync="false" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-id="astrojake" data-description="Support me on Buy me a coffee!" data-message="Support me here!" data-color="#4b3a69" data-position="Right" data-x_margin="18" data-y_margin="18"></script>
-</body>
+        <nav id="site-nav" class="site-nav" aria-label="Primary navigation">
+          <a href="{{ '/research/' | relative_url }}" {% if page.url == '/research/' %}aria-current="page"{% endif %}>Research</a>
+          <a href="{{ '/publications/' | relative_url }}" {% if page.url == '/publications/' %}aria-current="page"{% endif %}>Publications</a>
+          <a href="{{ '/robert/' | relative_url }}" {% if page.url == '/robert/' %}aria-current="page"{% endif %}>ROBERT</a>
+          <a href="{{ '/posts/' | relative_url }}" {% if page.url == '/posts/' %}aria-current="page"{% endif %}>Outreach</a>
+          <a href="{{ '/about/' | relative_url }}" {% if page.url == '/about/' %}aria-current="page"{% endif %}>About</a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="main-content">
+      {{ content }}
+    </main>
+
+    <footer class="site-footer">
+      <div class="footer-shell">
+        <div>
+          <a class="site-brand footer-brand" href="{{ '/' | relative_url }}">
+            <span class="brand-orbit" aria-hidden="true"></span>
+            <span>Dr Jake Taylor</span>
+          </a>
+          <p>Exoplanet atmospheres, retrievals and science communication.</p>
+        </div>
+        <div class="footer-links" aria-label="Social and professional links">
+          <a href="https://www.physics.ox.ac.uk/our-people/jaketaylor">Oxford Physics</a>
+          <a href="https://ui.adsabs.harvard.edu/search/q=author%3A%22Taylor%2C%20Jake%22">NASA ADS</a>
+          <a href="https://github.com/astrojaket">GitHub</a>
+          <a href="https://www.tiktok.com/@astrojaket">TikTok</a>
+          <a href="https://bsky.app/profile/astrojake.bsky.social">Bluesky</a>
+        </div>
+      </div>
+      <div class="footer-note">
+        <span>&copy; {{ 'now' | date: '%Y' }} Jake Taylor</span>
+        <span>Built with GitHub Pages</span>
+      </div>
+    </footer>
+
+    <script src="{{ '/assets/js/site.js' | relative_url }}" defer></script>
+  </body>
 </html>
-
-<!-- CSS for Improved Navigation with Mobile Support -->
-<style>
-  body {
-    font-family: Avenir, sans-serif;
-    background-color: #e6e1f5;
-    margin: 0;
-    padding: 0;
-  }
-
-  .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px;
-    background-color: #4b3a69;
-    position: relative;
-  }
-
-  .logo {
-    font-size: 1.5rem;
-    color: white;
-  }
-
-  .navbar ul {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    gap: 20px;
-  }
-
-  .navbar a {
-    text-decoration: none;
-    color: white;
-    font-size: 1rem;
-    transition: color 0.3s;
-  }
-
-  .navbar a:hover {
-    color: #d3bce3;
-  }
-
-  .hamburger {
-    display: none;
-    font-size: 24px;
-    background: none;
-    border: none;
-    color: white;
-    cursor: pointer;
-  }
-
-  /* Mobile Styles */
-  @media (max-width: 768px) {
-    .hamburger {
-      display: block;
-    }
-
-    .navbar {
-      display: none;
-      flex-direction: column;
-      background-color: #4b3a69;
-      position: absolute;
-      top: 80px;
-      left: 0;
-      width: 100%;
-    }
-
-    .navbar.active {
-      display: flex;
-    }
-
-    .navbar ul {
-      flex-direction: column;
-      gap: 10px;
-      padding: 20px;
-    }
-  }
-</style>
-
-<script>
-  const hamburger = document.querySelector('.hamburger');
-  const navbar = document.querySelector('.navbar');
-
-  hamburger.addEventListener('click', () => {
-    navbar.classList.toggle('active');
-  });
-</script>
