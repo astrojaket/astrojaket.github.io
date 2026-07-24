@@ -1,168 +1,60 @@
 ---
 layout: default
-title: Publications
+title: Publications | Dr Jake Taylor
+description: Publications by Dr Jake Taylor on exoplanet atmospheres, JWST observations, atmospheric retrievals, clouds and radiative transfer.
 permalink: /publications/
 ---
 
-<style>
-  .pub-wrap {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 2rem 1rem 3rem;
-  }
+<header class="page-hero">
+  <div class="page-hero-inner">
+    <span class="eyebrow">Publications</span>
+    <h1>Research papers and <span class="text-gradient">collaborations.</span></h1>
+    <p>Search my publication list by title, author, year or topic. Paper titles link to their NASA ADS records.</p>
+  </div>
+</header>
 
-  .pub-intro {
-    text-align: center;
-    margin-bottom: 1.5rem;
-  }
-
-  .pub-intro h1 {
-    margin: 0 0 0.5rem;
-    color: #5a4d92;
-    font-size: 2.2rem;
-  }
-
-  .pub-intro p {
-    margin: 0;
-    color: #4a455a;
-  }
-
-  .pub-debug {
-    display: inline-block;
-    margin-top: 0.9rem;
-    padding: 0.45rem 0.75rem;
-    border-radius: 999px;
-    background: rgba(90, 77, 146, 0.10);
-    color: #5a4d92;
-    font-size: 0.92rem;
-  }
-
-  .pub-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1.5rem;
-    align-items: start;
-  }
-
-  .pub-column h2 {
-    color: #5a4d92;
-    margin: 0 0 1rem;
-    font-size: 1.35rem;
-    text-align: center;
-  }
-
-  .pub-card {
-    background: rgba(255, 255, 255, 0.82);
-    border: 1px solid rgba(90, 77, 146, 0.12);
-    border-radius: 14px;
-    padding: 1rem 1.1rem;
-    margin-bottom: 1rem;
-    box-shadow: 0 6px 18px rgba(47, 42, 61, 0.08);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-  }
-
-  .pub-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 24px rgba(47, 42, 61, 0.12);
-  }
-
-  .pub-title,
-  .pub-title:visited,
-  .pub-title:hover,
-  .pub-title:active {
-    color: #6b5b95 !important;
-    font-weight: 700;
-    text-decoration: none;
-  }
-
-  .pub-title:hover {
-    text-decoration: underline;
-  }
-
-  .pub-authors,
-  .pub-meta {
-    margin: 0.45rem 0 0;
-    color: #4a455a;
-    font-size: 0.95rem;
-  }
-
-  .pub-empty {
-    background: rgba(255, 255, 255, 0.82);
-    border: 1px dashed rgba(90, 77, 146, 0.25);
-    border-radius: 14px;
-    padding: 1rem 1.1rem;
-    color: #4a455a;
-  }
-
-  .pub-empty strong {
-    color: #5a4d92;
-  }
-
-  @media (max-width: 800px) {
-    .pub-grid {
-      grid-template-columns: 1fr;
-    }
-  }
-</style>
-
-{% assign first_author = site.data.publications.first_author %}
-{% assign coauthor = site.data.publications.coauthor %}
-{% assign first_count = first_author | size %}
-{% assign coauthor_count = coauthor | size %}
-
-<div class="pub-wrap">
-
-  {% if first_count == 0 and coauthor_count == 0 %}
-    <div class="pub-empty">
-      <strong>No publication data found yet.</strong>
-      <p>
-        Create or refresh <code>_data/publications.yml</code> and make sure your fetch step writes the paper lists into
-        <code>first_author</code> and <code>coauthor</code>.
-      </p>
+<section class="section">
+  <div class="section-shell">
+    <div class="publication-tools">
+      <div class="field">
+        <label for="publication-search">Search publications</label>
+        <input id="publication-search" type="search" placeholder="Try JWST, clouds or TRAPPIST-1">
+      </div>
+      <div class="field field-filter">
+        <label for="publication-filter">Authorship</label>
+        <select id="publication-filter">
+          <option value="all">All papers</option>
+          <option value="first-author">First author</option>
+          <option value="coauthor">Co-authored</option>
+        </select>
+      </div>
+      <span id="publication-count" class="publication-count" aria-live="polite"></span>
     </div>
-  {% else %}
-    <div class="pub-grid">
-      <section class="pub-column">
-        <h2>First Author Papers</h2>
-        {% for paper in first_author %}
-          <article class="pub-card">
-            {% if paper.link %}
-              <a href="{{ paper.link }}" class="pub-title" target="_blank" rel="noopener">{{ paper.title }}</a>
-            {% else %}
-              <span class="pub-title">{{ paper.title }}</span>
-            {% endif %}
 
-            {% if paper.authors %}
-              <p class="pub-authors">{{ paper.authors }}</p>
-            {% endif %}
+    <div class="publication-list">
+      {% for paper in site.data.publications.first_author %}
+        <article class="publication-card" data-category="first-author">
+          <span class="publication-type">First author</span>
+          <div>
+            <h2>{{ paper.title }}</h2>
+            <p>{{ paper.authors }}{% if paper.year %} · {{ paper.year }}{% endif %}</p>
+          </div>
+          <a class="paper-arrow" href="{{ paper.link }}" target="_blank" rel="noopener" aria-label="Read {{ paper.title }}">↗</a>
+        </article>
+      {% endfor %}
 
-            {% if paper.year %}
-              <!--<p class="pub-meta">{{ paper.year }}</p>-->
-            {% endif %}
-          </article>
-        {% endfor %}
-      </section>
-
-      <section class="pub-column">
-        <h2>Second–Fourth Author Papers</h2>
-        {% for paper in coauthor %}
-          <article class="pub-card">
-            {% if paper.link %}
-              <a href="{{ paper.link }}" class="pub-title" target="_blank" rel="noopener">{{ paper.title }}</a>
-            {% else %}
-              <span class="pub-title">{{ paper.title }}</span>
-            {% endif %}
-
-            {% if paper.authors %}
-              <p class="pub-authors">{{ paper.authors }}</p>
-            {% endif %}
-
-            {% if paper.year %}
-              <!--<p class="pub-meta">{{ paper.year }}</p>-->
-            {% endif %}
-          </article>
-        {% endfor %}
-      </section>
+      {% for paper in site.data.publications.coauthor %}
+        <article class="publication-card" data-category="coauthor">
+          <span class="publication-type">Co-author</span>
+          <div>
+            <h2>{{ paper.title }}</h2>
+            <p>{{ paper.authors }}{% if paper.year %} · {{ paper.year }}{% endif %}</p>
+          </div>
+          <a class="paper-arrow" href="{{ paper.link }}" target="_blank" rel="noopener" aria-label="Read {{ paper.title }}">↗</a>
+        </article>
+      {% endfor %}
     </div>
-  {% endif %}
-</div>
+
+    <p id="publication-empty" class="publication-empty" hidden>No papers match that search. Try a broader term.</p>
+  </div>
+</section>
