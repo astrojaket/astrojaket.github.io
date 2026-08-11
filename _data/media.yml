@@ -1,0 +1,78 @@
+press:
+  - outlet: NPR
+    date: 25 April 2025
+    title: New analysis casts doubt on ‘biosignatures’ found on planet K2-18b
+    description: An interview about my independent, model-agnostic check of the JWST spectrum and why strong claims need strong evidence.
+    link: https://www.npr.org/2025/04/25/g-s1-62610/biosignatures-k2-18b-james-webb-exoplanet-doubt
+
+  - outlet: Smithsonian Magazine
+    date: 30 April 2025
+    title: A new analysis raises doubts about potential hints of life on a distant exoplanet
+    description: Coverage of my K2-18b analysis and the wider scientific response to the claimed biosignature gases.
+    link: https://www.smithsonianmag.com/smart-news/a-new-analysis-raises-doubts-about-potential-hints-of-life-recently-detected-on-a-distant-exoplanet-180986521/
+
+  - outlet: Live Science
+    date: 25 April 2025
+    title: Did the James Webb telescope really find evidence of alien life?
+    description: A detailed guide to K2-18b, the reported DMS signal and my finding that the MIRI spectrum has no strong spectral features.
+    link: https://www.livescience.com/space/extraterrestrial-life/did-the-james-webb-telescope-really-find-evidence-of-alien-life-heres-the-truth-about-exoplanet-k2-18b
+
+  - outlet: Space.com
+    date: 1 May 2025
+    title: Doubts over signs of alien life on exoplanet K2-18b are rising
+    description: A report on how independent checks, including my analysis, form part of the scientific process around K2-18b.
+    link: https://www.space.com/space-exploration/search-for-life/doubts-mount-further-over-signs-of-alien-life-on-k2-18b-this-is-evidence-of-the-scientific-process-at-work
+
+  - outlet: Exeter College, Oxford
+    date: 6 May 2025
+    title: Exeter Supernumerary Fellow challenges claims of alien life on exoplanet K2-18b
+    description: Exeter College profiles the analysis, its simple statistical approach and the need for caution when assessing biosignatures.
+    link: https://www.exeter.ox.ac.uk/exeter-supernumerary-fellow-challenges-claims-of-alien-life-on-exoplanet-k2-18b/
+
+appearances:
+  - channel: Dr Becky
+    label: Featured appearance
+    title: JWST discovered photochemistry in an exoplanet’s atmosphere
+    description: I join Dr Becky to explain the first evidence of photochemistry in an exoplanet atmosphere and why it matters.
+    youtube_id: eW38rqLZMPg
+
+  - channel: Dr Becky
+    label: Interview
+    title: In conversation with Dr Jake Taylor
+    description: A conversation about JWST’s study of exoplanet atmospheres, rapid data analysis and scientific collaboration.
+    youtube_id: kjImQNaI_0s
+
+  - channel: Breakthrough
+    label: Conference discussion
+    title: K2-18b at Breakthrough Discuss 2025
+    description: A discussion with Professor Nikku Madhusudhan about K2-18b, the evidence for possible biosignatures and how to interpret the data.
+    youtube_id: kSRrxheJITQ
+
+  - channel: Oxford Physics
+    label: Panel discussion
+    title: ‘New Worlds’ exoplanets panel
+    description: Professor Chris Lintott and I discuss new worlds as part of Oxford Physics’ Afternoon of Astrophysics series.
+    youtube_id: GvQpoeD-J7A
+
+features:
+  - channel: Dr Becky
+    label: My work featured
+    title: "K2-18b: did JWST find life as we know it—or chemistry we don’t?"
+    description: Dr Becky examines the 2025 K2-18b claim, the counterarguments and my independent reanalysis of the MIRI spectrum.
+    youtube_id: j2eqanZ2YQ8
+
+pride_lectures:
+  - year: 2026
+    speaker: Professor Peter Norreys
+    title: "Improving happiness: exploring nature at its most fundamental level"
+    link: https://www.physics.ox.ac.uk/events/pride-lecture-2026-professor-norreys
+
+  - year: 2025
+    speaker: Professor Jan Eldridge
+    title: "Exploding binaries: stars and gender"
+    link: https://www.physics.ox.ac.uk/events/pride-lecture-2025-professor-jan-eldridge
+
+  - year: 2024
+    speaker: Professor Peter Coles
+    title: A time out in cosmology
+    link: https://www.physics.ox.ac.uk/events/pride-lecture-time-out-cosmology
