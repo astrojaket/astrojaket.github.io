@@ -248,10 +248,34 @@ select {
   grid-template-columns: minmax(0, 1.3fr) minmax(280px, 0.7fr);
 }
 
+.home-page .site-header {
+  position: relative;
+}
+
+.home-page .hero {
+  min-height: 0;
+  height: calc(100svh - 79px);
+  padding-block: clamp(30px, 5vh, 62px);
+}
+
+.home-page .hero h1 {
+  margin-bottom: 24px;
+  font-size: clamp(3.2rem, 6vw, 5rem);
+}
+
+.hero-role {
+  display: block;
+  margin-top: 14px;
+  color: var(--purple-dark);
+  font-size: clamp(1.08rem, 1.8vw, 1.4rem);
+  font-weight: 700;
+  letter-spacing: 0;
+  line-height: 1.35;
+}
+
 .eyebrow {
   display: inline-flex;
   align-items: center;
-  gap: 9px;
   margin-bottom: 22px;
   color: var(--purple-dark);
   font-size: 0.78rem;
@@ -261,11 +285,7 @@ select {
 }
 
 .eyebrow::before {
-  width: 28px;
-  height: 2px;
-  border-radius: 2px;
-  background: var(--purple);
-  content: "";
+  display: none;
 }
 
 .hero h1 {
@@ -1222,6 +1242,17 @@ select {
     grid-template-columns: 1fr;
   }
 
+  .home-page .hero {
+    height: calc(100svh - 79px);
+    padding-block: clamp(32px, 5vh, 56px);
+    gap: clamp(24px, 4vw, 42px);
+    grid-template-columns: minmax(0, 1.2fr) minmax(220px, 0.8fr);
+  }
+
+  .home-page .portrait-frame {
+    width: min(310px, 34vw);
+  }
+
   .portrait-wrap {
     justify-self: center;
   }
@@ -1271,6 +1302,31 @@ select {
 
   .hero {
     padding-block: 54px 72px;
+  }
+
+  .home-page .hero {
+    height: calc(100svh - 69px);
+    padding-block: clamp(30px, 6vh, 54px);
+    grid-template-columns: 1fr;
+  }
+
+  .home-page .hero h1 {
+    font-size: clamp(2.65rem, 12vw, 3.35rem);
+  }
+
+  .home-page .hero-lead {
+    margin-bottom: 28px;
+    font-size: 1rem;
+    line-height: 1.55;
+  }
+
+  .home-page .portrait-wrap {
+    display: block;
+    justify-self: center;
+  }
+
+  .home-page .portrait-frame {
+    width: min(190px, 48vw);
   }
 
   .page-hero {
