@@ -359,35 +359,11 @@ select {
   justify-self: end;
 }
 
-.portrait-wrap::before,
-.portrait-wrap::after {
-  position: absolute;
-  z-index: -1;
-  border-radius: 50%;
-  content: "";
-}
-
-.portrait-wrap::before {
-  top: -40px;
-  right: -35px;
-  width: 180px;
-  height: 180px;
-  border: 1px solid rgba(105, 86, 168, 0.25);
-}
-
-.portrait-wrap::after {
-  bottom: -25px;
-  left: -45px;
-  width: 125px;
-  height: 125px;
-  background: var(--sky);
-}
-
 .portrait-frame {
   width: min(390px, 80vw);
   overflow: hidden;
-  border: 9px solid rgba(255, 255, 255, 0.8);
-  border-radius: 48% 48% 28px 28px;
+  border: 6px solid rgba(255, 255, 255, 0.9);
+  border-radius: 28px;
   background: var(--lavender);
   box-shadow: var(--shadow);
 }
@@ -1326,7 +1302,8 @@ select {
   }
 
   .home-page .portrait-frame {
-    width: min(190px, 48vw);
+    width: min(175px, 44vw);
+    border-radius: 22px;
   }
 
   .page-hero {
