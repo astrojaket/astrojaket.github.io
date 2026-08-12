@@ -61,6 +61,18 @@ features:
     description: Dr Becky examines the 2025 K2-18b claim, the counterarguments and my independent reanalysis of the MIRI spectrum.
     youtube_id: j2eqanZ2YQ8
 
+  - channel: Anton Petrov
+    label: My work featured
+    title: Let’s Talk About Claims of Alien Life on Planet K2-18b (New Studies)
+    description: Anton discusses my statistical counter-analysis of the K2-18b claim in this English-language update.
+    youtube_id: IzgZRCQHyt0
+
+  - channel: Luca Perri
+    label: My work cited
+    title: Have we found evidence of life on another planet?
+    description: This Italian-language overview of the K2-18b debate cites my independent reanalysis.
+    youtube_id: CvMbRdic-SM
+
 pride_lectures:
   - year: 2026
     speaker: Professor Peter Norreys
